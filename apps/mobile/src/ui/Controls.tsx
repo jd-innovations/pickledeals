@@ -147,6 +147,8 @@ export function SearchField({
         </Text>
       ) : (
         <TextInput
+          accessibilityLabel={placeholder}
+          accessibilityRole="search"
           placeholder={placeholder}
           placeholderTextColor={colors.textSecondary}
           style={{ flex: 1, fontSize: 17, color: colors.textPrimary }}

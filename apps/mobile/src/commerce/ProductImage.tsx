@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { View, type DimensionValue, type ViewStyle } from 'react-native';
 
 import { useTheme } from '@/design/theme';
-import { PlaceholderArt, type PlaceholderKind } from '@/dev/PlaceholderArt';
+import { PlaceholderArt, type PlaceholderKind } from './PlaceholderArt';
 
 export type ImageSource =
   | { kind: 'remote'; uri: string; isCutout: boolean; blurhash?: string; alt: string }

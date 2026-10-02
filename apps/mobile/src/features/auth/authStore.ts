@@ -77,10 +77,20 @@ export const useAuth = create<AuthState>((set, get) => ({
   refreshProfile: async () => {
     const user = get().user;
     if (!user) return null;
-    const profile = await fetchProfile(user.id);
-    // Ignore a late response for a user who has since signed out.
-    if (get().user?.id === user.id) set({ profile });
-    return profile;
+    try {
+      const profile = await fetchProfile(user.id);
+      // Ignore a late response for a user who has since signed out.
+      if (get().user?.id === user.id) set({ profile });
+      return profile;
+    } catch (e) {
+      // No profile row: the account was deleted elsewhere. Confirm with the server, then drop the
+      // stale local session instead of showing a signed-in shell with no identity.
+      if ((e as { code?: string }).code === 'PGRST116' && supabase) {
+        const { error } = await supabase.auth.getUser();
+        if (error) await supabase.auth.signOut({ scope: 'local' });
+      }
+      throw e;
+    }
   },
   setProfile: (profile) => set({ profile }),
 }));

@@ -1,8 +1,8 @@
 import Svg, { Circle, Ellipse, G, Path, Rect } from 'react-native-svg';
 
 /**
- * Dev-only stand-in for catalog photography (same drawings as the approved design).
- * Real screens render ProductImage with catalog/listing image URLs.
+ * Placeholder product art from the approved design ("Product image (placeholder art)"). Shown until a
+ * licensed catalog image (D8) exists for the product.
  */
 export type PlaceholderKind = 'paddle' | 'shoe' | 'ball' | 'bag' | 'grip' | 'eyewear' | 'apparel' | 'machine' | 'net';
 

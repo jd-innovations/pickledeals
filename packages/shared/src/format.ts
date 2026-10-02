@@ -31,3 +31,22 @@ export function formatApproxDistance(meters: number): string {
   const rounded = miles < 5 ? Math.round(miles * 2) / 2 : Math.round(miles);
   return `~${rounded} mi`;
 }
+
+/** "just now", "4m ago", "2h ago", "3d ago" — for "Checked …" and "verified …" labels. */
+export function formatAgo(from: Date | string, now: Date = new Date()): string {
+  const s = Math.max(0, Math.floor((now.getTime() - new Date(from).getTime()) / 1000));
+  if (s < 60) return 'just now';
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+}
+
+/** "Ends in 3h", "Ends in 2 days", "Ends today" for promo expiry. */
+export function formatEndsIn(at: Date | string, now: Date = new Date()): string {
+  const h = (new Date(at).getTime() - now.getTime()) / 3_600_000;
+  if (h <= 0) return 'Ended';
+  if (h < 1) return 'Ends within the hour';
+  if (h < 24) return `Ends in ${Math.floor(h)}h`;
+  const d = Math.floor(h / 24);
+  return `Ends in ${d} ${d === 1 ? 'day' : 'days'}`;
+}

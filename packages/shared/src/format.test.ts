@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { pickDealBadge } from './domain';
-import { formatApproxDistance, formatPercentOff, formatPrice, percentOff } from './format';
+import { formatAgo, formatApproxDistance, formatEndsIn, formatPercentOff, formatPrice, percentOff } from './format';
 
 describe('formatPrice', () => {
   it('drops zero cents', () => expect(formatPrice(17900)).toBe('$179'));
@@ -24,4 +24,19 @@ describe('pickDealBadge', () => {
   it('shows only the highest-priority badge', () =>
     expect(pickDealBadge(['HOT DEAL', 'PRICE DROP'])).toBe('PRICE DROP'));
   it('returns null when none apply', () => expect(pickDealBadge([])).toBeNull());
+});
+
+describe('formatAgo / formatEndsIn', () => {
+  const now = new Date('2026-10-02T12:00:00Z');
+  it('formats elapsed time', () => {
+    expect(formatAgo('2026-10-02T11:59:30Z', now)).toBe('just now');
+    expect(formatAgo('2026-10-02T11:56:00Z', now)).toBe('4m ago');
+    expect(formatAgo('2026-10-02T10:00:00Z', now)).toBe('2h ago');
+    expect(formatAgo('2026-09-29T12:00:00Z', now)).toBe('3d ago');
+  });
+  it('formats time remaining', () => {
+    expect(formatEndsIn('2026-10-02T15:30:00Z', now)).toBe('Ends in 3h');
+    expect(formatEndsIn('2026-10-03T13:00:00Z', now)).toBe('Ends in 1 day');
+    expect(formatEndsIn('2026-10-02T11:00:00Z', now)).toBe('Ended');
+  });
 });

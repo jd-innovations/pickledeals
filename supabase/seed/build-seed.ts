@@ -84,20 +84,22 @@ begin
 end;
 $offers$;
 
--- Synthetic 120-day history for priced offers, so charts and deal quality have data.
+-- Synthetic 120-day history for priced offers, so charts and deal quality have data: a gentle
+-- random walk with retail-style prices ($x.99), changing every few days.
 do $history$
 declare
-  o    record;
-  d    integer;
-  base integer;
+  o     record;
+  d     integer;
+  price integer;
 begin
   perform setseed(0.42);
   for o in select id, price_cents, shipping_cents from public.retailer_offers where price_display = 'show' order by external_ref nulls first, url loop
-    base := round(o.price_cents * (1.04 + random() * 0.14));
+    price := round(o.price_cents * (0.98 + random() * 0.14));
     for d in reverse 120..1 loop
-      if d % 6 = 0 then
+      if d % 5 = 0 and random() < 0.6 then
+        price := greatest(round(price * (0.955 + random() * 0.09) / 100) * 100 - 1, 99);
         insert into public.price_points (offer_id, observed_at, price_cents, shipping_cents, in_stock, price_display)
-        values (o.id, now() - make_interval(days => d), round(base * (0.82 + random() * 0.30)), o.shipping_cents, true, 'show');
+        values (o.id, now() - make_interval(days => d), price, o.shipping_cents, true, 'show');
       end if;
     end loop;
   end loop;

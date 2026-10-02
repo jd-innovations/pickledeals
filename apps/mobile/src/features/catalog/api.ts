@@ -203,3 +203,9 @@ export async function fetchProduct(slug: string): Promise<ProductDetail> {
       .map((v) => ({ id: v.id, label: v.label, msrpCents: v.msrp_cents, isDefault: v.is_default, attributes: v.attributes })),
   };
 }
+
+export async function fetchProductSlug(productId: string): Promise<string> {
+  const { data, error } = await requireSupabase().from('products').select('slug').eq('id', productId).single();
+  if (error) throw error;
+  return data.slug;
+}

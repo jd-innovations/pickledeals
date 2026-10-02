@@ -11,7 +11,10 @@ export default function DealsStack() {
       <Stack.Screen name="browse" options={{ title: 'Browse' }} />
       <Stack.Screen name="category/[slug]" options={{ title: '' }} />
       <Stack.Screen name="brand/[slug]" />
-      <Stack.Screen name="product/[slug]" />
+      <Stack.Screen name="product/[slug]/index" options={{ title: '', headerLargeTitle: false }} />
+      <Stack.Screen name="product/[slug]/offers" options={{ title: 'All offers', headerLargeTitle: false }} />
+      <Stack.Screen name="product/[slug]/history" options={{ title: 'Price history', headerLargeTitle: false }} />
+      <Stack.Screen name="offer/[id]" options={{ title: '', headerLargeTitle: false }} />
     </Stack>
   );
 }

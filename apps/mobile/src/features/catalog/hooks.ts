@@ -7,7 +7,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { productArt } from '@/commerce/catalogArt';
 import type { ImageSource } from '@/commerce';
 
-import { fetchBrand, fetchBrands, fetchCategories, fetchCategory, fetchProduct, imageUrl, searchCatalog, type ProductSummary } from './api';
+import { fetchBrand, fetchBrands, fetchCategories, fetchCategory, fetchProduct, fetchProductSlug, imageUrl, searchCatalog, type ProductSummary } from './api';
 
 const CATALOG_STALE = 5 * 60_000;
 
@@ -49,6 +49,9 @@ export const useBrand = (slug: string) =>
   useQuery({ queryKey: catalogKeys.brand(slug), queryFn: () => fetchBrand(slug), staleTime: CATALOG_STALE, enabled: !!slug });
 export const useProduct = (slug: string) =>
   useQuery({ queryKey: catalogKeys.product(slug), queryFn: () => fetchProduct(slug), staleTime: CATALOG_STALE, enabled: !!slug });
+
+export const useProductSlug = (productId: string | undefined) =>
+  useQuery({ queryKey: ['catalog', 'slug', productId ?? ''], queryFn: () => fetchProductSlug(productId!), enabled: !!productId, staleTime: Infinity });
 
 /** Licensed catalog image when one exists (D8), otherwise the design's placeholder art. */
 export function productImage(p: Pick<ProductSummary, 'slug' | 'name' | 'brand' | 'category' | 'image'>): ImageSource {

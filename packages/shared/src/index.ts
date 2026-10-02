@@ -6,3 +6,4 @@ export * from './utf8';
 export * from './csv';
 export * from './catalog';
 export type { Database, Json } from './database.types';
+export * from './offers';

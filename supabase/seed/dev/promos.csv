@@ -1,0 +1,5 @@
+retailer_slug,code,title,discount_type,discount_value,min_purchase_usd,target_kind,target_slug,ends_in_days,verified_days_ago,is_exclusive
+joola-com,DINK15,15% off sitewide,percent,15,,,,4,0,yes
+courtside-pro-shop,COURT20,$20 off shoes over $100,amount,2000,100,category,shoes,2,0,no
+crbn-com,CRBN10,10% off the 3X series,percent,10,,product,crbn-3x-power-series,10,1,no
+baseline-sports,OLDCODE,Expired-verification example (hidden),percent,30,,,,30,30,no

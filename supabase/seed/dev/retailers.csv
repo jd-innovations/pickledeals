@@ -1,0 +1,11 @@
+slug,name,kind,domain,price_display_default
+amazon,Amazon,marketplace,amazon.com,check_price
+pickleball-central,Pickleball Central,retailer,pickleballcentral.com,show
+dicks-sporting-goods,Dick's Sporting Goods,retailer,dickssportinggoods.com,show
+joola-com,JOOLA.com,manufacturer,joola.com,show
+selkirk-com,Selkirk.com,manufacturer,selkirk.com,show
+crbn-com,CRBN.com,manufacturer,crbnpickleball.com,show
+skechers-com,Skechers.com,manufacturer,skechers.com,show
+courtside-pro-shop,CourtSide Pro Shop,retailer,courtside-pro-shop.example,show
+baseline-sports,Baseline Sports,retailer,baseline-sports.example,show
+racquet-and-court,Racquet & Court Co.,retailer,racquet-and-court.example,show

@@ -1,16 +1,39 @@
 import { router } from 'expo-router';
-import { ScrollView, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, ScrollView, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
+import { authErrorMessage, signOut } from '@/features/auth/api';
 import { useAuth } from '@/features/auth/authStore';
 import { Button, Group, ListRow, Text } from '@/ui';
 
 const APPEARANCE_LABEL = { system: 'System', light: 'Light', dark: 'Dark' } as const;
 
+/**
+ * D5 (revised): Profile is the canonical home of the Saved library, buying & selling and Messages.
+ * Rows for features that land in later phases are listed without a destination.
+ */
 export default function ProfileScreen() {
   const { colors, preference } = useTheme();
   const user = useAuth((s) => s.user);
-  const signOut = useAuth((s) => s.signOut);
+  const profile = useAuth((s) => s.profile);
+  const [signingOut, setSigningOut] = useState(false);
+
+  const onSignOut = async () => {
+    setSigningOut(true);
+    try {
+      await signOut();
+    } catch (e) {
+      Alert.alert('Couldn’t sign out', authErrorMessage(e));
+    } finally {
+      setSigningOut(false);
+    }
+  };
+
+  const name = profile?.displayName ?? ' ';
+  const subtitle = profile
+    ? [profile.areaLabel, `member since ${new Date(profile.memberSince).getFullYear()}`].filter(Boolean).join(' · ')
+    : ' ';
 
   return (
     <ScrollView
@@ -20,9 +43,17 @@ export default function ProfileScreen() {
       {user ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
           <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.surfacePressed, alignItems: 'center', justifyContent: 'center' }}>
-            <Text variant="title1">{user.displayName.charAt(0)}</Text>
+            <Text variant="title1">{name.charAt(0)}</Text>
           </View>
-          <Text variant="title2">{user.displayName}</Text>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text variant="title2" numberOfLines={1}>
+              {name}
+            </Text>
+            <Text variant="subhead" weight="400" tone="secondary" numberOfLines={1}>
+              {subtitle.charAt(0).toUpperCase() + subtitle.slice(1)}
+            </Text>
+          </View>
+          <Button label="Edit" variant="secondary" size="sm" onPress={() => router.push('/display-name')} />
         </View>
       ) : (
         <View style={{ gap: 12, padding: 20, borderRadius: 20, backgroundColor: colors.surface }}>
@@ -34,9 +65,25 @@ export default function ProfileScreen() {
         </View>
       )}
 
+      {user && (
+        <>
+          <Group label="Shopping">
+            <ListRow title="Saved products & deals" value="Phase 5" />
+            <ListRow title="Saved listings" value="Phase 6" />
+            <ListRow title="Followed brands" value="Phase 5" last />
+          </Group>
+          <Group label="Buying & selling">
+            <ListRow title="My listings" value="Phase 6" />
+            <ListRow title="Offers" value="Phase 9" />
+            <ListRow title="Messages" value="Phase 8" last />
+          </Group>
+        </>
+      )}
+
       <Group label="Settings">
-        <ListRow title="Appearance" value={APPEARANCE_LABEL[preference]} onPress={() => router.push('/profile/appearance')} />
-        <ListRow title="Notifications" value="Phase 10" last />
+        <ListRow title="Notifications" value="Phase 10" />
+        <ListRow title="Appearance" value={APPEARANCE_LABEL[preference]} onPress={() => router.push('/profile/appearance')} last={!user} />
+        {user && <ListRow title="Account" onPress={() => router.push('/profile/account')} last />}
       </Group>
 
       {__DEV__ && (
@@ -45,7 +92,7 @@ export default function ProfileScreen() {
         </Group>
       )}
 
-      {user && <Button label="Sign out" variant="secondary" onPress={signOut} />}
+      {user && <Button label="Sign out" variant="secondary" onPress={onSignOut} loading={signingOut} />}
     </ScrollView>
   );
 }

@@ -32,10 +32,10 @@ Where a decision below conflicts with a later section, the decision wins.
 
 **D5 — Native iOS tab bar** (Expo Router native tabs), with tabs **Deals · Marketplace · Sell · Alerts · Profile**.
 - Sell is a native tab item that opens the sell flow as a modal. It uses the best native representation (a prominent SF Symbol), not a custom-drawn black circle.
-- This tab set replaces the "Watchlist / Inbox" tabs proposed in the design:
-  - **Alerts** contains Activity (notifications), Price alerts and Saved.
+- This tab set replaces the "Watchlist / Inbox" tabs proposed in the design. *Confirmed Oct 2, 2026:*
+  - **Alerts is event-oriented:** Activity (deal and marketplace notifications), Price alerts and Saved searches (including marketplace search alerts). It may surface relevant saved products in context, but it is not a second Saved library.
+  - **Profile is library-oriented and canonical for Saved:** saved products, saved deals, saved listings, followed brands, My listings, Offers, Messages, and Account/settings.
   - **Messages** is reached from Profile and from the conversation entry points (listing, offer, push). It also has a badge on the Profile tab.
-- *To confirm in Phase 0 review.*
 
 **D6 — Browse without an account; auth only at the moment of intent.**
 - Browsing, search, categories, products, offer comparison, listings, the map and seller profiles are all public (the `anon` role can read).
@@ -262,6 +262,8 @@ Rule: **routes compose; features own logic; `ui/` and `commerce/` own all visual
 - **Profile bootstrap:** a trigger on `auth.users` inserts `profiles` and `profiles_private`.
 - **Roles:** `user_roles` → Custom Access Token hook → `app_role` claim → an `is_admin()` SQL helper.
 - **Account deletion (App Store requirement):** the `delete-account` Edge Function (service role) removes listings and images, anonymizes the sender on messages ("Deleted user"), revokes tokens and deletes the auth user.
+  - *Phase 1:* Apple users re-authenticate at deletion; the function exchanges that fresh authorization code and revokes it with Apple **before** deleting, so no Apple refresh tokens are ever stored. A failed revocation deletes nothing.
+- **Public names:** new accounts get a generated "Player 1234" name (or "Given F." from Apple). Listing, messaging and offering first ask for a chosen public name (`profiles.display_name_source = 'provided'`); saving and alerts never do.
 - **Deep links:** `pickledeals://` plus universal links on `pickledeals.app` (used for auth callbacks, shared listings and push routes).
 
 ---

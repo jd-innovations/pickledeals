@@ -1,41 +1,121 @@
-import type { AuthIntent } from '@pickledeals/shared';
+import { requiresPublicName, type AuthIntent } from '@pickledeals/shared';
+import type { User } from '@supabase/supabase-js';
 import { router } from 'expo-router';
 import { create } from 'zustand';
+
+import { fetchProfile, type MyProfile } from '@/features/profile/api';
+import { queryClient } from '@/lib/queryClient';
+import { supabase } from '@/lib/supabase';
 
 /**
  * D6: browsing never requires an account. Identity-dependent actions call `requireAuth(intent, run)`.
  * Guests get the native auth sheet; after signing in, the original action resumes automatically.
- * Phase 1 replaces `user` with the Supabase session; the intent flow stays the same.
+ * Intents that show the user's name to others (list, message, offer) first ask for a public name
+ * if the account still has its generated "Player 1234" name.
  */
 type PendingIntent = { intent: AuthIntent; run: () => void };
 
+export type AuthUser = { id: string; email: string | null; providers: string[] };
+
 type AuthState = {
-  user: { id: string; displayName: string } | null;
+  /** False until the persisted session has been read on launch. */
+  ready: boolean;
+  user: AuthUser | null;
+  profile: MyProfile | null;
   pending: PendingIntent | null;
   requireAuth: (intent: AuthIntent, run: () => void) => void;
-  completeSignIn: (user: { id: string; displayName: string }) => void;
+  /** Called by the sign-in sheet once a session exists. */
+  resumeAfterSignIn: () => void;
+  /** Called by the display-name sheet after saving. */
+  resumeAfterProfile: () => void;
   cancel: () => void;
-  signOut: () => void;
+  refreshProfile: () => Promise<MyProfile | null>;
+  setProfile: (profile: MyProfile) => void;
 };
 
+const needsPublicName = (intent: AuthIntent, profile: MyProfile | null) =>
+  requiresPublicName(intent) && profile?.nameSource !== 'provided';
+
+function finish(pending: PendingIntent | null) {
+  if (router.canGoBack()) router.back();
+  // Let the sheet finish dismissing before resuming, so navigation from the intent lands correctly.
+  if (pending) setTimeout(pending.run, 350);
+}
+
 export const useAuth = create<AuthState>((set, get) => ({
+  ready: false,
   user: null,
+  profile: null,
   pending: null,
   requireAuth: (intent, run) => {
-    if (get().user) return run();
-    set({ pending: { intent, run } });
-    router.push({ pathname: '/sign-in', params: { intent } });
+    const { user, profile } = get();
+    if (!user) {
+      set({ pending: { intent, run } });
+      router.push({ pathname: '/sign-in', params: { intent } });
+    } else if (needsPublicName(intent, profile)) {
+      set({ pending: { intent, run } });
+      router.push({ pathname: '/display-name', params: { intent } });
+    } else {
+      run();
+    }
   },
-  completeSignIn: (user) => {
-    const pending = get().pending;
-    set({ user, pending: null });
-    if (router.canGoBack()) router.back();
-    // Let the sheet finish dismissing before resuming, so navigation from the intent lands correctly.
-    if (pending) setTimeout(pending.run, 350);
+  resumeAfterSignIn: () => {
+    const { pending, profile } = get();
+    if (pending && needsPublicName(pending.intent, profile)) {
+      router.replace({ pathname: '/display-name', params: { intent: pending.intent } });
+      return;
+    }
+    set({ pending: null });
+    finish(pending);
+  },
+  resumeAfterProfile: () => {
+    const { pending } = get();
+    set({ pending: null });
+    finish(pending);
   },
   cancel: () => set({ pending: null }),
-  signOut: () => set({ user: null }),
+  refreshProfile: async () => {
+    const user = get().user;
+    if (!user) return null;
+    const profile = await fetchProfile(user.id);
+    // Ignore a late response for a user who has since signed out.
+    if (get().user?.id === user.id) set({ profile });
+    return profile;
+  },
+  setProfile: (profile) => set({ profile }),
 }));
+
+function toAuthUser(user: User): AuthUser {
+  const providers = (user.app_metadata.providers as string[] | undefined) ?? [user.app_metadata.provider ?? 'email'];
+  return { id: user.id, email: user.email ?? null, providers };
+}
+
+/** Mirrors the Supabase session into the store. Call once from the root layout. */
+export function startAuthListener(): () => void {
+  if (!supabase) {
+    useAuth.setState({ ready: true });
+    return () => {};
+  }
+  const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    const user = session ? toAuthUser(session.user) : null;
+    const previous = useAuth.getState().user;
+    useAuth.setState({
+      ready: true,
+      user: user && previous?.id === user.id && previous.email === user.email ? previous : user,
+      ...(user ? null : { profile: null, pending: null }),
+    });
+    if (event === 'SIGNED_OUT') queryClient.clear();
+    if (user && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN')) {
+      // supabase-js deadlocks if another auth call is awaited inside this callback; defer it.
+      // Sign-in flows load the profile themselves, so skip it when it is already there.
+      setTimeout(() => {
+        const state = useAuth.getState();
+        if (state.profile?.id !== user.id) state.refreshProfile().catch(() => {});
+      }, 0);
+    }
+  });
+  return () => data.subscription.unsubscribe();
+}
 
 export const INTENT_COPY: Record<AuthIntent, string> = {
   save_product: 'Sign in to save products and get price-drop alerts.',

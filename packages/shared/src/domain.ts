@@ -57,3 +57,7 @@ export const AUTH_INTENTS = [
   'manage_listings',
 ] as const;
 export type AuthIntent = (typeof AUTH_INTENTS)[number];
+
+/** Intents that put the user's name in front of other people; they need a chosen display name. */
+export const PUBLIC_IDENTITY_INTENTS: readonly AuthIntent[] = ['message_seller', 'make_offer', 'create_listing'];
+export const requiresPublicName = (intent: AuthIntent) => PUBLIC_IDENTITY_INTENTS.includes(intent);

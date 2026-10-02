@@ -4,7 +4,8 @@ import { ScrollView } from 'react-native';
 import { useAuth } from '@/features/auth/authStore';
 import { EmptyState, SegmentedControl } from '@/ui';
 
-type Section = 'activity' | 'alerts' | 'saved';
+/** D5 (revised): Alerts is event-oriented. The Saved library lives in Profile. */
+type Section = 'activity' | 'alerts' | 'searches';
 
 export default function AlertsScreen() {
   const [section, setSection] = useState<Section>('activity');
@@ -17,7 +18,7 @@ export default function AlertsScreen() {
         options={[
           { value: 'activity', label: 'Activity' },
           { value: 'alerts', label: 'Price alerts' },
-          { value: 'saved', label: 'Saved' },
+          { value: 'searches', label: 'Saved searches' },
         ]}
         value={section}
         onChange={setSection}

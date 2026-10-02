@@ -5,11 +5,16 @@ import { supabase } from './lib/supabase';
 import { BrandsPage } from './pages/Brands';
 import { CategoriesPage } from './pages/Categories';
 import { ImportPage } from './pages/Import';
+import { OffersPage } from './pages/Offers';
 import { ProductEditPage } from './pages/ProductEdit';
 import { ProductsPage } from './pages/Products';
+import { PromosPage } from './pages/Promos';
+import { RetailersPage } from './pages/Retailers';
+import { ReviewPage } from './pages/Review';
 
 /**
- * Internal admin (D7, Phase 2 minimal): catalog CRUD, images with provenance (D8) and CSV import.
+ * Internal admin (D7): catalog CRUD, images with provenance (D8), CSV import (Phase 2); offers via
+ * the ingestion pipeline, review queue, promo codes and retailers (Phase 3).
  * Staff only — the UI checks the app_role claim, and RLS enforces it on every write.
  */
 export default function App() {
@@ -35,7 +40,7 @@ export const go = (path: string) => {
   window.location.hash = `/${path}`;
 };
 
-function Shell({ role }: { role: string }) {
+function Shell({ role }: { role: 'admin' | 'editor' }) {
   const [section, id] = useHashRoute();
   const link = (path: string, label: string) => (
     <a href={`#/${path}`} className={section === path ? 'on' : ''}>
@@ -49,7 +54,14 @@ function Shell({ role }: { role: string }) {
         {link('products', 'Products')}
         {link('brands', 'Brands')}
         {link('categories', 'Categories')}
-        {link('import', 'CSV import')}
+        {link('import', 'Catalog CSV import')}
+        <span className="muted" style={{ padding: '14px 10px 4px', fontSize: 12 }}>
+          Retail
+        </span>
+        {link('offers', 'Offers')}
+        {link('review', 'Review queue')}
+        {link('promos', 'Promo codes')}
+        {link('retailers', 'Retailers')}
         <span className="spacer" />
         <span className="muted" style={{ padding: '0 10px', fontSize: 12 }}>
           Signed in as {role}
@@ -63,6 +75,10 @@ function Shell({ role }: { role: string }) {
         {section === 'brands' && <BrandsPage />}
         {section === 'categories' && <CategoriesPage />}
         {section === 'import' && <ImportPage />}
+        {section === 'offers' && <OffersPage />}
+        {section === 'review' && <ReviewPage />}
+        {section === 'promos' && <PromosPage />}
+        {section === 'retailers' && <RetailersPage role={role} />}
       </main>
     </div>
   );

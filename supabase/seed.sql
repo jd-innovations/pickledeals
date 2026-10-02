@@ -73,3 +73,20 @@ select pc.id,
  where p.target_kind is not null;
 
 select public.refresh_variant_price_stats(variant_id) from (select distinct variant_id from public.retailer_offers) v;
+
+-- DEV ADMIN (local only): admin@pickledeals.test signs in with an email code from Mailpit
+-- (http://127.0.0.1:54324). Never created outside a local db reset.
+do $admin$
+declare
+  uid uuid := gen_random_uuid();
+begin
+  insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
+                          created_at, updated_at, confirmation_token, recovery_token, email_change, email_change_token_new)
+  values ('00000000-0000-0000-0000-000000000000', uid, 'authenticated', 'authenticated', 'admin@pickledeals.test', now(),
+          '{"provider":"email","providers":["email"]}', '{}', now(), now(), '', '', '', '');
+  insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+  values (uid::text, uid, jsonb_build_object('sub', uid::text, 'email', 'admin@pickledeals.test', 'email_verified', true), 'email', now(), now(), now());
+  insert into public.user_roles (user_id, role) values (uid, 'admin');
+  update public.profiles set display_name = 'Dev Admin' where id = uid;
+end;
+$admin$;

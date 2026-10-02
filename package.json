@@ -16,7 +16,8 @@
     "preview:design": "python -m http.server 5173 --directory preview",
     "db:start": "supabase start",
     "db:reset": "supabase db reset",
-    "db:test": "supabase test db"
+    "db:test": "supabase test db",
+    "catalog:seed": "vite-node supabase/seed/build-seed.ts"
   },
   "engines": {
     "node": ">=20.19.4"

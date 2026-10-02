@@ -1,0 +1,170 @@
+product_slug,brand_slug,category_slug,name,msrp_usd,variant,variant_msrp_usd,default,attributes,aliases
+joola-perseus-pro-iv,joola,paddles,Perseus Pro IV,279.95,14mm,,,thickness_mm=14,perseus 4|perseus pro 4|ben johns perseus
+joola-perseus-pro-iv,,,,,16mm,,yes,thickness_mm=16,
+joola-perseus-cfs,joola,paddles,Perseus CFS,179.95,14mm,,,thickness_mm=14,perseus cfs
+joola-perseus-cfs,,,,,16mm,,yes,thickness_mm=16,
+joola-hyperion-pro-iv,joola,paddles,Hyperion Pro IV,279.95,14mm,,,thickness_mm=14,hyperion 4|hyperion pro 4
+joola-hyperion-pro-iv,,,,,16mm,,yes,thickness_mm=16,
+joola-hyperion-cfs,joola,paddles,Hyperion CFS,179.95,14mm,,,thickness_mm=14,hyperion cfs
+joola-hyperion-cfs,,,,,16mm,,yes,thickness_mm=16,
+joola-scorpeus-pro-iv,joola,paddles,Scorpeus Pro IV,279.95,14mm,,,thickness_mm=14,scorpeus 4|collin johns scorpeus
+joola-scorpeus-pro-iv,,,,,16mm,,yes,thickness_mm=16,
+joola-magnus-3,joola,paddles,Magnus 3,229.95,16mm,,yes,thickness_mm=16,tyson mcguffin magnus|magnus gen 3
+joola-agassi-pro,joola,paddles,Agassi Pro,199.95,16mm,,yes,thickness_mm=16,andre agassi paddle
+selkirk-vanguard-power-air-invikta,selkirk,paddles,Vanguard Power Air Invikta,250.00,16mm,,yes,thickness_mm=16,power air invikta|vanguard invikta
+selkirk-vanguard-power-air-epic,selkirk,paddles,Vanguard Power Air Epic,250.00,16mm,,yes,thickness_mm=16,power air epic
+selkirk-vanguard-power-air-s2,selkirk,paddles,Vanguard Power Air S2,250.00,16mm,,yes,thickness_mm=16,power air s2
+selkirk-luxx-control-air-invikta,selkirk,paddles,LUXX Control Air Invikta,250.00,20mm,,yes,thickness_mm=20,luxx invikta|luxx control
+selkirk-luxx-control-air-epic,selkirk,paddles,LUXX Control Air Epic,250.00,20mm,,yes,thickness_mm=20,luxx epic
+selkirk-boomstik,selkirk,paddles,Boomstik,279.99,16mm,,yes,thickness_mm=16,boom stik
+selkirk-slk-halo-power-xl,selkirk,paddles,SLK Halo Power XL,159.99,16mm,,yes,thickness_mm=16,halo power|slk halo
+selkirk-slk-halo-control,selkirk,paddles,SLK Halo Control,159.99,16mm,,yes,thickness_mm=16,halo control
+crbn-3x-power-series,crbn,paddles,3X Power Series,229.00,14mm,,,thickness_mm=14,crbn 3x|3x power
+crbn-3x-power-series,,,,,16mm,,yes,thickness_mm=16,
+crbn-1x-power-series,crbn,paddles,1X Power Series,219.00,14mm,,,thickness_mm=14,crbn 1x|1x power
+crbn-1x-power-series,,,,,16mm,,yes,thickness_mm=16,
+crbn-2x-power-series,crbn,paddles,2X Power Series,219.00,14mm,,,thickness_mm=14,crbn 2x|2x power
+crbn-2x-power-series,,,,,16mm,,yes,thickness_mm=16,
+six-zero-double-black-diamond-control,six-zero,paddles,Double Black Diamond Control,180.00,14mm,,,thickness_mm=14,dbd|double black diamond
+six-zero-double-black-diamond-control,,,,,16mm,,yes,thickness_mm=16,
+six-zero-black-diamond-power,six-zero,paddles,Black Diamond Power,180.00,14mm,,,thickness_mm=14,black diamond
+six-zero-black-diamond-power,,,,,16mm,,yes,thickness_mm=16,
+six-zero-ruby,six-zero,paddles,Ruby,190.00,14mm,,,thickness_mm=14,six zero ruby
+six-zero-ruby,,,,,16mm,,yes,thickness_mm=16,
+engage-pursuit-pro1-6-0,engage,paddles,Pursuit Pro1 6.0,199.99,16mm,,yes,thickness_mm=16,pursuit pro 1|pro1
+engage-pursuit-mx-6-0,engage,paddles,Pursuit MX 6.0,179.99,16mm,,yes,thickness_mm=16,pursuit mx
+engage-pursuit-ex-6-0,engage,paddles,Pursuit EX 6.0,169.99,16mm,,yes,thickness_mm=16,pursuit ex
+franklin-ben-johns-signature,franklin,paddles,Ben Johns Signature,129.99,16mm,,yes,thickness_mm=16,franklin signature
+franklin-c45-pro,franklin,paddles,C45 Pro,149.99,16mm,,yes,thickness_mm=16,c45
+gearbox-pro-power-fusion,gearbox,paddles,Pro Power Fusion,250.00,14mm,,,thickness_mm=14,gearbox fusion|pro power
+gearbox-pro-power-fusion,,,,,16mm,,yes,thickness_mm=16,
+gearbox-pro-control-fusion,gearbox,paddles,Pro Control Fusion,250.00,14mm,,,thickness_mm=14,pro control
+gearbox-pro-control-fusion,,,,,16mm,,yes,thickness_mm=16,
+paddletek-bantam-ts-5-pro,paddletek,paddles,Bantam TS-5 Pro,149.99,14mm,,yes,thickness_mm=14,bantam ts5|ts-5
+paddletek-tempest-wave-pro,paddletek,paddles,Tempest Wave Pro,139.99,14mm,,yes,thickness_mm=14,tempest wave
+onix-z5-graphite,onix,paddles,Z5 Graphite,89.99,13mm,,yes,thickness_mm=13,z5|onix z5
+onix-evoke-premier,onix,paddles,Evoke Premier,159.99,16mm,,yes,thickness_mm=16,evoke
+head-extreme-tour,head,paddles,Extreme Tour,199.99,16mm,,yes,thickness_mm=16,head extreme
+head-gravity-tour,head,paddles,Gravity Tour,199.99,16mm,,yes,thickness_mm=16,head gravity
+head-radical-pro,head,paddles,Radical Pro,149.99,16mm,,yes,thickness_mm=16,head radical
+vatic-pro-prism-flash,vatic-pro,paddles,Prism Flash,99.99,14mm,,,thickness_mm=14,vatic flash|prism
+vatic-pro-prism-flash,,,,,16mm,,yes,thickness_mm=16,
+vatic-pro-v7,vatic-pro,paddles,V7,129.99,16mm,,yes,thickness_mm=16,vatic v7
+wilson-blaze-pro,wilson,paddles,Blaze Pro,159.99,16mm,,yes,thickness_mm=16,wilson blaze
+k-swiss-express-light-3-pickleball,k-swiss,shoes,Express Light 3 Pickleball,99.95,Standard,,yes,,express light|k swiss express
+k-swiss-hypercourt-express-2,k-swiss,shoes,Hypercourt Express 2,119.95,Standard,,yes,,hypercourt|hc express
+k-swiss-ultrashot-team,k-swiss,shoes,Ultrashot Team,99.95,Standard,,yes,,ultrashot
+asics-gel-renma,asics,shoes,GEL-Renma,79.95,Standard,,yes,,renma
+asics-gel-dedicate-8-pickleball,asics,shoes,GEL-Dedicate 8 Pickleball,89.95,Standard,,yes,,dedicate 8
+asics-gel-resolution-9-pickleball,asics,shoes,GEL-Resolution 9 Pickleball,159.95,Standard,,yes,,resolution 9
+new-balance-696v5,new-balance,shoes,696v5 Pickleball,99.99,Standard,,yes,,nb 696|696 v5
+new-balance-fresh-foam-lav-v2,new-balance,shoes,Fresh Foam Lav v2,139.99,Standard,,yes,,fresh foam lav
+skechers-viper-court-pro,skechers,shoes,Viper Court Pro,110.00,Standard,,yes,,viper court
+skechers-viper-court-reload,skechers,shoes,Viper Court Reload,100.00,Standard,,yes,,viper reload
+fila-volley-zone,fila,shoes,Volley Zone,74.99,Standard,,yes,,fila volley
+head-sprint-pro-3-5-pickleball,head,shoes,Sprint Pro 3.5 Pickleball,129.95,Standard,,yes,,sprint pro
+babolat-jet-mach-3-pickleball,babolat,shoes,Jet Mach 3 Pickleball,159.95,Standard,,yes,,jet mach
+joola-tour-elite-shoe,joola,shoes,Tour Elite Court Shoe,119.95,Standard,,yes,,joola shoe
+franklin-x-40-outdoor,franklin,balls,X-40 Outdoor,12.99,3-pack,,yes,pack_size=3,x40|franklin x-40
+franklin-x-40-outdoor,,,,,12-pack,39.99,,pack_size=12,
+franklin-x-40-outdoor,,,,,100-pack,249.99,,pack_size=100,
+franklin-x-26-indoor,franklin,balls,X-26 Indoor,11.99,3-pack,,yes,pack_size=3,x26|indoor ball
+franklin-x-26-indoor,,,,,12-pack,34.99,,pack_size=12,
+onix-dura-fast-40,onix,balls,Dura Fast 40,12.99,3-pack,,yes,pack_size=3,dura|dura fast|df40
+onix-dura-fast-40,,,,,12-pack,39.99,,pack_size=12,
+onix-pure-2-outdoor,onix,balls,Pure 2 Outdoor,10.99,3-pack,,yes,pack_size=3,pure 2
+selkirk-pro-s1,selkirk,balls,Pro S1 Outdoor,14.99,4-pack,,yes,pack_size=4,s1 ball
+selkirk-pro-s1,,,,,12-pack,39.99,,pack_size=12,
+joola-primo-outdoor,joola,balls,Primo Outdoor,12.99,3-pack,,yes,pack_size=3,primo
+penn-40-outdoor,penn,balls,40 Outdoor,11.99,3-pack,,yes,pack_size=3,penn 40
+penn-40-outdoor,,,,,12-pack,34.99,,pack_size=12,
+penn-26-indoor,penn,balls,26 Indoor,10.99,3-pack,,yes,pack_size=3,penn 26
+gamma-photon-outdoor,gamma,balls,Photon Outdoor,11.99,3-pack,,yes,pack_size=3,photon
+wilson-tru-32,wilson,balls,TRU 32 Outdoor,12.99,3-pack,,yes,pack_size=3,tru32
+head-tour-outdoor,head,balls,Tour Outdoor,11.99,3-pack,,yes,pack_size=3,head tour ball
+joola-vision-ii-backpack,joola,bags,Vision II Backpack,110.00,Standard,,yes,,vision backpack|vision 2
+joola-tour-elite-duffle,joola,bags,Tour Elite Duffle,129.95,Standard,,yes,,joola duffle
+joola-essentials-sling,joola,bags,Essentials Sling Bag,49.95,Standard,,yes,,joola sling
+selkirk-core-line-tour-bag,selkirk,bags,Core Line Tour Bag,99.99,Standard,,yes,,selkirk tour bag
+selkirk-pro-line-team-bag,selkirk,bags,Pro Line Team Bag,149.99,Standard,,yes,,selkirk team bag
+selkirk-core-line-backpack,selkirk,bags,Core Line Backpack,79.99,Standard,,yes,,selkirk backpack
+crbn-pro-team-backpack,crbn,bags,Pro Team Backpack,89.00,Standard,,yes,,crbn backpack
+franklin-pickleball-sling-bag,franklin,bags,Pickleball Sling Bag,39.99,Standard,,yes,,franklin sling
+head-pro-x-backpack,head,bags,Pro X Backpack,99.95,Standard,,yes,,head backpack
+gearbox-core-backpack,gearbox,bags,Core Backpack,69.99,Standard,,yes,,gearbox backpack
+six-zero-pro-backpack,six-zero,bags,Pro Backpack,89.00,Standard,,yes,,six zero backpack
+wilson-tour-backpack,wilson,bags,Tour Pickleball Backpack,79.95,Standard,,yes,,wilson backpack
+joola-performance-tee,joola,apparel,Performance Tee,38.00,Standard,,yes,,joola shirt|joola tee
+joola-performance-shorts,joola,apparel,Performance Shorts,48.00,Standard,,yes,,joola shorts
+joola-tour-visor,joola,apparel,Tour Visor,24.95,Standard,,yes,,joola visor
+selkirk-core-performance-tee,selkirk,apparel,Core Performance Tee,34.99,Standard,,yes,,selkirk shirt
+selkirk-core-performance-hoodie,selkirk,apparel,Core Performance Hoodie,64.99,Standard,,yes,,selkirk hoodie
+selkirk-visor,selkirk,apparel,Performance Visor,24.99,Standard,,yes,,selkirk visor
+crbn-performance-hat,crbn,apparel,Performance Hat,32.00,Standard,,yes,,crbn hat
+franklin-pickleball-visor,franklin,apparel,Pickleball Visor,19.99,Standard,,yes,,franklin visor
+head-performance-skort,head,apparel,Performance Skort,54.95,Standard,,yes,,head skort
+k-swiss-court-crew-socks,k-swiss,apparel,Court Crew Socks,16.95,Standard,,yes,,pickleball socks
+tourna-grip-original,tourna,grips,Grip Original,7.99,3-pack,,yes,pack_size=3,tourna|blue grip
+tourna-grip-original,,,,,10-pack,19.99,,pack_size=10,
+tourna-grip-original,,,,,30-pack,54.99,,pack_size=30,
+wilson-pro-overgrip,wilson,grips,Pro Overgrip,9.99,3-pack,,yes,pack_size=3,wilson overgrip
+wilson-pro-overgrip,,,,,12-pack,29.99,,pack_size=12,
+gamma-supreme-overgrip,gamma,grips,Supreme Overgrip,8.99,3-pack,,yes,pack_size=3,gamma overgrip
+babolat-vs-original-overgrip,babolat,grips,VS Original Overgrip,11.99,3-pack,,yes,pack_size=3,vs grip|babolat vs
+yonex-super-grap,yonex,grips,Super Grap Overgrip,8.99,3-pack,,yes,pack_size=3,super grap
+head-prime-tour-overgrip,head,grips,Prime Tour Overgrip,9.99,3-pack,,yes,pack_size=3,prime tour
+joola-feel-tec-pure-grip,joola,grips,Feel-Tec Pure Grip,9.95,Standard,,yes,,feel tec|feeltec
+selkirk-pro-grip,selkirk,grips,Pro Grip,12.99,Standard,,yes,,selkirk replacement grip
+head-pickleball-protective-eyewear,head,eyewear,Pickleball Protective Eyewear,39.95,Standard,,yes,,head glasses|eye protection
+onix-pickleball-eyewear,onix,eyewear,Pickleball Eyewear,29.99,Standard,,yes,,onix glasses
+franklin-pickleball-glasses,franklin,eyewear,Pickleball Glasses,24.99,Standard,,yes,,franklin glasses
+selkirk-sport-shades,selkirk,eyewear,Sport Shades,49.99,Standard,,yes,,selkirk sunglasses
+joola-sport-sunglasses,joola,eyewear,Sport Sunglasses,59.95,Standard,,yes,,joola sunglasses
+franklin-official-pickleball-net,franklin,nets,Official Size Pickleball Net,169.99,Standard,,yes,,franklin net|portable net
+onix-portable-net-system,onix,nets,Portable Net System,199.99,Standard,,yes,,onix net
+joola-essential-portable-net,joola,nets,Essential Portable Net,159.95,Standard,,yes,,joola net
+selkirk-sport-portable-net,selkirk,nets,Portable Net,179.99,Standard,,yes,,selkirk net
+gamma-pickleball-net,gamma,nets,Portable Pickleball Net,149.99,Standard,,yes,,gamma net
+lobster-pickle-elite,lobster,ball-machines,Pickle Elite,1299.00,Standard,,yes,,lobster|pickle elite|ball launcher
+lobster-pickle-elite-two,lobster,ball-machines,Pickle Elite Two,1699.00,Standard,,yes,,lobster two
+sports-tutor-pickletutor-plus,sports-tutor,ball-machines,PickleTutor Plus,1199.00,Standard,,yes,,pickle tutor|pickletutor
+spinshot-pickleball-player,spinshot,ball-machines,Pickleball Player,1399.00,Standard,,yes,,spinshot
+slinger-bag-pickleball,slinger,ball-machines,Bag Pickleball Launcher,599.00,Standard,,yes,,slinger bag
+franklin-pickleball-rebounder,franklin,training,Pickleball Rebounder,79.99,Standard,,yes,,rebounder|practice net
+selkirk-training-paddle,selkirk,training,Sweet Spot Trainer,59.99,Standard,,yes,,training paddle|sweet spot
+onix-practice-ball-pack,onix,training,Practice Ball Pack,49.99,48-pack,,yes,pack_size=48,practice balls|bucket of balls
+franklin-ball-pickup-tube,franklin,training,Ball Pickup Tube,24.99,Standard,,yes,,ball retriever|pickup tube
+gamma-dink-trainer,gamma,training,Dink Trainer,39.99,Standard,,yes,,dink trainer
+joola-edge-guard-tape,joola,paddle-accessories,Edge Guard Tape,14.95,Standard,,yes,,edge tape|edge guard
+gamma-lead-tape,gamma,paddle-accessories,Lead Tape,9.99,Standard,,yes,,lead tape|paddle weight
+selkirk-paddle-cover,selkirk,paddle-accessories,Paddle Cover,24.99,Standard,,yes,,paddle case|paddle sleeve
+crbn-paddle-cover,crbn,paddle-accessories,Paddle Cover,25.00,Standard,,yes,,crbn cover
+franklin-paddle-eraser,franklin,paddle-accessories,Paddle Eraser,12.99,Standard,,yes,,eraser|grit cleaner
+joola-paddle-eraser,joola,paddle-accessories,Paddle Eraser,12.95,Standard,,yes,,joola eraser
+six-zero-paddle-cover,six-zero,paddle-accessories,Paddle Cover,24.00,Standard,,yes,,six zero cover
+head-paddle-cover,head,paddle-accessories,Paddle Cover,19.95,Standard,,yes,,head cover
+franklin-court-marker-kit,franklin,court-accessories,Court Marker Kit,39.99,Standard,,yes,,court lines|line marker
+onix-court-lines-kit,onix,court-accessories,Court Lines Kit,34.99,Standard,,yes,,onix lines
+gamma-ball-hopper,gamma,court-accessories,Pickleball Hopper,54.99,Standard,,yes,,ball hopper|ball basket
+franklin-ball-cart,franklin,court-accessories,Wheeled Ball Cart,89.99,Standard,,yes,,ball cart
+joola-court-squeegee,joola,court-accessories,Court Squeegee,49.95,Standard,,yes,,squeegee|court dryer
+selkirk-scorekeeper,selkirk,court-accessories,Flip Scorekeeper,29.99,Standard,,yes,,score keeper|scoreboard
+selkirk-amped-epic,selkirk,paddles,AMPED Epic,149.99,16mm,,yes,thickness_mm=16,amped epic
+selkirk-amped-invikta,selkirk,paddles,AMPED Invikta,149.99,16mm,,yes,thickness_mm=16,amped invikta
+selkirk-amped-s2,selkirk,paddles,AMPED S2,149.99,16mm,,yes,thickness_mm=16,amped s2
+selkirk-slk-evo-control,selkirk,paddles,SLK Evo Control,99.99,16mm,,yes,thickness_mm=16,slk evo
+paddletek-bantam-ex-l-pro,paddletek,paddles,Bantam EX-L Pro,149.99,14mm,,yes,thickness_mm=14,bantam exl|ex-l
+onix-stryker-4,onix,paddles,Stryker 4,79.99,14mm,,yes,thickness_mm=14,stryker
+engage-encore-pro,engage,paddles,Encore Pro,129.99,16mm,,yes,thickness_mm=16,encore
+engage-elite-pro-maverick,engage,paddles,Elite Pro Maverick,139.99,16mm,,yes,thickness_mm=16,maverick
+franklin-fs-tour-dynasty,franklin,paddles,FS Tour Dynasty,149.99,16mm,,yes,thickness_mm=16,fs tour|dynasty
+joola-hyperion-cas,joola,paddles,Hyperion CAS,159.95,13mm,,,thickness_mm=13,hyperion cas
+joola-hyperion-cas,,,,,16mm,,yes,thickness_mm=16,
+joola-solaire-cas,joola,paddles,Solaire CAS,109.95,13mm,,yes,thickness_mm=13,solaire
+six-zero-coral,six-zero,paddles,Coral,150.00,16mm,,yes,thickness_mm=16,six zero coral
+crbn-trufoam-genesis,crbn,paddles,TruFoam Genesis,249.00,14mm,,,thickness_mm=14,trufoam|genesis
+crbn-trufoam-genesis,,,,,16mm,,yes,thickness_mm=16,
+gearbox-gx6-power,gearbox,paddles,GX6 Power,179.99,16mm,,yes,thickness_mm=16,gx6
+vulcan-vpro-flight,vulcan,balls,VPRO Flight Outdoor,12.99,3-pack,,yes,pack_size=3,vpro|vulcan flight
+vulcan-v560-control,vulcan,paddles,V560 Control,119.99,16mm,,yes,thickness_mm=16,v560
+selkirk-core-performance-shorts,selkirk,apparel,Core Performance Shorts,39.99,Standard,,yes,,selkirk shorts

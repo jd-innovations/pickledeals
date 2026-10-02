@@ -1,0 +1,13 @@
+slug,name,parent_slug,sort,variant_axes
+paddles,Paddles,,1,thickness
+shoes,Shoes,,2,
+balls,Balls,,3,pack_size
+bags,Bags,,4,
+apparel,Apparel,,5,
+grips,Grips,,6,pack_size
+eyewear,Eyewear,,7,
+nets,Nets,,8,
+ball-machines,Ball machines,,9,
+training,Training,,10,
+paddle-accessories,Paddle accessories,,11,
+court-accessories,Court accessories,,12,

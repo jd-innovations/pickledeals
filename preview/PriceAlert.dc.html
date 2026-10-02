@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Set price alert</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: var(--img)">
+<div aria-hidden="true" style="position: absolute; left: 70px; right: 70px; top: 60px; height: 300px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div>
+<div style="position: absolute; inset: 0; background: var(--overlay)"></div>
+<div role="dialog" aria-label="Price alert" style="position: absolute; left: 0; right: 0; bottom: 0; height: 640px; border-radius: 28px 28px 0 0; background: var(--surface-elev); box-shadow: var(--shadow-sheet); padding: 8px 20px 34px; display: flex; flex-direction: column">
+<span style="align-self: center; width: 36px; height: 5px; border-radius: 3px; background: var(--border)"></span>
+<div style="display: flex; align-items: center; justify-content: space-between; padding-top: 12px">
+<a href="ProductDetail.dc.html" style="font-size: 17px; color: var(--text-2)">Cancel</a>
+<span style="font-size: 17px; font-weight: 700">Price alert</span>
+<span style="width: 52px"></span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 18px 0; border-bottom: 1px solid var(--sep)">
+<div style="width: 48px; height: 48px; border-radius: 12px; background: var(--img); padding: 4px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div>
+<div style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">JOOLA Perseus Pro IV 16mm</span><span class="num" style="font-size: 13px; color: var(--text-2)">Now $179 · 90-day low $159</span></div>
+</div>
+<span style="font-size: 15px; color: var(--text-2); padding-top: 20px">Notify me when it drops below</span>
+<div style="display: flex; align-items: center; justify-content: space-between; padding-top: 6px">
+<button aria-label="Decrease by $5" onClick="{{dec}}" style="width: 48px; height: 48px; border-radius: 24px; background: var(--chip); font-size: 26px; font-weight: 400; display: flex; align-items: center; justify-content: center">−</button>
+<span class="num" style="font-size: 56px; font-weight: 700; letter-spacing: -0.04em">${{target}}</span>
+<button aria-label="Increase by $5" onClick="{{inc}}" style="width: 48px; height: 48px; border-radius: 24px; background: var(--chip); font-size: 26px; font-weight: 400; display: flex; align-items: center; justify-content: center">+</button>
+</div>
+<span class="num" style="text-align: center; font-size: 13px; color: var(--text-2)">{{hint}}</span>
+<div style="display: flex; gap: 8px; justify-content: center; padding-top: 14px">
+<sc-for list="{{presets}}" as="p" hint-placeholder-count="3">
+<button onClick="{{p.pick}}" style="height: 34px; padding: 0 12px; border-radius: 17px; background: {{p.bg}}; color: {{p.fg}}; font-size: 13px; font-weight: 600">{{p.label}}</button>
+</sc-for>
+</div>
+<div style="margin-top: 22px; border-radius: 16px; background: var(--surface); overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid var(--bg)"><div style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">New offers</span><span style="font-size: 12px; color: var(--text-2)">Any retailer, incl. verified codes</span></div><span role="switch" aria-checked="true" aria-label="New offers" style="width: 51px; height: 31px; border-radius: 16px; background: var(--int); position: relative"><span style="position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: var(--on-int)"></span></span></div>
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 13px 16px"><div style="display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">Pre-owned listings</span><span style="font-size: 12px; color: var(--text-2)">Within 25 mi or ships · Excellent or better</span></div><span role="switch" aria-checked="true" aria-label="Pre-owned listings" style="width: 51px; height: 31px; border-radius: 16px; background: var(--int); position: relative"><span style="position: absolute; right: 2px; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: var(--on-int)"></span></span></div>
+</div>
+<div style="flex-grow: 1"></div>
+<a href="Saved.dc.html" style="height: 54px; border-radius: 27px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center">Create alert</a>
+<span style="text-align: center; font-size: 12px; color: var(--text-2); padding-top: 10px">One notification per drop. Edit or pause in Watchlist.</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { target: 150 }; }
+  renderVals() {
+    const t = this.state.target;
+    const set = (v) => () => this.setState({ target: v });
+    const mk = (v, label) => ({ label, pick: set(v), bg: t === v ? 'var(--int)' : 'var(--chip)', fg: t === v ? 'var(--on-int)' : 'var(--text-1)' });
+    let hint = '$' + (179 - t) + ' below today · ';
+    hint += t < 149 ? 'below the all-time low — may take a while' : t <= 159 ? 'reached ' + (t >= 159 ? '6' : '2') + ' times in 90 days' : 'likely soon';
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      target: t, hint,
+      dec: () => this.setState({ target: Math.max(50, t - 5) }),
+      inc: () => this.setState({ target: Math.min(175, t + 5) }),
+      presets: [mk(159, '$159 · 90-day low'), mk(150, '$150'), mk(140, '$140')]
+    };
+  }
+}
+</script>
+</body>
+</html>

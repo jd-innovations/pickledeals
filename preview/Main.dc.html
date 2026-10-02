@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PickleDeals — system foundations</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 1600px; height: 3300px; overflow: hidden; padding: 96px; display: flex; flex-direction: column; gap: 96px">
+
+<section style="display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 64px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: center; gap: 14px">
+<div style="width: 44px; height: 44px; border-radius: 12px; background: var(--int); color: var(--on-int); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 22px; letter-spacing: -0.04em">pd</div>
+<span style="font-size: 15px; font-weight: 500; color: var(--text-2)">pickledeals.app · iOS design system v1</span>
+</div>
+<h1 style="font-size: 112px; line-height: 0.95; font-weight: 800; letter-spacing: -0.045em">PickleDeals</h1>
+<p style="font-size: 30px; line-height: 1.25; font-weight: 500; letter-spacing: -0.02em; max-width: 640px">Discover the best pickleball deals. Buy new or pre-owned. Sell your gear.</p>
+<p style="font-size: 17px; line-height: 1.5; color: var(--text-2); max-width: 600px">A monochrome interface so the merchandise is the colour. One canonical product catalog connects retailer deals, price history and pre-owned listings, so every screen can answer the same question: what is the best way to buy this right now?</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<div style="aspect-ratio: 3 / 4; border-radius: 20px; background: var(--img); padding: 24px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div>
+<div style="aspect-ratio: 3 / 4; border-radius: 20px; background: var(--img); padding: 24px; margin-top: 48px"><dc-import name="ProductArt" kind="shoe" c1="#FF5D8F" c2="#1C1C1C" hint-size="100%,100%"></dc-import></div>
+<div style="aspect-ratio: 3 / 4; border-radius: 20px; background: var(--img); padding: 24px"><dc-import name="ProductArt" kind="ball" c1="#D8F23A" c2="#000000" hint-size="100%,100%"></dc-import></div>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 24px; border-top: 1px solid var(--sep); padding-top: 40px">
+<sc-for list="{{principles}}" as="p" hint-placeholder-count="6">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 600; color: var(--text-3)" class="num">{{p.n}}</span>
+<span style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em">{{p.t}}</span>
+<span style="font-size: 15px; line-height: 1.45; color: var(--text-2)">{{p.d}}</span>
+</div>
+</sc-for>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="font-size: 44px; font-weight: 700; letter-spacing: -0.03em">Information architecture</h2>
+<span style="font-size: 17px; color: var(--text-2)">Five tabs · Sell is a modal action · Profile lives behind the avatar</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{ia}}" as="col" hint-placeholder-count="6">
+<div style="display: flex; flex-direction: column; align-items: stretch; gap: 0">
+<div style="height: 52px; border-radius: 26px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 17px; font-weight: 700; background: {{col.bg}}; color: {{col.fg}}; border: 1.5px solid var(--int)">{{col.tab}}</div>
+<span style="text-align: center; font-size: 13px; color: var(--text-2); padding: 10px 0 6px">{{col.role}}</span>
+<sc-for list="{{col.nodes}}" as="n" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; align-items: center">
+<div style="width: 1.5px; height: 18px; background: var(--border)"></div>
+<div style="width: 100%; padding: 14px 16px; border-radius: 14px; background: var(--surface); display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 15px; font-weight: 600">{{n.t}}</span>
+<span style="font-size: 13px; line-height: 1.4; color: var(--text-2)">{{n.d}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 8px">
+<div style="padding: 20px 24px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 15px; font-weight: 700">Search is global</span><span style="font-size: 15px; line-height: 1.45; color: var(--text-2)">One field on Deals and Pre-owned. Results group Products, Deals, Pre-owned, Brands and Categories — no need to pick a section first.</span></div>
+<div style="padding: 20px 24px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 15px; font-weight: 700">The product page is the bridge</span><span style="font-size: 15px; line-height: 1.45; color: var(--text-2)">Every deal, listing and search hit resolves to one canonical product. From there: Get deal, Set alert, View pre-owned, Sell yours.</span></div>
+<div style="padding: 20px 24px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 15px; font-weight: 700">Watchlist earns the tab</span><span style="font-size: 15px; line-height: 1.45; color: var(--text-2)">Saves and price alerts are the retention loop, so they get a tab. Notifications live in Inbox › Activity, next to messages and offers.</span></div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="font-size: 44px; font-weight: 700; letter-spacing: -0.03em">One canonical catalog</h2>
+<span style="font-size: 17px; color: var(--text-2)">Deals and listings attach to products — never the other way round</span>
+</div>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1.1fr) 56px minmax(0, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 16px 0; height: 520px">
+<div style="grid-column: 1; grid-row: 1; padding: 20px 22px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--text-3)">NEW OFFERS</span><span style="font-size: 17px; font-weight: 600">Amazon $179 · CourtSide $189 · Baseline $199 · JOOLA.com $229</span><span style="font-size: 13px; color: var(--text-2)">price, shipping, stock, affiliate flag, sponsored flag, checked_at</span></div>
+<div style="grid-column: 1; grid-row: 2; padding: 20px 22px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--text-3)">PROMO CODES</span><span style="font-size: 17px; font-weight: 600">DINK15 — 15% off at JOOLA.com</span><span style="font-size: 13px; color: var(--text-2)">scope, expiry, verified_at, exclusive flag</span></div>
+<div style="grid-column: 1; grid-row: 3; padding: 20px 22px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--text-3)">PRICE HISTORY</span><span style="font-size: 17px; font-weight: 600">MSRP $279 · Typical $219 · 90-day low $159</span><span style="font-size: 13px; color: var(--text-2)">daily price points per offer → deal-quality score</span></div>
+<div style="grid-column: 2; grid-row: 1; display: flex; align-items: center"><div style="width: 100%; height: 1.5px; background: var(--text-3)"></div></div>
+<div style="grid-column: 2; grid-row: 2; display: flex; align-items: center"><div style="width: 100%; height: 1.5px; background: var(--text-3)"></div></div>
+<div style="grid-column: 2; grid-row: 3; display: flex; align-items: center"><div style="width: 100%; height: 1.5px; background: var(--text-3)"></div></div>
+<div style="grid-column: 3; grid-row: 1 / span 3; border-radius: 24px; background: var(--int); color: var(--on-int); padding: 28px; display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; opacity: .7">CANONICAL PRODUCT</span>
+<div style="flex-grow: 1; border-radius: 16px; background: var(--img); padding: 20px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div>
+<span style="font-size: 26px; font-weight: 700; letter-spacing: -0.02em">JOOLA Perseus Pro IV 16mm</span>
+<span style="font-size: 15px; opacity: .75">brand · model · category · specs · images · MSRP · variants</span>
+</div>
+<div style="grid-column: 4; grid-row: 1; display: flex; align-items: center"><div style="width: 100%; height: 1.5px; background: var(--text-3)"></div></div>
+<div style="grid-column: 4; grid-row: 2; display: flex; align-items: center"><div style="width: 100%; height: 1.5px; background: var(--text-3)"></div></div>
+<div style="grid-column: 4; grid-row: 3; display: flex; align-items: center"><div style="width: 100%; height: 1.5px; background: var(--text-3)"></div></div>
+<div style="grid-column: 5; grid-row: 1; padding: 20px 22px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--text-3)">PRE-OWNED LISTINGS</span><span style="font-size: 17px; font-weight: 600">Like New $145 · Excellent $130 · Good $110</span><span style="font-size: 13px; color: var(--text-2)">condition, ask, approx. area, pickup / ships, status</span></div>
+<div style="grid-column: 5; grid-row: 2; padding: 20px 22px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--text-3)">VARIANTS</span><span style="font-size: 17px; font-weight: 600">14mm · 16mm · Elongated · Hybrid</span><span style="font-size: 13px; color: var(--text-2)">offers and listings bind to a variant when known</span></div>
+<div style="grid-column: 5; grid-row: 3; padding: 20px 22px; border-radius: 16px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--text-3)">ALERTS &amp; SAVES</span><span style="font-size: 17px; font-weight: 600">Notify below $150 · new or pre-owned</span><span style="font-size: 13px; color: var(--text-2)">target price, scope (new / used / both), radius</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="padding: 24px; border-radius: 16px; background: var(--surface); display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 17px; font-weight: 700">Offer object · states</span>
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<span style="padding: 8px 14px; border-radius: 999px; background: var(--int); color: var(--on-int); font-size: 15px; font-weight: 600">Pending</span>
+<span style="color: var(--text-3)">→</span>
+<span style="padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--int); font-size: 15px; font-weight: 600">Accepted</span>
+<span style="padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--border); font-size: 15px; font-weight: 600">Countered ↺</span>
+<span style="padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--border); font-size: 15px; font-weight: 600; color: var(--text-2)">Declined</span>
+<span style="padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--border); font-size: 15px; font-weight: 600; color: var(--text-2)">Withdrawn</span>
+<span style="padding: 8px 14px; border-radius: 999px; border: 1.5px dashed var(--border); font-size: 15px; font-weight: 600; color: var(--text-2)">Expired · 48h</span>
+</div>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.6; color: var(--text-2)">offer { id, listing_id, conversation_id, from_user, amount, parent_offer_id, state, expires_at, message }</span>
+</div>
+<div style="padding: 24px; border-radius: 16px; background: var(--surface); display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 17px; font-weight: 700">Listing object · states</span>
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+<span style="padding: 8px 14px; border-radius: 999px; background: var(--int); color: var(--on-int); font-size: 15px; font-weight: 600">Active</span>
+<span style="color: var(--text-3)">→</span>
+<span style="padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--int); font-size: 15px; font-weight: 600">Pending</span>
+<span style="color: var(--text-3)">→</span>
+<span style="padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--int); font-size: 15px; font-weight: 600">Sold</span>
+<span style="font-size: 15px; color: var(--text-2)">· Pending can return to Active</span>
+</div>
+<span style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.6; color: var(--text-2)">listing { id, product_id, variant_id, seller_id, condition, ask, photos[], area_geohash, pickup, ships, status, payment_ref: null /* reserved for V2 */ }</span>
+</div>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h2 style="font-size: 44px; font-weight: 700; letter-spacing: -0.03em">Semantic colour</h2>
+<span style="font-size: 17px; color: var(--text-2)">System appearance by default · dark is tuned separately, never inverted</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+<div class="pd" style="border-radius: 24px; border: 1px solid var(--border); padding: 28px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 20px; font-weight: 700; padding-bottom: 12px">Light</span>
+<sc-for list="{{light}}" as="t" hint-placeholder-count="13">
+<div style="display: flex; align-items: center; gap: 14px; padding: 6px 0; border-bottom: 1px solid var(--sep)">
+<span style="width: 36px; height: 24px; border-radius: 6px; border: 1px solid rgba(128,128,128,.35); background: {{t.hex}}"></span>
+<span style="flex-grow: 1; font-size: 15px; font-weight: 600">{{t.name}}</span>
+<span class="num" style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: var(--text-2)">{{t.hex}}</span>
+</div>
+</sc-for>
+</div>
+<div class="pd dark" style="border-radius: 24px; border: 1px solid var(--border); padding: 28px; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 20px; font-weight: 700; padding-bottom: 12px">Dark</span>
+<sc-for list="{{dark}}" as="t" hint-placeholder-count="13">
+<div style="display: flex; align-items: center; gap: 14px; padding: 6px 0; border-bottom: 1px solid var(--sep)">
+<span style="width: 36px; height: 24px; border-radius: 6px; border: 1px solid rgba(128,128,128,.35); background: {{t.hex}}"></span>
+<span style="flex-grow: 1; font-size: 15px; font-weight: 600">{{t.name}}</span>
+<span class="num" style="font-family: 'Geist Mono', ui-monospace, monospace; font-size: 13px; color: var(--text-2)">{{t.hex}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<h2 style="font-size: 44px; font-weight: 700; letter-spacing: -0.03em">Type</h2>
+<span style="font-size: 15px; color: var(--text-2)">SF Pro (Dynamic Type) on device. Hierarchy from size and weight, not colour. Prices always tabular.</span>
+<sc-for list="{{type}}" as="s" hint-placeholder-count="10">
+<div style="display: grid; grid-template-columns: 150px 80px minmax(0, 1fr); align-items: baseline; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--sep)">
+<span style="font-size: 13px; font-weight: 600; color: var(--text-2)">{{s.name}}</span>
+<span class="num" style="font-size: 13px; color: var(--text-3)">{{s.spec}}</span>
+<span class="num" style="font-size: {{s.size}}px; font-weight: {{s.w}}; letter-spacing: {{s.ls}}; white-space: nowrap; overflow: hidden">{{s.sample}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 28px">
+<h2 style="font-size: 44px; font-weight: 700; letter-spacing: -0.03em">Space &amp; shape</h2>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 700">4-pt grid · 16 pt screen gutter · 44 pt touch targets</span>
+<div style="display: flex; align-items: flex-end; gap: 10px">
+<sc-for list="{{space}}" as="sp" hint-placeholder-count="9">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: {{sp}}px; height: {{sp}}px; background: var(--int); border-radius: 3px"></div><span class="num" style="font-size: 12px; color: var(--text-2)">{{sp}}</span></div>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 700">Radii</span>
+<div style="display: flex; gap: 14px; align-items: flex-end">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 64px; height: 64px; border: 1.5px solid var(--int); border-radius: 6px"></div><span style="font-size: 12px; color: var(--text-2)">6 badge</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 64px; height: 64px; border: 1.5px solid var(--int); border-radius: 10px"></div><span style="font-size: 12px; color: var(--text-2)">10 control</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 64px; height: 64px; border: 1.5px solid var(--int); border-radius: 16px"></div><span style="font-size: 12px; color: var(--text-2)">16 card</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 64px; height: 64px; border: 1.5px solid var(--int); border-radius: 28px 28px 0 0"></div><span style="font-size: 12px; color: var(--text-2)">28 sheet</span></div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 96px; height: 44px; border: 1.5px solid var(--int); border-radius: 22px"></div><span style="font-size: 12px; color: var(--text-2)">capsule</span></div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 700">Elevation — three levels only</span>
+<div style="display: flex; gap: 14px">
+<div style="flex: 1; height: 72px; border-radius: 16px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-2)">Flat · fill</div>
+<div style="flex: 1; height: 72px; border-radius: 16px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-2)">Hairline</div>
+<div style="flex: 1; height: 72px; border-radius: 16px; background: var(--surface-elev); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-2)">Floating · glass</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 700">Trust labels — always text, never disguised</span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--int); color: var(--on-int)">LOWEST PRICE</span>
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border); color: var(--text-2)">SPONSORED</span>
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--chip)">PRE-OWNED</span>
+<span style="font-size: 13px; color: var(--text-2); padding: 4px 0">Affiliate link ⓘ</span>
+</div>
+<span style="font-size: 13px; line-height: 1.5; color: var(--text-2)">Best price = lowest delivered price after verified promo codes. Commission rate is never a ranking input.</span>
+</div>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1600,"height":3300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      principles: [
+        { n: '01', t: 'Product-first', d: 'Photography leads every card. The UI stays black, white and grey.' },
+        { n: '02', t: 'Honest prices', d: 'Lowest real price wins. Sponsored and affiliate are always labelled.' },
+        { n: '03', t: 'One catalog', d: 'New offers, price history and used listings share one product record.' },
+        { n: '04', t: 'Native & fast', d: 'Standard iOS navigation, sheets, haptics and Dynamic Type.' },
+        { n: '05', t: 'Private by default', d: 'Listings show an approximate area. Exact spots stay in chat.' },
+        { n: '06', t: 'Free to sell', d: 'No checkout, escrow or fees in V1. Agree in app, settle directly.' }
+      ],
+      ia: [
+        { tab: 'Deals', role: 'Discover new gear', bg: 'var(--int)', fg: 'var(--on-int)', nodes: [
+          { t: 'Home', d: 'Today’s best, drops, promo codes, nearby used' },
+          { t: 'Search', d: 'Suggestions → grouped results' },
+          { t: 'Browse', d: 'Categories · brands · retailers' },
+          { t: 'Product', d: 'Best price, all offers, history, pre-owned' },
+          { t: 'Offers · History · Alert', d: 'Drill-ins and sheets' } ] },
+        { tab: 'Pre-owned', role: 'Buy used, locally or shipped', bg: 'var(--int)', fg: 'var(--on-int)', nodes: [
+          { t: 'Home', d: 'Grid ⇄ map toggle, nearby / nationwide' },
+          { t: 'Filters', d: 'Half-height sheet' },
+          { t: 'Map', d: 'Price pins, clusters, preview card' },
+          { t: 'Listing', d: 'Ask vs. new price, seller, pickup / ship' },
+          { t: 'Make offer → Chat', d: 'Offer sheet, then conversation' } ] },
+        { tab: '+ Sell', role: 'Modal flow, ~60 seconds', bg: 'var(--int)', fg: 'var(--on-int)', nodes: [
+          { t: 'Product', d: 'Pick from the catalog' },
+          { t: 'Photos', d: 'Up to 10, first is cover' },
+          { t: 'Condition · Price', d: 'Guided by used-price range' },
+          { t: 'Details', d: 'Area, pickup, shipping' },
+          { t: 'Preview → Publish', d: 'Free, no fees' } ] },
+        { tab: 'Watchlist', role: 'Saves + price alerts', bg: 'var(--int)', fg: 'var(--on-int)', nodes: [
+          { t: 'Saved', d: 'Products · deals · listings' },
+          { t: 'Price alerts', d: 'Target price, new / used' },
+          { t: 'Brands followed', d: 'New-deal triggers' } ] },
+        { tab: 'Inbox', role: 'Messages + activity', bg: 'var(--int)', fg: 'var(--on-int)', nodes: [
+          { t: 'Messages', d: 'One thread per listing + buyer' },
+          { t: 'Conversation', d: 'Offers as structured cards' },
+          { t: 'Activity', d: 'Drops, offers, nearby matches' } ] },
+        { tab: 'Profile', role: 'Avatar, top-right', bg: 'transparent', fg: 'var(--text-1)', nodes: [
+          { t: 'My listings', d: 'Active · pending · sold' },
+          { t: 'Offers', d: 'Sent and received' },
+          { t: 'Settings', d: 'Notifications, location, appearance' },
+          { t: 'Help · Privacy · Terms', d: 'Plain list' } ] }
+      ],
+      light: [
+        { name: 'background', hex: '#FFFFFF' }, { name: 'surface', hex: '#F4F4F3' }, { name: 'surfaceElevated', hex: '#FFFFFF' },
+        { name: 'surfacePressed', hex: '#E9E9E7' }, { name: 'imageTile', hex: '#F1F1EF' }, { name: 'textPrimary', hex: '#0A0A0A' },
+        { name: 'textSecondary', hex: '#555555' }, { name: 'textTertiary', hex: '#717171' }, { name: 'border', hex: '#E2E2E0' },
+        { name: 'separator', hex: '#ECECEA' }, { name: 'interactive', hex: '#0A0A0A' }, { name: 'interactivePressed', hex: '#2D2D2D' },
+        { name: 'overlay', hex: 'rgba(10,10,10,.38)' }
+      ],
+      dark: [
+        { name: 'background', hex: '#0B0B0C' }, { name: 'surface', hex: '#161617' }, { name: 'surfaceElevated', hex: '#1E1E20' },
+        { name: 'surfacePressed', hex: '#2A2A2D' }, { name: 'imageTile', hex: '#1A1A1C' }, { name: 'textPrimary', hex: '#F5F5F4' },
+        { name: 'textSecondary', hex: '#A6A6A6' }, { name: 'textTertiary', hex: '#8A8A8A' }, { name: 'border', hex: '#2E2E31' },
+        { name: 'separator', hex: '#232326' }, { name: 'interactive', hex: '#F5F5F4' }, { name: 'interactivePressed', hex: '#D6D6D6' },
+        { name: 'overlay', hex: 'rgba(0,0,0,.60)' }
+      ],
+      type: [
+        { name: 'Large Title', spec: '34 / 41', size: 34, w: 700, ls: '-0.025em', sample: 'Deals' },
+        { name: 'Title 1', spec: '28 / 34', size: 28, w: 700, ls: '-0.02em', sample: 'Pre-owned near you' },
+        { name: 'Title 2', spec: '22 / 28', size: 22, w: 700, ls: '-0.015em', sample: 'Biggest price drops' },
+        { name: 'Headline', spec: '17 / 22', size: 17, w: 600, ls: '-0.01em', sample: 'JOOLA Perseus Pro IV 16mm' },
+        { name: 'Body', spec: '17 / 22', size: 17, w: 400, ls: '-0.01em', sample: 'Lightly used, edge guard intact.' },
+        { name: 'Subhead', spec: '15 / 20', size: 15, w: 500, ls: '0', sample: 'Amazon · ends in 6h' },
+        { name: 'Footnote', spec: '13 / 18', size: 13, w: 400, ls: '0', sample: 'Prices checked 4 min ago' },
+        { name: 'Caption', spec: '11 / 13', size: 11, w: 700, ls: '0.06em', sample: 'PRICE DROP' },
+        { name: 'Price Display', spec: '40 / 44', size: 40, w: 700, ls: '-0.03em', sample: '$179  $279' },
+        { name: 'Price Card', spec: '17 / 22', size: 17, w: 700, ls: '-0.01em', sample: '$179  −36%' }
+      ],
+      space: [4, 8, 12, 16, 20, 24, 32, 40, 56]
+    };
+  }
+}
+</script>
+</body>
+</html>

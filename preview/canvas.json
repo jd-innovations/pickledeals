@@ -1,0 +1,520 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-01T12:00:00Z"
+ },
+ "title": "PickleDeals iOS",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1600,
+   "h": 3300,
+   "title": "00 · System foundations"
+  },
+  "Components.dc.html": {
+   "x": 1680,
+   "y": 0,
+   "w": 1600,
+   "h": 3300,
+   "title": "01 · Component library"
+  },
+  "ProductArt.dc.html": {
+   "x": 3360,
+   "y": 0,
+   "w": 240,
+   "h": 240,
+   "title": "Product image (placeholder art)"
+  },
+  "TabBar.dc.html": {
+   "x": 3360,
+   "y": 360,
+   "w": 358,
+   "h": 64,
+   "title": "Tab bar",
+   "is_interactive": true
+  },
+  "Launch.dc.html": {
+   "x": 0,
+   "y": 3700,
+   "w": 390,
+   "h": 844,
+   "title": "Launch",
+   "radius": 40
+  },
+  "Onboarding.dc.html": {
+   "x": 470,
+   "y": 3700,
+   "w": 390,
+   "h": 844,
+   "title": "Onboarding",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "DealsHome.dc.html": {
+   "x": 940,
+   "y": 3700,
+   "w": 390,
+   "h": 3500,
+   "title": "Deals home",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Search.dc.html": {
+   "x": 1410,
+   "y": 3700,
+   "w": 390,
+   "h": 844,
+   "title": "Search · suggestions",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "SearchResults.dc.html": {
+   "x": 1880,
+   "y": 3700,
+   "w": 390,
+   "h": 1900,
+   "title": "Search results (grouped)",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Browse.dc.html": {
+   "x": 2350,
+   "y": 3700,
+   "w": 390,
+   "h": 1300,
+   "title": "Categories & brands",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "CategoryDetail.dc.html": {
+   "x": 2820,
+   "y": 3700,
+   "w": 390,
+   "h": 1500,
+   "title": "Category · Paddles on sale",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "BrandDetail.dc.html": {
+   "x": 3290,
+   "y": 3700,
+   "w": 390,
+   "h": 1400,
+   "title": "Brand · JOOLA",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "DealDetail.dc.html": {
+   "x": 0,
+   "y": 7600,
+   "w": 390,
+   "h": 1300,
+   "title": "Deal detail (promo code)",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "ProductDetail.dc.html": {
+   "x": 470,
+   "y": 7600,
+   "w": 390,
+   "h": 2600,
+   "title": "Product detail (canonical)",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Offers.dc.html": {
+   "x": 940,
+   "y": 7600,
+   "w": 390,
+   "h": 1200,
+   "title": "All offers compared",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "PriceHistory.dc.html": {
+   "x": 1410,
+   "y": 7600,
+   "w": 390,
+   "h": 1200,
+   "title": "Price history",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "PriceAlert.dc.html": {
+   "x": 1880,
+   "y": 7600,
+   "w": 390,
+   "h": 844,
+   "title": "Set price alert (sheet)",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Saved.dc.html": {
+   "x": 2350,
+   "y": 7600,
+   "w": 390,
+   "h": 1200,
+   "title": "Watchlist · saved & alerts",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Alerts.dc.html": {
+   "x": 2820,
+   "y": 7600,
+   "w": 390,
+   "h": 1100,
+   "title": "Activity (notifications)",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "MarketHome.dc.html": {
+   "x": 0,
+   "y": 10600,
+   "w": 390,
+   "h": 1900,
+   "title": "Marketplace home",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "MarketFilters.dc.html": {
+   "x": 470,
+   "y": 10600,
+   "w": 390,
+   "h": 844,
+   "title": "Marketplace filters (sheet)",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "MarketMap.dc.html": {
+   "x": 940,
+   "y": 10600,
+   "w": 390,
+   "h": 844,
+   "title": "Marketplace map",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "MapPreview.dc.html": {
+   "x": 1410,
+   "y": 10600,
+   "w": 390,
+   "h": 844,
+   "title": "Map · listing preview",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "ListingDetail.dc.html": {
+   "x": 1880,
+   "y": 10600,
+   "w": 390,
+   "h": 2000,
+   "title": "Pre-owned listing detail",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "SellerProfile.dc.html": {
+   "x": 2350,
+   "y": 10600,
+   "w": 390,
+   "h": 1300,
+   "title": "Seller profile",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "MakeOffer.dc.html": {
+   "x": 0,
+   "y": 13000,
+   "w": 390,
+   "h": 844,
+   "title": "Make offer (sheet)",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Inbox.dc.html": {
+   "x": 470,
+   "y": 13000,
+   "w": 390,
+   "h": 1000,
+   "title": "Inbox · messages",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Conversation.dc.html": {
+   "x": 940,
+   "y": 13000,
+   "w": 390,
+   "h": 1700,
+   "title": "Conversation with offers",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Counter.dc.html": {
+   "x": 1410,
+   "y": 13000,
+   "w": 390,
+   "h": 844,
+   "title": "Counteroffer (sheet)",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "SellStart.dc.html": {
+   "x": 0,
+   "y": 15300,
+   "w": 390,
+   "h": 844,
+   "title": "Sell 1 · select product",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "SellPhotos.dc.html": {
+   "x": 470,
+   "y": 15300,
+   "w": 390,
+   "h": 844,
+   "title": "Sell 2 · photos",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "SellCondition.dc.html": {
+   "x": 940,
+   "y": 15300,
+   "w": 390,
+   "h": 1000,
+   "title": "Sell 3 · condition",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "SellPrice.dc.html": {
+   "x": 1410,
+   "y": 15300,
+   "w": 390,
+   "h": 1000,
+   "title": "Sell 4 · price",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "SellDetails.dc.html": {
+   "x": 1880,
+   "y": 15300,
+   "w": 390,
+   "h": 1100,
+   "title": "Sell 5 · details, location, delivery",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "SellPreview.dc.html": {
+   "x": 2350,
+   "y": 15300,
+   "w": 390,
+   "h": 1200,
+   "title": "Sell 6 · preview & publish",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "MyListings.dc.html": {
+   "x": 2820,
+   "y": 15300,
+   "w": 390,
+   "h": 1100,
+   "title": "My listings",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "ManageListing.dc.html": {
+   "x": 3290,
+   "y": 15300,
+   "w": 390,
+   "h": 844,
+   "title": "Mark pending / sold",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Profile.dc.html": {
+   "x": 0,
+   "y": 17200,
+   "w": 390,
+   "h": 1400,
+   "title": "Profile",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "NotifPrefs.dc.html": {
+   "x": 470,
+   "y": 17200,
+   "w": 390,
+   "h": 1200,
+   "title": "Notification preferences",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "Appearance.dc.html": {
+   "x": 940,
+   "y": 17200,
+   "w": 390,
+   "h": 900,
+   "title": "Appearance",
+   "radius": 40,
+   "is_interactive": true
+  },
+  "DarkHome.dc.html": {
+   "x": 0,
+   "y": 19000,
+   "w": 390,
+   "h": 3500,
+   "title": "Deals home · dark",
+   "radius": 40
+  },
+  "DarkProduct.dc.html": {
+   "x": 470,
+   "y": 19000,
+   "w": 390,
+   "h": 2600,
+   "title": "Product detail · dark",
+   "radius": 40
+  },
+  "DarkListing.dc.html": {
+   "x": 940,
+   "y": 19000,
+   "w": 390,
+   "h": 2000,
+   "title": "Listing detail · dark",
+   "radius": 40
+  },
+  "DarkConversation.dc.html": {
+   "x": 1410,
+   "y": 19000,
+   "w": 390,
+   "h": 1700,
+   "title": "Conversation · dark",
+   "radius": 40
+  },
+  "DarkMap.dc.html": {
+   "x": 1880,
+   "y": 19000,
+   "w": 390,
+   "h": 844,
+   "title": "Map · dark",
+   "radius": 40
+  },
+  "MapBase.dc.html": {
+   "x": 3360,
+   "y": 520,
+   "w": 390,
+   "h": 844,
+   "title": "Map base (approximate-area map)"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Components.dc.html",
+  "ProductArt.dc.html",
+  "TabBar.dc.html",
+  "MapBase.dc.html",
+  "Launch.dc.html",
+  "Onboarding.dc.html",
+  "DealsHome.dc.html",
+  "Search.dc.html",
+  "SearchResults.dc.html",
+  "Browse.dc.html",
+  "CategoryDetail.dc.html",
+  "BrandDetail.dc.html",
+  "DealDetail.dc.html",
+  "ProductDetail.dc.html",
+  "Offers.dc.html",
+  "PriceHistory.dc.html",
+  "PriceAlert.dc.html",
+  "Saved.dc.html",
+  "Alerts.dc.html",
+  "MarketHome.dc.html",
+  "MarketFilters.dc.html",
+  "MarketMap.dc.html",
+  "MapPreview.dc.html",
+  "ListingDetail.dc.html",
+  "SellerProfile.dc.html",
+  "MakeOffer.dc.html",
+  "Inbox.dc.html",
+  "Conversation.dc.html",
+  "Counter.dc.html",
+  "SellStart.dc.html",
+  "SellPhotos.dc.html",
+  "SellCondition.dc.html",
+  "SellPrice.dc.html",
+  "SellDetails.dc.html",
+  "SellPreview.dc.html",
+  "MyListings.dc.html",
+  "ManageListing.dc.html",
+  "Profile.dc.html",
+  "NotifPrefs.dc.html",
+  "Appearance.dc.html",
+  "DarkHome.dc.html",
+  "DarkProduct.dc.html",
+  "DarkListing.dc.html",
+  "DarkConversation.dc.html",
+  "DarkMap.dc.html"
+ ],
+ "notes": {
+  "t0": {
+   "x": 0,
+   "y": -280,
+   "text": "Foundations — IA, tokens, type, components",
+   "kind": "title1",
+   "maxW": 3600
+  },
+  "t1": {
+   "x": 0,
+   "y": 3420,
+   "text": "Discover — deals, search, browse",
+   "kind": "title1",
+   "maxW": 3680
+  },
+  "t2": {
+   "x": 0,
+   "y": 7320,
+   "text": "Compare — one product, every way to buy it",
+   "kind": "title1",
+   "maxW": 3200
+  },
+  "t3": {
+   "x": 0,
+   "y": 10320,
+   "text": "Pre-owned marketplace — grid, map, listing",
+   "kind": "title1",
+   "maxW": 2740
+  },
+  "t4": {
+   "x": 0,
+   "y": 12720,
+   "text": "Negotiate — offers live inside the chat",
+   "kind": "title1",
+   "maxW": 1800
+  },
+  "t5": {
+   "x": 0,
+   "y": 15020,
+   "text": "Sell in about a minute",
+   "kind": "title1",
+   "maxW": 3680
+  },
+  "t6": {
+   "x": 0,
+   "y": 16920,
+   "text": "You — profile & settings",
+   "kind": "title1",
+   "maxW": 1330
+  },
+  "t7": {
+   "x": 0,
+   "y": 18720,
+   "text": "Dark mode — designed, not inverted",
+   "kind": "title1",
+   "maxW": 2270
+  }
+ },
+ "designSystems": []
+}

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map listing preview</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 844px; position: relative; overflow: hidden">
+<div style="position: absolute; inset: 0"><dc-import name="MapBase" hint-size="100%,100%"></dc-import></div>
+<sc-for list="{{pins}}" as="p" hint-placeholder-count="6">
+<span class="num" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; height: 30px; padding: 0 10px; border-radius: 15px; background: var(--surface-elev); box-shadow: var(--shadow); border: 0.5px solid var(--border); font-size: 13px; font-weight: 700; display: flex; align-items: center; opacity: .9">{{p.t}}</span>
+</sc-for>
+<div aria-hidden="true" style="position: absolute; left: 190px; top: 210px; width: 150px; height: 150px; border-radius: 75px; background: rgba(10,10,10,.07); border: 1.5px dashed var(--text-3)"></div>
+<div style="position: absolute; left: 216px; top: 256px; display: flex; flex-direction: column; align-items: center">
+<span class="num" style="height: 44px; padding: 0 14px 0 5px; border-radius: 22px; background: var(--int); color: var(--on-int); box-shadow: var(--shadow); font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px"><span style="width: 34px; height: 34px; border-radius: 17px; background: var(--img); padding: 2px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></span>$150</span>
+<span style="width: 2px; height: 10px; background: var(--int)"></span>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; top: 58px; display: flex; gap: 8px">
+<a href="MarketMap.dc.html" aria-label="Back to map" class="glass" style="width: 44px; height: 44px; border-radius: 22px; border: 0.5px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<span class="glass" style="flex: 1; height: 44px; border-radius: 22px; border: 0.5px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; padding: 0 14px; font-size: 15px; color: var(--text-2)">Paddles · 25 mi · under $150</span>
+</div>
+<div style="position: absolute; left: 12px; right: 12px; bottom: 104px; display: flex; flex-direction: column; gap: 8px">
+<a href="ListingDetail.dc.html" style="display: flex; gap: 12px; padding: 12px; border-radius: 24px; background: var(--surface-elev); box-shadow: var(--shadow); border: 0.5px solid var(--border)">
+<div style="position: relative; width: 112px; height: 132px; border-radius: 16px; background: var(--img); padding: 10px; flex-shrink: 0"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import><span class="num" style="position: absolute; right: 6px; bottom: 6px; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 5px; background: var(--bg)">1/6</span></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0">
+<div style="display: flex; align-items: baseline; gap: 6px"><span class="num" style="font-size: 24px; font-weight: 700; letter-spacing: -0.02em">$150</span><span style="font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 5px; background: var(--chip)">Excellent</span></div>
+<span style="font-size: 15px; font-weight: 600; line-height: 1.25">JOOLA Perseus Pro IV 16mm</span>
+<span class="num" style="font-size: 13px; color: var(--text-2)">New from $179 · save $29</span>
+<span class="num" style="font-size: 13px; color: var(--text-2)">Lakewood Ranch · 3.2 mi</span>
+<span style="font-size: 13px; color: var(--text-2)">Pickup · Ships · Marcus T.</span>
+</div>
+</a>
+<div style="display: flex; justify-content: center; gap: 6px"><span style="width: 6px; height: 6px; border-radius: 3px; background: var(--text-3); opacity: .4"></span><span style="width: 18px; height: 6px; border-radius: 3px; background: var(--int)"></span><span style="width: 6px; height: 6px; border-radius: 3px; background: var(--text-3); opacity: .4"></span><span style="width: 6px; height: 6px; border-radius: 3px; background: var(--text-3); opacity: .4"></span></div>
+</div>
+<div style="position: absolute; left: 16px; bottom: 24px"><dc-import name="TabBar" active="market" hint-size="358px,64px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      pins: [ { x: 150, y: 340, t: '$95' }, { x: 120, y: 200, t: '$110' }, { x: 300, y: 400, t: '$130' }, { x: 160, y: 430, t: '$145' }, { x: 290, y: 170, t: '$125' }, { x: 240, y: 470, t: '$80' } ]
+    };
+  }
+}
+</script>
+</body>
+</html>

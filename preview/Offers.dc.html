@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>All offers</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 1200px; position: relative; overflow: hidden">
+<div style="padding: 54px 16px 0; display: flex; align-items: center; gap: 12px">
+<a href="ProductDetail.dc.html" aria-label="Back" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<div style="flex: 1; display: flex; flex-direction: column; align-items: center"><span style="font-size: 17px; font-weight: 600">All offers</span><span style="font-size: 12px; color: var(--text-2)">Perseus Pro IV · 16mm</span></div>
+<span style="width: 40px"></span>
+</div>
+<div role="tablist" aria-label="Sort" style="margin: 16px 16px 0; height: 36px; border-radius: 10px; background: var(--surface); padding: 2px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr))">
+<button role="tab" aria-selected="true" style="border-radius: 8px; background: var(--surface-elev); box-shadow: 0 1px 3px rgba(0,0,0,.12); font-size: 15px; font-weight: 600; text-align: center">Delivered price</button>
+<button role="tab" aria-selected="false" style="border-radius: 8px; font-size: 15px; font-weight: 600; color: var(--text-2); text-align: center">Item price</button>
+</div>
+<div style="padding: 16px 16px 0; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{offers}}" as="o" hint-placeholder-count="5">
+<div style="border-radius: 18px; border: {{o.border}}; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="width: 40px; height: 40px; border-radius: 10px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">{{o.m}}</span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">{{o.n}}</span><span style="font-size: 12px; color: var(--text-2)">{{o.tags}}</span></div>
+<div style="display: flex; flex-direction: column; align-items: flex-end"><span class="num" style="font-size: 20px; font-weight: 700">{{o.total}}</span><span class="num" style="font-size: 12px; color: var(--text-2)">{{o.diff}}</span></div>
+</div>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-2)"><span>{{o.line}}</span><span>{{o.when}}</span></div>
+<a href="DealDetail.dc.html" style="height: 40px; border-radius: 20px; background: {{o.bg}}; color: {{o.fg}}; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{o.cta}}</a>
+</div>
+</sc-for>
+<a href="MarketHome.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 18px; background: var(--surface); margin-top: 4px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 4px 7px; border-radius: 6px; background: var(--bg)">PRE-OWNED</span>
+<span class="num" style="flex: 1; font-size: 15px; font-weight: 600">6 listings from $110</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</a>
+<span style="font-size: 12px; line-height: 1.45; color: var(--text-2); padding: 4px 2px">Ranked by what you pay, including shipping and verified codes. Sponsored offers are labelled and sit in their price position. Commission never changes the order.</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const best = { border: '2px solid var(--int)', bg: 'var(--int)', fg: 'var(--on-int)', cta: 'Get deal' };
+    const other = { border: '1px solid var(--border)', bg: 'var(--chip)', fg: 'var(--text-1)', cta: 'View offer' };
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      offers: [
+        Object.assign({ m: 'a', n: 'Amazon', tags: 'Lowest price · affiliate', total: '$179', diff: 'Best', line: '$179 + free shipping', when: 'Checked 4m ago' }, best),
+        Object.assign({ m: 'CS', n: 'CourtSide Pro Shop', tags: 'In stock · affiliate', total: '$195', diff: '+$16', line: '$189 + $6 shipping', when: 'Checked 12m ago' }, other),
+        Object.assign({ m: 'J', n: 'JOOLA.com', tags: 'Manufacturer · code DINK15', total: '$195', diff: '+$16', line: '$229 − $34 code + free shipping', when: 'Checked 1h ago' }, other),
+        Object.assign({ m: 'BL', n: 'Baseline Sports', tags: 'Sponsored', total: '$199', diff: '+$20', line: '$199 + free shipping', when: 'Checked 30m ago' }, other),
+        Object.assign({ m: 'RC', n: 'Racquet & Court Co.', tags: 'Low stock', total: '$219', diff: '+$40', line: '$209 + $10 shipping', when: 'Checked 2h ago' }, other)
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

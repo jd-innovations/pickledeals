@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Watchlist</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 1200px; position: relative; overflow: hidden">
+<div style="padding: 62px 16px 0; display: flex; align-items: center; justify-content: space-between">
+<h1 style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em">Watchlist</h1>
+<a href="Profile.dc.html" aria-label="Profile" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface-pressed); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700">D</a>
+</div>
+<div class="noscroll" style="display: flex; gap: 8px; overflow-x: auto; padding: 14px 16px 0">
+<span style="flex-shrink: 0; height: 36px; padding: 0 14px; border-radius: 18px; background: var(--int); color: var(--on-int); font-size: 15px; font-weight: 600; display: flex; align-items: center">All 14</span>
+<span style="flex-shrink: 0; height: 36px; padding: 0 14px; border-radius: 18px; background: var(--surface); font-size: 15px; font-weight: 600; display: flex; align-items: center">Products 6</span>
+<span style="flex-shrink: 0; height: 36px; padding: 0 14px; border-radius: 18px; background: var(--surface); font-size: 15px; font-weight: 600; display: flex; align-items: center">Deals 4</span>
+<span style="flex-shrink: 0; height: 36px; padding: 0 14px; border-radius: 18px; background: var(--surface); font-size: 15px; font-weight: 600; display: flex; align-items: center">Pre-owned 2</span>
+<span style="flex-shrink: 0; height: 36px; padding: 0 14px; border-radius: 18px; background: var(--surface); font-size: 15px; font-weight: 600; display: flex; align-items: center">Brands 2</span>
+</div>
+<section style="padding: 24px 16px 0; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="font-size: 22px; font-weight: 700; letter-spacing: -0.015em">Price alerts</h2><span style="font-size: 13px; color: var(--text-2)">3 active</span></div>
+<sc-for list="{{alerts}}" as="a" hint-placeholder-count="3">
+<a href="ProductDetail.dc.html" style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 18px; background: var(--surface)">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 52px; height: 52px; border-radius: 12px; background: var(--img); padding: 5px; flex-shrink: 0"><dc-import name="ProductArt" kind="{{a.k}}" c1="{{a.c1}}" c2="{{a.c2}}" hint-size="100%,100%"></dc-import></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">{{a.name}}</span><span class="num" style="font-size: 13px; color: var(--text-2)">{{a.scope}}</span></div>
+<sc-if value="{{a.hit}}" hint-placeholder-val="{{false}}"><span style="font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 4px 7px; border-radius: 6px; background: var(--int); color: var(--on-int)">HIT</span></sc-if>
+</div>
+<div style="position: relative; height: 6px; border-radius: 3px; background: var(--border)"><div style="position: absolute; left: 0; top: 0; bottom: 0; width: {{a.pct}}; border-radius: 3px; background: var(--int)"></div></div>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 13px"><span style="color: var(--text-2)">Now <b style="color: var(--text-1)">{{a.now}}</b></span><span style="color: var(--text-2)">Target <b style="color: var(--text-1)">{{a.target}}</b></span></div>
+</a>
+</sc-for>
+</section>
+<section style="padding: 28px 16px 0; display: flex; flex-direction: column">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 6px"><h2 style="font-size: 22px; font-weight: 700; letter-spacing: -0.015em">Saved</h2><span style="font-size: 13px; color: var(--text-2)">Swipe for actions</span></div>
+<sc-for list="{{saved}}" as="s" hint-placeholder-count="4">
+<a href="{{s.href}}" style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--sep)">
+<div style="width: 64px; height: 64px; border-radius: 12px; background: var(--img); padding: 6px; flex-shrink: 0"><dc-import name="ProductArt" kind="{{s.k}}" c1="{{s.c1}}" c2="{{s.c2}}" hint-size="100%,100%"></dc-import></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--text-3)">{{s.type}}</span><span style="font-size: 15px; font-weight: 600">{{s.name}}</span><span class="num" style="font-size: 13px; color: var(--text-2)">{{s.meta}}</span></div>
+<div style="display: flex; flex-direction: column; align-items: flex-end"><span class="num" style="font-size: 17px; font-weight: 700">{{s.price}}</span><span class="num" style="font-size: 12px; font-weight: 600">{{s.change}}</span></div>
+</a>
+</sc-for>
+</section>
+<div style="position: absolute; left: 16px; bottom: 24px"><dc-import name="TabBar" active="watch" hint-size="358px,64px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1200}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      alerts: [
+        { k: 'paddle', c1: '#1F5FD1', c2: '#C8F03C', name: 'JOOLA Perseus Pro IV 16mm', scope: 'New + pre-owned · 25 mi', now: '$179', target: '$150', pct: '84%', hit: false },
+        { k: 'shoe', c1: '#3A86FF', c2: '#FFBE0B', name: 'K-Swiss Express Light · 10', scope: 'New only', now: '$89', target: '$95', pct: '100%', hit: true },
+        { k: 'machine', c1: '#FF7F11', c2: '#FFFFFF', name: 'Lobster Pickle Elite', scope: 'Pre-owned · ships', now: '$520', target: '$450', pct: '87%', hit: false }
+      ],
+      saved: [
+        { href: 'ProductDetail.dc.html', type: 'PRODUCT', k: 'paddle', c1: '#26282B', c2: '#9BE15D', name: 'CRBN 3X Power 16mm', meta: 'Amazon · 5 offers', price: '$169', change: '↓ $20 since saved' },
+        { href: 'DealDetail.dc.html', type: 'DEAL · ENDS 2D', k: 'shoe', c1: '#FF5D8F', c2: '#1C1C1C', name: 'Skechers Viper Court Pro', meta: 'Code COURT20', price: '$94', change: '−30%' },
+        { href: 'ListingDetail.dc.html', type: 'PRE-OWNED · PENDING', k: 'paddle', c1: '#D7263D', c2: '#F4D35E', name: 'Selkirk Vanguard Power Air', meta: 'Excellent · 3.2 mi', price: '$125', change: 'New $189' },
+        { href: 'ProductDetail.dc.html', type: 'PRODUCT', k: 'bag', c1: '#1D3557', c2: '#E63946', name: 'Selkirk Core Tour Backpack', meta: 'Selkirk.com', price: '$110', change: 'No change' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

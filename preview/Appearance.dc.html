@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Appearance</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 900px; position: relative; overflow: hidden; background: var(--surface)">
+<div style="padding: 54px 16px 0">
+<a href="Profile.dc.html" aria-label="Back" style="width: 40px; height: 40px; border-radius: 20px; background: var(--bg); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+</div>
+<h1 style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em; padding: 12px 16px 0">Appearance</h1>
+<div role="radiogroup" aria-label="Appearance" style="margin: 20px 16px 0; padding: 18px 12px; border-radius: 20px; background: var(--bg); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{opts}}" as="o" hint-placeholder-count="3">
+<button role="radio" aria-checked="{{o.on}}" onClick="{{o.pick}}" style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<span style="width: 84px; height: 150px; border-radius: 16px; overflow: hidden; border: {{o.border}}; display: flex; background: {{o.bgA}}">
+<span style="flex: 1; padding: 10px 6px; display: flex; flex-direction: column; gap: 5px; background: {{o.bgA}}"><span style="height: 6px; width: 70%; border-radius: 3px; background: {{o.fgA}}"></span><span style="flex: 1; border-radius: 6px; background: {{o.tileA}}"></span><span style="height: 5px; width: 80%; border-radius: 3px; background: {{o.fgA}}; opacity: .5"></span><span style="height: 12px; border-radius: 6px; background: {{o.fgA}}"></span></span>
+<span style="flex: {{o.split}}; padding: 10px 6px; display: flex; flex-direction: column; gap: 5px; background: {{o.bgB}}"><span style="height: 6px; width: 70%; border-radius: 3px; background: {{o.fgB}}"></span><span style="flex: 1; border-radius: 6px; background: {{o.tileB}}"></span><span style="height: 5px; width: 80%; border-radius: 3px; background: {{o.fgB}}; opacity: .5"></span><span style="height: 12px; border-radius: 6px; background: {{o.fgB}}"></span></span>
+</span>
+<span style="font-size: 15px; font-weight: 600">{{o.t}}</span>
+<span style="width: 22px; height: 22px; border-radius: 11px; border: {{o.ring}}; display: flex; align-items: center; justify-content: center; background: {{o.dot}}; color: var(--on-int)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+</button>
+</sc-for>
+</div>
+<p style="font-size: 13px; line-height: 1.45; color: var(--text-2); padding: 10px 32px 0">System follows your iPhone’s setting and switches at sunset if you use Automatic.</p>
+<section style="padding: 22px 16px 0; display: flex; flex-direction: column; gap: 6px">
+<div style="border-radius: 16px; background: var(--bg); overflow: hidden">
+<div style="display: flex; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--sep)"><span style="font-size: 16px">App icon</span><span style="font-size: 15px; color: var(--text-2)">Black ›</span></div>
+<div style="display: flex; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--sep)"><span style="font-size: 16px">Text size</span><span style="font-size: 15px; color: var(--text-2)">Follows Dynamic Type ›</span></div>
+<div style="display: flex; justify-content: space-between; padding: 14px 16px"><span style="font-size: 16px">Reduce motion</span><span style="font-size: 15px; color: var(--text-2)">System ›</span></div>
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { pick: 'System' }; }
+  renderVals() {
+    const p = this.state.pick;
+    const L = { bg: '#FFFFFF', fg: '#0A0A0A', tile: '#F1F1EF' }, D = { bg: '#0B0B0C', fg: '#F5F5F4', tile: '#1A1A1C' };
+    const mk = (t, a, b, split) => ({
+      t, on: p === t, pick: () => this.setState({ pick: t }), split,
+      bgA: a.bg, fgA: a.fg, tileA: a.tile, bgB: b.bg, fgB: b.fg, tileB: b.tile,
+      border: p === t ? '2.5px solid var(--int)' : '1px solid var(--border)',
+      ring: p === t ? '0' : '1.5px solid var(--border)', dot: p === t ? 'var(--int)' : 'transparent'
+    });
+    const dark = p === 'Dark' || (p === 'System' && this.props.theme === 'dark');
+    return {
+      mode: dark ? 'dark' : '',
+      opts: [mk('System', L, D, '1'), mk('Light', L, L, '0'), mk('Dark', D, D, '0')]
+    };
+  }
+}
+</script>
+</body>
+</html>

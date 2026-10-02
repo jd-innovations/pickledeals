@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Activity</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 1100px; position: relative; overflow: hidden">
+<div style="padding: 62px 16px 0; display: flex; align-items: center; justify-content: space-between">
+<h1 style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em">Inbox</h1>
+<a href="NotifPrefs.dc.html" aria-label="Notification settings" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></a>
+</div>
+<div role="tablist" aria-label="Inbox" style="margin: 14px 16px 0; height: 36px; border-radius: 10px; background: var(--surface); padding: 2px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr))">
+<a href="Inbox.dc.html" role="tab" aria-selected="false" style="border-radius: 8px; font-size: 15px; font-weight: 600; color: var(--text-2); display: flex; align-items: center; justify-content: center">Messages</a>
+<span role="tab" aria-selected="true" style="border-radius: 8px; background: var(--surface-elev); box-shadow: 0 1px 3px rgba(0,0,0,.12); font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">Activity</span>
+</div>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<section style="padding: 22px 16px 0; display: flex; flex-direction: column">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .06em; color: var(--text-3); padding-bottom: 4px">{{g.label}}</span>
+<sc-for list="{{g.items}}" as="n" hint-placeholder-count="3">
+<a href="{{n.href}}" style="display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sep); align-items: flex-start">
+<span style="width: 36px; height: 36px; border-radius: 18px; background: {{n.ibg}}; color: {{n.ifg}}; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 15px; font-weight: 700">{{n.icon}}</span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+<div style="display: flex; justify-content: space-between"><span style="font-size: 11px; font-weight: 700; letter-spacing: .08em">{{n.type}}</span><span style="font-size: 12px; color: var(--text-3)">{{n.time}}</span></div>
+<span style="font-size: 15px; line-height: 1.35; font-weight: {{n.weight}}">{{n.body}}</span>
+</div>
+<div style="width: 48px; height: 48px; border-radius: 10px; background: var(--img); padding: 4px; flex-shrink: 0"><dc-import name="ProductArt" kind="{{n.k}}" c1="{{n.c1}}" c2="{{n.c2}}" hint-size="100%,100%"></dc-import></div>
+</a>
+</sc-for>
+</section>
+</sc-for>
+<div style="position: absolute; left: 16px; bottom: 24px"><dc-import name="TabBar" active="inbox" hint-size="358px,64px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const un = { ibg: 'var(--int)', ifg: 'var(--on-int)', weight: 600 };
+    const rd = { ibg: 'var(--surface)', ifg: 'var(--text-1)', weight: 400 };
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      groups: [
+        { label: 'TODAY', items: [
+          Object.assign({ href: 'ProductDetail.dc.html', icon: '↓', type: 'PRICE DROP', time: '9:12 AM', body: 'The paddle you saved dropped from $199 to $159.', k: 'paddle', c1: '#1F5FD1', c2: '#C8F03C' }, un),
+          Object.assign({ href: 'Conversation.dc.html', icon: '$', type: 'OFFER RECEIVED', time: '8:40 AM', body: 'Jordan offered $120 for your CRBN 3X.', k: 'paddle', c1: '#26282B', c2: '#9BE15D' }, un),
+          Object.assign({ href: 'Conversation.dc.html', icon: '↺', type: 'COUNTEROFFER', time: '7:55 AM', body: 'The seller countered your $125 offer at $140.', k: 'paddle', c1: '#1F5FD1', c2: '#C8F03C' }, un)
+        ] },
+        { label: 'YESTERDAY', items: [
+          Object.assign({ href: 'Conversation.dc.html', icon: '✓', type: 'OFFER ACCEPTED', time: '6:20 PM', body: 'Your $135 offer was accepted. Arrange pickup in chat.', k: 'paddle', c1: '#1F5FD1', c2: '#C8F03C' }, rd),
+          Object.assign({ href: 'BrandDetail.dc.html', icon: '+', type: 'NEW DEAL', time: '2:03 PM', body: 'A new Selkirk deal matches your saved search “power paddle”.', k: 'paddle', c1: '#D7263D', c2: '#F4D35E' }, rd),
+          Object.assign({ href: 'MapPreview.dc.html', icon: '⌖', type: 'NEARBY LISTING', time: '11:47 AM', body: 'A paddle matching “16mm under $150” was listed 3 mi away.', k: 'paddle', c1: '#0F9D8A', c2: '#FFD166' }, rd),
+          Object.assign({ href: 'Conversation.dc.html', icon: '…', type: 'NEW MESSAGE', time: '9:30 AM', body: 'New message about your JOOLA Perseus listing.', k: 'paddle', c1: '#2B2D42', c2: '#EF233C' }, rd)
+        ] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

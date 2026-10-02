@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Deal detail</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 1300px; position: relative; overflow: hidden">
+<div style="position: relative; height: 360px; background: var(--img); padding: 100px 40px 30px">
+<dc-import name="ProductArt" kind="shoe" c1="#FF5D8F" c2="#1C1C1C" hint-size="100%,100%"></dc-import>
+<div style="position: absolute; left: 16px; right: 16px; top: 54px; display: flex; justify-content: space-between">
+<a href="DealsHome.dc.html" aria-label="Back" class="glass" style="width: 44px; height: 44px; border-radius: 22px; border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<button aria-label="Save" class="glass" style="width: 44px; height: 44px; border-radius: 22px; border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.8-7.5 10.2-7.5 10.2z"/></svg></button>
+</div>
+<span style="position: absolute; left: 16px; bottom: 16px; font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--bg); border: 1px dashed var(--text-3)">PROMO CODE</span>
+</div>
+<main style="padding: 20px 16px 140px; display: flex; flex-direction: column; gap: 22px">
+<section style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 15px; font-weight: 600; color: var(--text-2)">Skechers · Shoes</span>
+<h1 style="font-size: 26px; line-height: 1.15; font-weight: 700; letter-spacing: -0.02em">Viper Court Pro — extra $20 off with code</h1>
+<span style="font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>Ends in 2 days · verified 2h ago</span>
+</section>
+<section class="num" style="border-radius: 20px; background: var(--surface); padding: 16px; display: flex; flex-direction: column; gap: 8px; font-size: 15px">
+<div style="display: flex; justify-content: space-between; color: var(--text-2)"><span>List price</span><span style="text-decoration: line-through">$135.00</span></div>
+<div style="display: flex; justify-content: space-between; color: var(--text-2)"><span>Sale price at Skechers.com</span><span>$114.00</span></div>
+<div style="display: flex; justify-content: space-between"><span>Code COURT20</span><span style="font-weight: 600">−$20.00</span></div>
+<div style="height: 1px; background: var(--border); margin: 4px 0"></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-weight: 700">You pay</span><span style="font-size: 32px; font-weight: 700; letter-spacing: -0.03em">$94</span></div>
+<div style="display: flex; justify-content: flex-end; gap: 8px; align-items: center"><span style="font-size: 13px; font-weight: 700; padding: 3px 7px; border-radius: 6px; background: var(--int); color: var(--on-int)">−30%</span><span style="font-weight: 600">Save $41</span></div>
+</section>
+<section style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; border: 1.5px dashed var(--border)">
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 12px; color: var(--text-2)">Promo code</span><span style="font-family: ui-monospace, 'SF Mono', monospace; font-size: 22px; font-weight: 700; letter-spacing: .08em">COURT20</span></div>
+<button onClick="{{copy}}" style="height: 40px; padding: 0 14px; border-radius: 20px; background: var(--chip); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>{{copyLabel}}</button>
+</section>
+<section style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 15px; font-weight: 700">Colour · Size (men’s US)</span>
+<div style="display: flex; gap: 10px">
+<span style="width: 32px; height: 32px; border-radius: 16px; background: #FF5D8F; outline: 2px solid var(--int); outline-offset: 2px"></span>
+<span style="width: 32px; height: 32px; border-radius: 16px; background: #1C1C1C; border: 1px solid var(--border)"></span>
+<span style="width: 32px; height: 32px; border-radius: 16px; background: #F4F4F2; border: 1px solid var(--border)"></span>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<span style="height: 40px; min-width: 52px; border-radius: 10px; border: 1px solid var(--border); font-size: 15px; display: flex; align-items: center; justify-content: center">9</span>
+<span style="height: 40px; min-width: 52px; border-radius: 10px; border: 2px solid var(--int); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">9.5</span>
+<span style="height: 40px; min-width: 52px; border-radius: 10px; border: 1px solid var(--border); font-size: 15px; display: flex; align-items: center; justify-content: center">10</span>
+<span style="height: 40px; min-width: 52px; border-radius: 10px; border: 1px dashed var(--border); font-size: 15px; color: var(--text-3); display: flex; align-items: center; justify-content: center; text-decoration: line-through">10.5</span>
+<span style="height: 40px; min-width: 52px; border-radius: 10px; border: 1px solid var(--border); font-size: 15px; display: flex; align-items: center; justify-content: center">11</span>
+</div>
+</section>
+<a href="ProductDetail.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; background: var(--surface)">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">Compare all offers for this shoe</span><span class="num" style="font-size: 13px; color: var(--text-2)">This is the lowest of 4 · 2 pre-owned from $55</span></div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</a>
+<span style="font-size: 12px; line-height: 1.45; color: var(--text-2)">Opens Skechers.com. The code is copied for you. PickleDeals doesn’t handle checkout and may earn a commission from this link.</span>
+</main>
+<div class="glass" style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px 34px; border-top: 0.5px solid var(--border)">
+<a href="ProductDetail.dc.html" style="height: 54px; border-radius: 27px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px">Copy code &amp; get deal <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></a>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { copied: false }; }
+  renderVals() {
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      copyLabel: this.state.copied ? 'Copied' : 'Copy',
+      copy: () => this.setState({ copied: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

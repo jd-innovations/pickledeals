@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PickleDeals — component library</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 1600px; height: 3300px; overflow: hidden; padding: 96px; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<h1 style="font-size: 64px; font-weight: 800; letter-spacing: -0.04em">Components</h1>
+<span style="font-size: 17px; color: var(--text-2)">Shown at 1× iOS points · every screen is assembled from these</span>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start">
+
+<div style="display: flex; flex-direction: column; gap: 24px">
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 20px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">DEAL CARD · GRID</span>
+<div style="display: grid; grid-template-columns: repeat(3, 173px); gap: 16px 24px">
+<sc-for list="{{cards}}" as="d" hint-placeholder-count="3">
+<div style="position: relative; display: flex; flex-direction: column; gap: 8px; width: 173px">
+<a href="ProductDetail.dc.html" style="display: flex; flex-direction: column; gap: 8px">
+<div style="position: relative; height: 173px; border-radius: 16px; background: var(--img); padding: 14px">
+<dc-import name="ProductArt" kind="{{d.kind}}" c1="{{d.c1}}" c2="{{d.c2}}" hint-size="100%,100%"></dc-import>
+<sc-if value="{{d.badge}}" hint-placeholder-val="{{true}}"><span style="position: absolute; left: 8px; top: 8px; font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 4px 7px; border-radius: 6px; background: var(--bg); color: var(--text-1)">{{d.badge}}</span></sc-if>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; padding: 0 2px">
+<span style="font-size: 12px; font-weight: 600; color: var(--text-2)">{{d.brand}}</span>
+<span class="clamp2" style="font-size: 15px; font-weight: 500; line-height: 1.25">{{d.name}}</span>
+<div style="display: flex; align-items: baseline; gap: 6px; margin-top: 4px"><span class="num" style="font-size: 17px; font-weight: 700">{{d.price}}</span><span class="num" style="font-size: 13px; color: var(--text-3); text-decoration: line-through">{{d.was}}</span><span class="num" style="margin-left: auto; font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: var(--int); color: var(--on-int)">{{d.off}}</span></div>
+<span style="font-size: 12px; color: var(--text-2)">{{d.meta}}</span>
+</div>
+</a>
+<button aria-label="Save" class="glass" style="position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="{{d.heartFill}}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.8-7.5 10.2-7.5 10.2z"/></svg></button>
+</div>
+</sc-for>
+</div>
+<span style="font-size: 13px; line-height: 1.5; color: var(--text-2)">One badge max, on the image. Discount is always a black pill. Sponsored is a text line under the card, never a badge that looks like a deal signal.</span>
+</div>
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 20px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">PRODUCT CARD · LISTING CARD · ROW</span>
+<div style="display: flex; gap: 24px; align-items: flex-start">
+<div style="width: 173px; display: flex; flex-direction: column; gap: 8px">
+<div style="height: 173px; border-radius: 16px; background: var(--img); padding: 14px"><dc-import name="ProductArt" kind="paddle" c1="#26282B" c2="#9BE15D" hint-size="100%,100%"></dc-import></div>
+<span style="font-size: 12px; font-weight: 600; color: var(--text-2)">CRBN</span>
+<span style="font-size: 15px; font-weight: 500">3X Power Series 16mm</span>
+<span class="num" style="font-size: 15px"><span style="color: var(--text-2)">From</span> <b>$169</b> new</span>
+<span class="num" style="font-size: 12px; color: var(--text-2)">5 offers · 8 pre-owned from $95</span>
+</div>
+<div style="width: 173px; display: flex; flex-direction: column; gap: 8px">
+<div style="position: relative; height: 173px; border-radius: 16px; background: var(--img); padding: 14px"><dc-import name="ProductArt" kind="paddle" c1="#D7263D" c2="#F4D35E" hint-size="100%,100%"></dc-import><span style="position: absolute; left: 8px; bottom: 8px; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 6px; background: var(--bg)">Excellent</span></div>
+<div style="display: flex; align-items: baseline; gap: 6px"><span class="num" style="font-size: 17px; font-weight: 700">$125</span><span class="num" style="font-size: 12px; color: var(--text-2)">New $179</span></div>
+<span style="font-size: 15px; font-weight: 500">Selkirk Vanguard Power Air</span>
+<span class="num" style="font-size: 12px; color: var(--text-2)">Lakewood Ranch · 3.2 mi</span>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 0; border-radius: 16px; background: var(--bg); overflow: hidden">
+<div style="display: flex; gap: 12px; align-items: center; padding: 12px">
+<div style="width: 64px; height: 64px; border-radius: 12px; background: var(--img); padding: 6px; flex-shrink: 0"><dc-import name="ProductArt" kind="shoe" c1="#3A86FF" c2="#FFBE0B" hint-size="100%,100%"></dc-import></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0"><span style="font-size: 15px; font-weight: 600">K-Swiss Express Light</span><span class="num" style="font-size: 13px; color: var(--text-2)">$129 → <b style="color: var(--text-1)">$89</b></span><span style="font-size: 12px; color: var(--text-2)">↓ 31% this week</span></div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 20px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">PRICE BLOCK · DISCOUNT · DEAL QUALITY</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+<div style="background: var(--bg); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">BEST NEW PRICE</span>
+<div style="display: flex; align-items: baseline; gap: 10px"><span class="num" style="font-size: 40px; font-weight: 700; letter-spacing: -0.03em">$179</span><span class="num" style="font-size: 17px; color: var(--text-3); text-decoration: line-through">$279</span></div>
+<div style="display: flex; align-items: center; gap: 8px"><span class="num" style="font-size: 13px; font-weight: 700; padding: 3px 7px; border-radius: 6px; background: var(--int); color: var(--on-int)">−36%</span><span class="num" style="font-size: 15px; font-weight: 600">Save $100</span><span style="font-size: 15px; color: var(--text-2)">at Amazon</span></div>
+</div>
+<div style="background: var(--bg); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">USED VS NEW</span>
+<div style="display: flex; gap: 0; border-radius: 12px; border: 1px solid var(--border); overflow: hidden">
+<div style="flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: var(--text-2)">This listing</span><span class="num" style="font-size: 22px; font-weight: 700">$125</span><span style="font-size: 12px; font-weight: 600">Excellent</span></div>
+<div style="flex: 1; padding: 12px; display: flex; flex-direction: column; gap: 2px; background: var(--surface); border-left: 1px solid var(--border)"><span style="font-size: 12px; color: var(--text-2)">Best new</span><span class="num" style="font-size: 22px; font-weight: 700">$179</span><span style="font-size: 12px; color: var(--text-2)">Amazon</span></div>
+</div>
+<span class="num" style="font-size: 13px; color: var(--text-2)">$54 less than new · typical used $105–$135</span>
+</div>
+<div style="background: var(--bg); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 10px; grid-column: 1 / span 2">
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="font-size: 17px; font-weight: 700">Excellent deal</span><span class="num" style="font-size: 13px; color: var(--text-2)">Typical $219 · 90-day low $159</span></div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px"><div style="height: 6px; border-radius: 3px; background: var(--int)"></div><div style="height: 6px; border-radius: 3px; background: var(--int)"></div><div style="height: 6px; border-radius: 3px; background: var(--int)"></div><div style="height: 6px; border-radius: 3px; background: var(--int)"></div><div style="height: 6px; border-radius: 3px; background: var(--border)"></div></div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-3)"><span>Above typical</span><span>Typical</span><span>Good</span><span>Excellent</span><span>All-time low</span></div>
+</div>
+</div>
+</div>
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">DEAL BADGES</span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<span style="font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--bg)">HOT DEAL</span>
+<span style="font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--bg)">PRICE DROP</span>
+<span style="font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--int); color: var(--on-int)">LOWEST PRICE</span>
+<span style="font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--bg)">ENDING SOON</span>
+<span style="font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--bg); border: 1px dashed var(--text-3)">PROMO CODE</span>
+<span style="font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--bg)">NEW DEAL</span>
+<span style="font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; border: 1px solid var(--border); color: var(--text-2)">SPONSORED</span>
+</div>
+<span style="font-size: 13px; line-height: 1.5; color: var(--text-2)">Priority when several apply: Lowest price › Price drop › Ending soon › Promo code › Hot › New. Only the top one shows.</span>
+</div>
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">RETAILER ROWS · BRAND ROW · PROMO CODE</span>
+<div style="background: var(--bg); border-radius: 16px; overflow: hidden">
+<div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--sep)">
+<div style="width: 36px; height: 36px; border-radius: 10px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">a</div>
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">Amazon <span style="font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 2px 6px; border-radius: 5px; background: var(--int); color: var(--on-int); margin-left: 4px">LOWEST</span></span><span style="font-size: 12px; color: var(--text-2)">Free shipping · in stock · checked 4m ago</span></div>
+<span class="num" style="font-size: 17px; font-weight: 700">$179</span>
+<a href="DealDetail.dc.html" style="height: 34px; padding: 0 14px; border-radius: 17px; background: var(--int); color: var(--on-int); font-size: 13px; font-weight: 700; display: flex; align-items: center">Get deal</a>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--sep)">
+<div style="width: 36px; height: 36px; border-radius: 10px; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">CS</div>
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">CourtSide Pro Shop</span><span class="num" style="font-size: 12px; color: var(--text-2)">+$10 vs. lowest · $6 shipping</span></div>
+<span class="num" style="font-size: 17px; font-weight: 600">$189</span>
+<a href="DealDetail.dc.html" style="height: 34px; padding: 0 14px; border-radius: 17px; background: var(--chip); font-size: 13px; font-weight: 700; display: flex; align-items: center">View</a>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px">
+<div style="width: 36px; height: 36px; border-radius: 18px; background: var(--int); color: var(--on-int); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; letter-spacing: -0.02em">JOOLA</div>
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">JOOLA</span><span style="font-size: 12px; color: var(--text-2)">42 live deals · 3 promo codes</span></div>
+<button style="height: 34px; padding: 0 14px; border-radius: 17px; border: 1px solid var(--border); font-size: 13px; font-weight: 700">Following</button>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px; background: var(--bg); border: 1.5px dashed var(--border)">
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">15% off sitewide</span><span style="font-size: 12px; color: var(--text-2)">JOOLA.com · verified 2h ago · ends Oct 6</span></div>
+<button style="height: 36px; padding: 0 12px; border-radius: 10px; background: var(--surface); font-family: ui-monospace, 'SF Mono', monospace; font-size: 15px; font-weight: 700; letter-spacing: .06em; display: flex; align-items: center; gap: 8px">DINK15 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+</div>
+</div>
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">SEARCH · CHIPS · FAVOURITE · ALERT CONTROL</span>
+<div style="height: 44px; border-radius: 22px; background: var(--bg); display: flex; align-items: center; gap: 8px; padding: 0 14px; color: var(--text-2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span style="font-size: 17px">Search paddles, shoes, brands</span></div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<span style="height: 36px; padding: 0 14px; border-radius: 18px; background: var(--int); color: var(--on-int); font-size: 15px; font-weight: 600; display: flex; align-items: center">Today</span>
+<span style="height: 36px; padding: 0 14px; border-radius: 18px; background: var(--bg); font-size: 15px; font-weight: 500; display: flex; align-items: center">Price drops</span>
+<span style="height: 36px; padding: 0 14px; border-radius: 18px; background: var(--bg); font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 6px">Brand <span style="font-size: 12px; font-weight: 700; padding: 1px 6px; border-radius: 8px; background: var(--int); color: var(--on-int)">2</span></span>
+<span style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--border); font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 6px">Under $100 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
+<span style="height: 36px; padding: 0 12px; border-radius: 18px; background: var(--bg); font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 8px"><span style="width: 24px; height: 24px; border-radius: 12px; background: var(--img); display: inline-block"></span>Paddles</span>
+</div>
+<div style="display: flex; gap: 16px; align-items: center">
+<button aria-label="Save" style="width: 44px; height: 44px; border-radius: 22px; background: var(--bg); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.8-7.5 10.2-7.5 10.2z"/></svg></button>
+<button aria-label="Saved" style="width: 44px; height: 44px; border-radius: 22px; background: var(--int); color: var(--on-int); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.8-7.5 10.2-7.5 10.2z"/></svg></button>
+<span style="font-size: 13px; color: var(--text-2)">Save: fill + light haptic + 1.15× spring</span>
+</div>
+<div style="background: var(--bg); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: 600">Alert me below</span><span class="num" style="font-size: 28px; font-weight: 700; letter-spacing: -0.02em">$150</span></div>
+<div style="position: relative; height: 28px"><div style="position: absolute; left: 0; right: 0; top: 12px; height: 4px; border-radius: 2px; background: var(--border)"></div><div style="position: absolute; left: 0; width: 46%; top: 12px; height: 4px; border-radius: 2px; background: var(--int)"></div><div style="position: absolute; left: calc(46% - 14px); top: 0; width: 28px; height: 28px; border-radius: 14px; background: var(--surface-elev); box-shadow: var(--shadow); border: 0.5px solid var(--border)"></div></div>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-3)"><span>90-day low $159</span><span>Now $179</span></div>
+</div>
+</div>
+
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 24px">
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">CONDITION · SELLER IDENTITY</span>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{conditions}}" as="c" hint-placeholder-count="5">
+<div style="background: var(--bg); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+<span style="align-self: flex-start; font-size: 11px; font-weight: 700; letter-spacing: .04em; padding: 3px 7px; border-radius: 6px; background: {{c.bg}}; color: {{c.fg}}; border: 1px solid var(--border)">{{c.t}}</span>
+<span style="font-size: 12px; line-height: 1.4; color: var(--text-2)">{{c.d}}</span>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; background: var(--bg); border-radius: 16px; padding: 14px 16px">
+<div style="width: 44px; height: 44px; border-radius: 22px; background: var(--surface-pressed); display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700">M</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">Marcus T.</span><span class="num" style="font-size: 12px; color: var(--text-2)">Sarasota, FL · member since 2025 · 14 sold</span></div>
+<span style="font-size: 12px; color: var(--text-2); text-align: right">Replies in<br><b style="color: var(--text-1)">~1 hour</b></span>
+</div>
+</div>
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">OFFER CARD · ALL STATES</span>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="background: var(--bg); border-radius: 18px; border: 1px solid var(--border); padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 11px; font-weight: 700; letter-spacing: .08em">OFFER · PENDING</span><span style="font-size: 12px; color: var(--text-2)">47h left</span></div>
+<div style="display: flex; gap: 10px; align-items: center"><div style="width: 40px; height: 40px; border-radius: 10px; background: var(--img); padding: 3px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div><span style="font-size: 13px; font-weight: 600">JOOLA Perseus Pro IV</span></div>
+<div class="num" style="display: flex; gap: 16px"><div style="display: flex; flex-direction: column"><span style="font-size: 11px; color: var(--text-2)">Asking</span><span style="font-size: 15px; color: var(--text-2); text-decoration: line-through">$150</span></div><div style="display: flex; flex-direction: column"><span style="font-size: 11px; color: var(--text-2)">Offer</span><span style="font-size: 22px; font-weight: 700">$125</span></div></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px"><button style="height: 36px; border-radius: 10px; background: var(--int); color: var(--on-int); font-size: 13px; font-weight: 700">Accept</button><button style="height: 36px; border-radius: 10px; background: var(--chip); font-size: 13px; font-weight: 700">Counter</button><button style="height: 36px; border-radius: 10px; background: var(--chip); font-size: 13px; font-weight: 700">Decline</button></div>
+</div>
+<div style="background: var(--bg); border-radius: 18px; border: 1px solid var(--border); padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-size: 11px; font-weight: 700; letter-spacing: .08em">COUNTEROFFER</span><span style="font-size: 12px; color: var(--text-2)">from seller</span></div>
+<div class="num" style="display: flex; gap: 16px; align-items: baseline"><span style="font-size: 15px; color: var(--text-2); text-decoration: line-through">$125</span><span style="font-size: 22px; font-weight: 700">$140</span></div>
+<span style="font-size: 13px; color: var(--text-2)">“Can do 140, it’s barely used.”</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px"><button style="height: 36px; border-radius: 10px; background: var(--int); color: var(--on-int); font-size: 13px; font-weight: 700">Accept</button><button style="height: 36px; border-radius: 10px; background: var(--chip); font-size: 13px; font-weight: 700">Counter</button><button style="height: 36px; border-radius: 10px; background: var(--chip); font-size: 13px; font-weight: 700">Decline</button></div>
+</div>
+<div style="background: var(--int); color: var(--on-int); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span style="font-size: 11px; font-weight: 700; letter-spacing: .08em">OFFER ACCEPTED</span></div>
+<span class="num" style="font-size: 28px; font-weight: 700">$135</span>
+<span style="font-size: 12px; opacity: .75">Not a purchase. Arrange payment and pickup or shipping in chat.</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="border-radius: 14px; border: 1px solid var(--border); padding: 10px 14px; display: flex; justify-content: space-between; color: var(--text-2)"><span style="font-size: 13px; font-weight: 600">Offer declined</span><span class="num" style="font-size: 13px; text-decoration: line-through">$100</span></div>
+<div style="border-radius: 14px; border: 1px solid var(--border); padding: 10px 14px; display: flex; justify-content: space-between; color: var(--text-2)"><span style="font-size: 13px; font-weight: 600">Offer withdrawn</span><span class="num" style="font-size: 13px; text-decoration: line-through">$110</span></div>
+<div style="border-radius: 14px; border: 1px dashed var(--border); padding: 10px 14px; display: flex; justify-content: space-between; color: var(--text-2)"><span style="font-size: 13px; font-weight: 600">Offer expired</span><span class="num" style="font-size: 13px; text-decoration: line-through">$115</span></div>
+</div>
+</div>
+</div>
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">CONVERSATION HEADER · BUBBLES</span>
+<div class="glass" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 16px; border: 0.5px solid var(--border)">
+<div style="width: 40px; height: 40px; border-radius: 10px; background: var(--img); padding: 3px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div>
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 600">JOOLA Perseus Pro IV 16mm</span><span class="num" style="font-size: 12px; color: var(--text-2)">$150 · Active</span></div>
+<a href="ListingDetail.dc.html" style="height: 30px; padding: 0 12px; border-radius: 15px; background: var(--chip); font-size: 12px; font-weight: 700; display: flex; align-items: center">View listing</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; background: var(--bg); border-radius: 16px; padding: 16px">
+<span style="align-self: center; font-size: 11px; color: var(--text-3); font-weight: 600">Today 9:41 AM</span>
+<div style="align-self: flex-start; max-width: 70%; padding: 8px 12px; border-radius: 18px 18px 18px 6px; background: var(--bubble-in); font-size: 15px; line-height: 1.35">Still available? Is the edge guard chipped?</div>
+<div style="align-self: flex-end; max-width: 70%; padding: 8px 12px; border-radius: 18px 18px 6px 18px; background: var(--bubble-out); color: var(--on-bubble-out); font-size: 15px; line-height: 1.35">Yes and no — clean edge. Pics below.</div>
+<div style="align-self: flex-end; width: 150px; height: 110px; border-radius: 18px; background: var(--img); padding: 10px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div>
+<span style="align-self: flex-end; font-size: 11px; color: var(--text-3)">Read 9:44</span>
+<div style="align-self: center; font-size: 12px; color: var(--text-2); padding: 4px 10px; border-radius: 10px; background: var(--surface)">Marcus marked this listing Pending</div>
+<div style="align-self: flex-start; padding: 12px 14px; border-radius: 18px; background: var(--bubble-in); display: flex; gap: 4px"><span style="width: 7px; height: 7px; border-radius: 4px; background: var(--text-3)"></span><span style="width: 7px; height: 7px; border-radius: 4px; background: var(--text-3); opacity: .7"></span><span style="width: 7px; height: 7px; border-radius: 4px; background: var(--text-3); opacity: .4"></span></div>
+</div>
+</div>
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">MAP MARKERS · PREVIEW CARD</span>
+<div style="position: relative; height: 260px; border-radius: 16px; background: var(--map-land); overflow: hidden">
+<div style="position: absolute; left: 0; right: 0; top: 120px; height: 10px; background: var(--map-road)"></div>
+<div style="position: absolute; top: 0; bottom: 0; left: 300px; width: 10px; background: var(--map-road)"></div>
+<div style="position: absolute; left: 380px; top: 20px; width: 160px; height: 90px; border-radius: 12px; background: var(--map-park)"></div>
+<div style="position: absolute; left: 40px; top: 150px; width: 120px; height: 120px; border-radius: 60px; background: rgba(10,10,10,.08); border: 1.5px dashed var(--text-3)"></div>
+<span class="num" style="position: absolute; left: 70px; top: 196px; height: 30px; padding: 0 10px; border-radius: 15px; background: var(--surface-elev); box-shadow: var(--shadow); font-size: 13px; font-weight: 700; display: flex; align-items: center">$130</span>
+<span class="num" style="position: absolute; left: 190px; top: 50px; height: 30px; padding: 0 10px; border-radius: 15px; background: var(--surface-elev); box-shadow: var(--shadow); font-size: 13px; font-weight: 700; display: flex; align-items: center">$95</span>
+<div style="position: absolute; left: 330px; top: 140px; display: flex; flex-direction: column; align-items: center"><span class="num" style="height: 36px; padding: 0 12px 0 4px; border-radius: 18px; background: var(--int); color: var(--on-int); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow)"><span style="width: 28px; height: 28px; border-radius: 14px; background: var(--img); display: inline-block"></span>$125</span><span style="width: 2px; height: 8px; background: var(--int)"></span></div>
+<span class="num" style="position: absolute; left: 500px; top: 170px; width: 44px; height: 44px; border-radius: 22px; background: var(--int); color: var(--on-int); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; border: 3px solid var(--surface-elev); box-shadow: var(--shadow)">12</span>
+</div>
+<div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-2)"><span>Approx. area (privacy)</span><span>Price pin</span><span>Selected · with thumb</span><span>Cluster</span></div>
+<div style="display: flex; gap: 12px; padding: 12px; border-radius: 20px; background: var(--surface-elev); box-shadow: var(--shadow)">
+<div style="width: 92px; height: 92px; border-radius: 14px; background: var(--img); padding: 8px; flex-shrink: 0"><dc-import name="ProductArt" kind="paddle" c1="#D7263D" c2="#F4D35E" hint-size="100%,100%"></dc-import></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span class="num" style="font-size: 20px; font-weight: 700">$125 <span style="font-size: 12px; font-weight: 500; color: var(--text-2)">New $179</span></span><span style="font-size: 15px; font-weight: 600">Selkirk Vanguard Power Air</span><span style="font-size: 12px; color: var(--text-2)">Excellent · Lakewood Ranch · 3.2 mi</span><span style="font-size: 12px; color: var(--text-2)">Pickup · Ships</span></div>
+</div>
+</div>
+
+<div style="border-radius: 24px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 13px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">EMPTY · LOADING · ERROR · SHEET · DIALOG · BUTTONS</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<div style="background: var(--bg); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.8-7.5 10.2-7.5 10.2z"/></svg>
+<span style="font-size: 15px; font-weight: 600">Nothing saved yet</span><span style="font-size: 12px; color: var(--text-2)">Tap the heart on any deal to watch its price.</span>
+</div>
+<div style="background: var(--bg); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 8px">
+<div style="height: 84px; border-radius: 12px; background: var(--surface)"></div><div style="height: 10px; width: 50%; border-radius: 5px; background: var(--surface)"></div><div style="height: 12px; width: 85%; border-radius: 6px; background: var(--surface)"></div><div style="height: 14px; width: 40%; border-radius: 7px; background: var(--surface-pressed)"></div>
+</div>
+<div style="background: var(--bg); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+<span style="font-size: 15px; font-weight: 600">Prices didn’t load</span><span style="font-size: 12px; color: var(--text-2)">Showing prices from 2h ago.</span>
+<button style="height: 32px; padding: 0 14px; border-radius: 16px; background: var(--chip); font-size: 13px; font-weight: 700">Try again</button>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="position: relative; height: 200px; border-radius: 16px; background: var(--overlay); overflow: hidden">
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 150px; border-radius: 28px 28px 0 0; background: var(--surface-elev); padding: 8px 16px; display: flex; flex-direction: column; gap: 10px">
+<span style="align-self: center; width: 36px; height: 5px; border-radius: 3px; background: var(--border)"></span>
+<span style="font-size: 17px; font-weight: 700">Bottom sheet</span>
+<span style="font-size: 13px; color: var(--text-2)">Medium / large detents · drag to dismiss · grabber always visible</span>
+</div>
+</div>
+<div style="position: relative; height: 200px; border-radius: 16px; background: var(--overlay); overflow: hidden; padding: 12px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px">
+<div style="border-radius: 14px; background: var(--surface-elev); overflow: hidden; text-align: center">
+<div style="padding: 10px; font-size: 12px; color: var(--text-2); border-bottom: 1px solid var(--sep)">Mark as sold? Buyers can no longer message you about it.</div>
+<div style="padding: 12px; font-size: 17px; font-weight: 600">Mark as sold</div>
+</div>
+<div style="border-radius: 14px; background: var(--surface-elev); padding: 12px; text-align: center; font-size: 17px; font-weight: 700">Cancel</div>
+</div>
+</div>
+<div style="display: flex; gap: 10px; align-items: center">
+<a href="DealDetail.dc.html" style="height: 50px; padding: 0 22px; border-radius: 25px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px">Get deal <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></a>
+<button style="height: 50px; padding: 0 22px; border-radius: 25px; background: var(--chip); font-size: 17px; font-weight: 700">Make offer</button>
+<button style="height: 50px; padding: 0 22px; border-radius: 25px; border: 1px solid var(--border); font-size: 17px; font-weight: 600">Message</button>
+<button style="height: 50px; padding: 0 8px; font-size: 17px; font-weight: 600; text-decoration: underline; text-underline-offset: 4px">Sell yours</button>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1600,"height":3300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      cards: [
+        { kind: 'paddle', c1: '#1F5FD1', c2: '#C8F03C', badge: 'LOWEST PRICE', brand: 'JOOLA', name: 'Perseus Pro IV 16mm', price: '$179', was: '$279', off: '−36%', meta: 'Amazon · Save $100', heartFill: 'currentColor' },
+        { kind: 'shoe', c1: '#FF5D8F', c2: '#1C1C1C', badge: 'PROMO CODE', brand: 'Skechers', name: 'Viper Court Pro', price: '$94', was: '$135', off: '−30%', meta: 'Code COURT20 · ends 2d', heartFill: 'none' },
+        { kind: 'bag', c1: '#1D3557', c2: '#E63946', badge: '', brand: 'Sponsored · Selkirk', name: 'Core Line Tour Backpack', price: '$89', was: '$110', off: '−19%', meta: 'Selkirk.com', heartFill: 'none' }
+      ],
+      conditions: [
+        { t: 'NEW / SEALED', d: 'Unused, in original packaging.', bg: 'var(--int)', fg: 'var(--on-int)' },
+        { t: 'LIKE NEW', d: 'Played under 5 times. No visible wear.', bg: 'var(--bg)', fg: 'var(--text-1)' },
+        { t: 'EXCELLENT', d: 'Light use. Minor surface marks only.', bg: 'var(--bg)', fg: 'var(--text-1)' },
+        { t: 'GOOD', d: 'Regular use. Scuffs, grip may need replacing.', bg: 'var(--bg)', fg: 'var(--text-1)' },
+        { t: 'FAIR', d: 'Heavy wear, fully playable. Flaws shown.', bg: 'var(--bg)', fg: 'var(--text-1)' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

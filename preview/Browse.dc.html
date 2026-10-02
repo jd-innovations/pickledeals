@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Browse categories</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 1300px; position: relative; overflow: hidden">
+<div style="padding: 54px 16px 0; display: flex; align-items: center; justify-content: space-between">
+<a href="DealsHome.dc.html" aria-label="Back" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<a href="Search.dc.html" aria-label="Search" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></a>
+</div>
+<h1 style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em; padding: 12px 16px 0">Browse</h1>
+<div role="tablist" aria-label="Browse by" style="margin: 14px 16px 0; height: 36px; border-radius: 10px; background: var(--surface); padding: 2px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))">
+<button role="tab" aria-selected="{{isCat}}" onClick="{{showCat}}" style="border-radius: 8px; font-size: 15px; font-weight: 600; text-align: center; background: {{catBg}}; box-shadow: {{catSh}}">Categories</button>
+<button role="tab" aria-selected="{{isBrand}}" onClick="{{showBrand}}" style="border-radius: 8px; font-size: 15px; font-weight: 600; text-align: center; background: {{brandBg}}; box-shadow: {{brandSh}}">Brands</button>
+<button role="tab" style="border-radius: 8px; font-size: 15px; font-weight: 600; text-align: center; color: var(--text-2)">Retailers</button>
+</div>
+<sc-if value="{{isCat}}" hint-placeholder-val="{{true}}">
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 16px">
+<sc-for list="{{cats}}" as="c" hint-placeholder-count="12">
+<a href="CategoryDetail.dc.html" style="position: relative; height: 128px; border-radius: 18px; background: var(--img); overflow: hidden; padding: 14px; display: flex; flex-direction: column; justify-content: space-between">
+<span style="font-size: 17px; font-weight: 700; letter-spacing: -0.01em; position: relative">{{c.n}}</span>
+<span class="num" style="font-size: 12px; color: var(--text-2); position: relative">{{c.c}} deals</span>
+<div style="position: absolute; right: -6px; bottom: -8px; width: 96px; height: 96px"><dc-import name="ProductArt" kind="{{c.k}}" c1="{{c.c1}}" c2="{{c.c2}}" hint-size="100%,100%"></dc-import></div>
+</a>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{isBrand}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; padding: 8px 16px 0">
+<sc-for list="{{brands}}" as="b" hint-placeholder-count="8">
+<a href="BrandDetail.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sep)">
+<span style="width: 44px; height: 44px; border-radius: 22px; background: var(--int); color: var(--on-int); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800">{{b.m}}</span>
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 600">{{b.n}}</span><span class="num" style="font-size: 13px; color: var(--text-2)">{{b.c}} deals · {{b.u}} pre-owned</span></div>
+<span style="font-size: 13px; font-weight: 700; color: var(--text-2)">{{b.f}}</span>
+</a>
+</sc-for>
+</div>
+</sc-if>
+<div style="position: absolute; left: 16px; bottom: 24px"><dc-import name="TabBar" active="deals" hint-size="358px,64px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { tab: 'cat' }; }
+  renderVals() {
+    const cat = this.state.tab === 'cat';
+    const on = 'var(--surface-elev)', sh = '0 1px 3px rgba(0,0,0,.12)';
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      isCat: cat, isBrand: !cat,
+      catBg: cat ? on : 'transparent', catSh: cat ? sh : 'none',
+      brandBg: cat ? 'transparent' : on, brandSh: cat ? 'none' : sh,
+      showCat: () => this.setState({ tab: 'cat' }),
+      showBrand: () => this.setState({ tab: 'brand' }),
+      cats: [
+        { n: 'Paddles', c: 214, k: 'paddle', c1: '#1F5FD1', c2: '#C8F03C' },
+        { n: 'Shoes', c: 96, k: 'shoe', c1: '#FF5D8F', c2: '#1C1C1C' },
+        { n: 'Balls', c: 41, k: 'ball', c1: '#D8F23A', c2: '#000' },
+        { n: 'Bags', c: 58, k: 'bag', c1: '#1D3557', c2: '#E63946' },
+        { n: 'Apparel', c: 77, k: 'apparel', c1: '#06D6A0', c2: '#073B4C' },
+        { n: 'Grips', c: 33, k: 'grip', c1: '#4CC9F0', c2: '#F72585' },
+        { n: 'Eyewear', c: 19, k: 'eyewear', c1: '#1C1C1C', c2: '#7B2CBF' },
+        { n: 'Nets', c: 22, k: 'net', c1: '#FFFFFF', c2: '#FF7F11' },
+        { n: 'Ball machines', c: 11, k: 'machine', c1: '#FF7F11', c2: '#FFFFFF' },
+        { n: 'Training', c: 27, k: 'ball', c1: '#FF8A00', c2: '#000' },
+        { n: 'Paddle accessories', c: 45, k: 'grip', c1: '#2B2D42', c2: '#C8F03C' },
+        { n: 'Court accessories', c: 16, k: 'net', c1: '#1C1C1C', c2: '#3A86FF' }
+      ],
+      brands: [
+        { m: 'JOOLA', n: 'JOOLA', c: 42, u: 31, f: 'Following' }, { m: 'SLKRK', n: 'Selkirk', c: 37, u: 44, f: 'Following' },
+        { m: 'CRBN', n: 'CRBN', c: 12, u: 18, f: '' }, { m: '6/0', n: 'Six Zero', c: 9, u: 7, f: '' },
+        { m: 'ENGG', n: 'Engage', c: 18, u: 12, f: '' }, { m: 'FRNK', n: 'Franklin', c: 24, u: 9, f: '' },
+        { m: 'GBOX', n: 'Gearbox', c: 8, u: 6, f: '' }, { m: 'K-SW', n: 'K-Swiss', c: 14, u: 3, f: '' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

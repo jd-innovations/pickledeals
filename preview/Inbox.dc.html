@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Inbox</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 1000px; position: relative; overflow: hidden">
+<div style="padding: 62px 16px 0; display: flex; align-items: center; justify-content: space-between">
+<h1 style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em">Inbox</h1>
+<a href="Profile.dc.html" aria-label="Profile" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface-pressed); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700">D</a>
+</div>
+<div role="tablist" aria-label="Inbox" style="margin: 14px 16px 0; height: 36px; border-radius: 10px; background: var(--surface); padding: 2px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr))">
+<span role="tab" aria-selected="true" style="border-radius: 8px; background: var(--surface-elev); box-shadow: 0 1px 3px rgba(0,0,0,.12); font-size: 15px; font-weight: 600; display: flex; align-items: center; justify-content: center">Messages</span>
+<a href="Alerts.dc.html" role="tab" aria-selected="false" style="border-radius: 8px; font-size: 15px; font-weight: 600; color: var(--text-2); display: flex; align-items: center; justify-content: center; gap: 6px">Activity <span style="width: 7px; height: 7px; border-radius: 4px; background: var(--text-1)"></span></a>
+</div>
+<div class="noscroll" style="display: flex; gap: 8px; overflow-x: auto; padding: 14px 16px 0">
+<span style="flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; background: var(--int); color: var(--on-int); font-size: 13px; font-weight: 700; display: flex; align-items: center">All</span>
+<span style="flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; background: var(--surface); font-size: 13px; font-weight: 700; display: flex; align-items: center">Buying</span>
+<span style="flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; background: var(--surface); font-size: 13px; font-weight: 700; display: flex; align-items: center">Selling</span>
+<span style="flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; background: var(--surface); font-size: 13px; font-weight: 700; display: flex; align-items: center">Open offers 2</span>
+</div>
+<div style="padding: 8px 0 0">
+<sc-for list="{{threads}}" as="t" hint-placeholder-count="5">
+<div style="position: relative; overflow: hidden">
+<sc-if value="{{t.swiped}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; right: 0; top: 0; bottom: 0; display: flex">
+<button style="width: 80px; background: var(--surface-pressed); font-size: 13px; font-weight: 700; text-align: center">Mute</button>
+<button style="width: 80px; background: var(--int); color: var(--on-int); font-size: 13px; font-weight: 700; text-align: center">Archive</button>
+</div>
+</sc-if>
+<a href="Conversation.dc.html" style="position: relative; display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg); transform: translateX({{t.shift}})">
+<div style="position: relative; width: 56px; height: 56px; flex-shrink: 0">
+<div style="width: 56px; height: 56px; border-radius: 14px; background: var(--img); padding: 5px"><dc-import name="ProductArt" kind="{{t.k}}" c1="{{t.c1}}" c2="{{t.c2}}" hint-size="100%,100%"></dc-import></div>
+<span style="position: absolute; right: -4px; bottom: -4px; width: 26px; height: 26px; border-radius: 13px; background: var(--surface-pressed); border: 2px solid var(--bg); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700">{{t.init}}</span>
+</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; border-bottom: 1px solid var(--sep); padding-bottom: 12px; margin-bottom: -12px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><span style="font-size: 15px; font-weight: {{t.w}}">{{t.name}}</span><span style="font-size: 12px; color: var(--text-3)">{{t.time}}</span></div>
+<span style="font-size: 13px; color: var(--text-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.item}}</span>
+<div style="display: flex; align-items: center; gap: 6px"><sc-if value="{{t.tag}}" hint-placeholder-val="{{false}}"><span style="font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 2px 6px; border-radius: 5px; background: {{t.tagBg}}; color: {{t.tagFg}}">{{t.tag}}</span></sc-if><span style="flex: 1; font-size: 15px; font-weight: {{t.w}}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: {{t.fg}}">{{t.last}}</span><sc-if value="{{t.unread}}" hint-placeholder-val="{{false}}"><span style="width: 9px; height: 9px; border-radius: 5px; background: var(--text-1)"></span></sc-if></div>
+</div>
+</a>
+</div>
+</sc-for>
+</div>
+<div style="position: absolute; left: 16px; bottom: 24px"><dc-import name="TabBar" active="inbox" hint-size="358px,64px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const u = { w: 700, fg: 'var(--text-1)', unread: true };
+    const r = { w: 500, fg: 'var(--text-2)', unread: false };
+    const solid = { tagBg: 'var(--int)', tagFg: 'var(--on-int)' };
+    const soft = { tagBg: 'var(--chip)', tagFg: 'var(--text-1)' };
+    const base = { swiped: false, shift: '0' };
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      threads: [
+        Object.assign({}, base, u, solid, { k: 'paddle', c1: '#1F5FD1', c2: '#C8F03C', init: 'M', name: 'Marcus T.', time: '6:44 PM', item: 'Buying · JOOLA Perseus Pro IV 16mm', tag: 'ACCEPTED $135', last: 'See you Saturday at 9!' }),
+        Object.assign({}, base, u, soft, { k: 'paddle', c1: '#26282B', c2: '#9BE15D', init: 'J', name: 'Jordan R.', time: '8:40 AM', item: 'Selling · CRBN 3X 16mm', tag: 'OFFER $120', last: 'Would you take $120?' }),
+        Object.assign({}, base, r, soft, { k: 'shoe', c1: '#2EC4B6', c2: '#FF9F1C', init: 'A', name: 'Alyssa P.', time: 'Yesterday', item: 'Buying · ASICS Gel-Renma 10.5', tag: 'COUNTERED $75', last: 'You countered at $75' }),
+        Object.assign({}, r, soft, { swiped: true, shift: '-160px', k: 'machine', c1: '#FF7F11', c2: '#FFFFFF', init: 'K', name: 'Kevin L.', time: 'Mon', item: 'Buying · Lobster Pickle Elite', tag: '', last: 'Does it come with the remote?' }),
+        Object.assign({}, base, r, soft, { k: 'bag', c1: '#1D3557', c2: '#E63946', init: 'S', name: 'Sam W.', time: 'Sep 24', item: 'Selling · Selkirk Core Backpack', tag: 'SOLD', last: 'Thanks, enjoy it!' })
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

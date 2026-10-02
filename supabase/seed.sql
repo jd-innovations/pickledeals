@@ -1,0 +1,1 @@
+-- Local development seed. Catalog seed data (≈150 products) lands in Phase 2.

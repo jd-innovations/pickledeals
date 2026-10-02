@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Search results</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 1900px; position: relative; overflow: hidden">
+<div style="padding: 62px 16px 0; display: flex; align-items: center; gap: 10px">
+<a href="Search.dc.html" aria-label="Back" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<a href="Search.dc.html" style="flex: 1; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; gap: 8px; padding: 0 14px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color: var(--text-2)" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span style="font-size: 17px">CRBN 3X 16mm</span></a>
+<button aria-label="Save search" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></button>
+</div>
+<div class="noscroll" style="display: flex; gap: 8px; overflow-x: auto; padding: 14px 16px 0">
+<span style="flex-shrink: 0; height: 34px; padding: 0 14px; border-radius: 17px; background: var(--int); color: var(--on-int); font-size: 15px; font-weight: 600; display: flex; align-items: center">All</span>
+<span style="flex-shrink: 0; height: 34px; padding: 0 14px; border-radius: 17px; background: var(--surface); font-size: 15px; font-weight: 600; display: flex; align-items: center">Products 3</span>
+<span style="flex-shrink: 0; height: 34px; padding: 0 14px; border-radius: 17px; background: var(--surface); font-size: 15px; font-weight: 600; display: flex; align-items: center">Deals 5</span>
+<span style="flex-shrink: 0; height: 34px; padding: 0 14px; border-radius: 17px; background: var(--surface); font-size: 15px; font-weight: 600; display: flex; align-items: center">Pre-owned 8</span>
+<span style="flex-shrink: 0; height: 34px; padding: 0 14px; border-radius: 17px; background: var(--surface); font-size: 15px; font-weight: 600; display: flex; align-items: center">Brands</span>
+</div>
+
+<section style="margin: 20px 16px 0; border-radius: 24px; border: 1px solid var(--border); overflow: hidden">
+<a href="ProductDetail.dc.html" style="display: flex; gap: 14px; padding: 16px; align-items: center">
+<div style="width: 96px; height: 96px; border-radius: 16px; background: var(--img); padding: 8px; flex-shrink: 0"><dc-import name="ProductArt" kind="paddle" c1="#26282B" c2="#9BE15D" hint-size="100%,100%"></dc-import></div>
+<div style="display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">BEST MATCH · PRODUCT</span>
+<span style="font-size: 20px; font-weight: 700; letter-spacing: -0.015em">CRBN 3X Power Series 16mm</span>
+<span class="num" style="font-size: 13px; color: var(--text-2)">Paddles · MSRP $229</span>
+</div>
+</a>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--sep)">
+<div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid var(--sep)">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .08em">NEW</span>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 15px"><span>Amazon</span><b>$169</b></div>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 15px; color: var(--text-2)"><span>CourtSide</span><span>$179</span></div>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 15px; color: var(--text-2)"><span>CRBN.com</span><span>$229</span></div>
+</div>
+<div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .08em">PRE-OWNED</span>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 15px"><span>Like New <span style="color: var(--text-2); font-size: 12px">4 mi</span></span><b>$130</b></div>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 15px; color: var(--text-2)"><span>Excellent <span style="font-size: 12px">12 mi</span></span><span>$115</span></div>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 15px; color: var(--text-2)"><span>Good <span style="font-size: 12px">ships</span></span><span>$95</span></div>
+</div>
+</div>
+<div class="num" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 12px 16px; background: var(--surface)">
+<div style="display: flex; flex-direction: column"><span style="font-size: 11px; color: var(--text-2)">MSRP</span><span style="font-size: 15px; font-weight: 600">$229</span></div>
+<div style="display: flex; flex-direction: column"><span style="font-size: 11px; color: var(--text-2)">Typical new</span><span style="font-size: 15px; font-weight: 600">$189</span></div>
+<div style="display: flex; flex-direction: column"><span style="font-size: 11px; color: var(--text-2)">90-day low</span><span style="font-size: 15px; font-weight: 600">$159</span></div>
+<div style="display: flex; flex-direction: column"><span style="font-size: 11px; color: var(--text-2)">Typical used</span><span style="font-size: 15px; font-weight: 600">$105–135</span></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 14px 16px 16px">
+<a href="DealDetail.dc.html" style="height: 44px; border-radius: 22px; background: var(--int); color: var(--on-int); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">Get deal · $169</a>
+<a href="PriceAlert.dc.html" style="height: 44px; border-radius: 22px; background: var(--chip); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">Set alert</a>
+<a href="MarketHome.dc.html" style="height: 44px; border-radius: 22px; background: var(--chip); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">View pre-owned</a>
+<a href="SellPhotos.dc.html" style="height: 44px; border-radius: 22px; border: 1px solid var(--border); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">Sell yours</a>
+</div>
+</section>
+
+<section style="padding: 32px 16px 0; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="font-size: 22px; font-weight: 700; letter-spacing: -0.015em">Deals</h2><span style="font-size: 15px; font-weight: 600; color: var(--text-2)">5</span></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{deals}}" as="d" hint-placeholder-count="2">
+<a href="DealDetail.dc.html" style="display: flex; flex-direction: column; gap: 6px">
+<div style="position: relative; height: 173px; border-radius: 16px; background: var(--img); padding: 16px"><dc-import name="ProductArt" kind="paddle" c1="{{d.c1}}" c2="{{d.c2}}" hint-size="100%,100%"></dc-import><span style="position: absolute; left: 8px; top: 8px; font-size: 10px; font-weight: 700; letter-spacing: .06em; padding: 4px 7px; border-radius: 6px; background: var(--bg)">{{d.badge}}</span></div>
+<span style="font-size: 12px; font-weight: 600; color: var(--text-2)">{{d.brand}}</span>
+<span class="clamp2" style="font-size: 15px; font-weight: 500; line-height: 1.25; margin-top: -2px">{{d.name}}</span>
+<div style="display: flex; align-items: baseline; gap: 6px"><span class="num" style="font-size: 17px; font-weight: 700">{{d.price}}</span><span class="num" style="font-size: 13px; color: var(--text-3); text-decoration: line-through">{{d.was}}</span><span class="num" style="margin-left: auto; font-size: 12px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: var(--int); color: var(--on-int)">{{d.off}}</span></div>
+<span style="font-size: 12px; color: var(--text-2)">{{d.meta}}</span>
+</a>
+</sc-for>
+</div>
+</section>
+
+<section style="padding: 32px 16px 0; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 8px"><h2 style="font-size: 22px; font-weight: 700; letter-spacing: -0.015em">Pre-owned</h2><a href="MarketMap.dc.html" style="font-size: 15px; font-weight: 600; color: var(--text-2)">Map</a></div>
+<sc-for list="{{used}}" as="l" hint-placeholder-count="3">
+<a href="ListingDetail.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--sep)">
+<div style="width: 64px; height: 64px; border-radius: 12px; background: var(--img); padding: 6px; flex-shrink: 0"><dc-import name="ProductArt" kind="paddle" c1="#26282B" c2="#9BE15D" hint-size="100%,100%"></dc-import></div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">{{l.name}}</span><span style="font-size: 13px; color: var(--text-2)">{{l.cond}} · {{l.where}}</span></div>
+<div style="display: flex; flex-direction: column; align-items: flex-end"><span class="num" style="font-size: 17px; font-weight: 700">{{l.price}}</span><span class="num" style="font-size: 12px; color: var(--text-2)">{{l.save}}</span></div>
+</a>
+</sc-for>
+</section>
+
+<section style="padding: 32px 16px 0; display: flex; flex-direction: column; gap: 12px">
+<h2 style="font-size: 22px; font-weight: 700; letter-spacing: -0.015em">Brands &amp; categories</h2>
+<a href="BrandDetail.dc.html" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: var(--surface)">
+<span style="width: 44px; height: 44px; border-radius: 22px; background: var(--int); color: var(--on-int); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800">CRBN</span>
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">CRBN</span><span style="font-size: 12px; color: var(--text-2)">12 live deals · 1 promo code</span></div>
+<span style="height: 32px; padding: 0 12px; border-radius: 16px; background: var(--int); color: var(--on-int); font-size: 13px; font-weight: 700; display: flex; align-items: center">Follow</span>
+</a>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<a href="CategoryDetail.dc.html" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--border); font-size: 15px; font-weight: 500; display: flex; align-items: center">16mm paddles</a>
+<a href="CategoryDetail.dc.html" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--border); font-size: 15px; font-weight: 500; display: flex; align-items: center">Power paddles</a>
+<a href="CategoryDetail.dc.html" style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--border); font-size: 15px; font-weight: 500; display: flex; align-items: center">Edge guards</a>
+</div>
+</section>
+<div style="position: absolute; left: 16px; bottom: 24px"><dc-import name="TabBar" active="deals" hint-size="358px,64px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      deals: [
+        { c1: '#26282B', c2: '#9BE15D', badge: 'LOWEST PRICE', brand: 'CRBN', name: '3X Power Series 16mm', price: '$169', was: '$229', off: '−26%', meta: 'Amazon · Save $60' },
+        { c1: '#26282B', c2: '#FF4D6D', badge: 'PROMO CODE', brand: 'CRBN', name: '3X Power Series 14mm', price: '$184', was: '$229', off: '−20%', meta: 'Code CRBN20 · CRBN.com' }
+      ],
+      used: [
+        { name: 'CRBN 3X 16mm', cond: 'Like New', where: 'Sarasota · 4 mi', price: '$130', save: '$39 under new' },
+        { name: 'CRBN 3X 16mm', cond: 'Excellent', where: 'Bradenton · 12 mi', price: '$115', save: '$54 under new' },
+        { name: 'CRBN 3X 16mm', cond: 'Good', where: 'Ships from Austin, TX', price: '$95', save: '$74 under new' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

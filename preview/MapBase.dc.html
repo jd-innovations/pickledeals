@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Map base</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 100%; height: 100%; overflow: hidden">
+<svg viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" style="width: 100%; height: 100%; display: block" aria-hidden="true">
+<rect x="0" y="0" width="390" height="844" style="fill: var(--map-land)"/>
+<g style="fill: var(--map-block)"><rect x="160" y="210" width="44" height="40" rx="3"/><rect x="212" y="210" width="44" height="40" rx="3"/><rect x="160" y="262" width="44" height="40" rx="3"/><rect x="264" y="262" width="44" height="40" rx="3"/><rect x="160" y="420" width="44" height="40" rx="3"/><rect x="212" y="472" width="44" height="40" rx="3"/><rect x="160" y="524" width="44" height="40" rx="3"/><rect x="212" y="576" width="44" height="40" rx="3"/><rect x="264" y="680" width="44" height="40" rx="3"/><rect x="160" y="732" width="44" height="40" rx="3"/></g>
+<g style="fill: var(--map-park)"><rect x="250" y="520" width="100" height="74" rx="10"/><rect x="214" y="312" width="52" height="44" rx="8"/><rect x="120" y="620" width="30" height="80" rx="8"/></g>
+<path d="M0 0 H38 C30 200 44 400 30 600 C24 700 34 800 28 844 H0 Z" style="fill: var(--map-water)"/>
+<path d="M58 0 H118 C104 120 128 220 110 330 C98 420 120 520 96 620 C88 700 100 780 92 844 H64 C70 700 56 560 66 420 C74 280 52 140 58 0 Z" style="fill: var(--map-water)"/>
+<path d="M110 118 C180 98 260 138 390 108 L390 128 C260 158 180 120 112 140 Z" style="fill: var(--map-water)"/>
+<g style="stroke: var(--map-road); fill: none" stroke-width="4"><path d="M150 140 V844 M206 140 V844 M258 140 V844 M310 140 V844 M362 140 V844"/><path d="M110 204 H390 M110 256 H390 M112 308 H390 M114 360 H390 M110 412 H390 M106 464 H390 M104 516 H390 M102 568 H390 M100 620 H390 M98 672 H390 M96 724 H390 M94 776 H390"/><path d="M118 0 V96 M180 0 V100 M250 0 V110 M330 0 V100 M118 50 H390"/></g>
+<g style="stroke: var(--map-major); fill: none" stroke-linecap="round"><path d="M336 0 C328 200 344 420 326 620 C318 720 334 800 330 844" stroke-width="10"/><path d="M128 0 C138 220 124 440 140 844" stroke-width="7"/><path d="M128 388 C200 380 280 396 390 384" stroke-width="7"/></g>
+<g style="fill: var(--text-3)" font-size="11" font-weight="700" letter-spacing="1.2" font-family="-apple-system, 'SF Pro Text', Geist, sans-serif"><text x="190" y="84">BRADENTON</text><text x="168" y="452">SARASOTA</text><text x="236" y="236">LAKEWOOD RANCH</text><text x="200" y="760">SIESTA</text></g>
+<g style="fill: var(--text-3)" font-size="10" font-weight="600" font-family="-apple-system, 'SF Pro Text', Geist, sans-serif"><text x="341" y="300" transform="rotate(-90 341 300)">I-75</text><text x="70" y="500" transform="rotate(-82 70 500)">Sarasota Bay</text></g>
+</svg>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

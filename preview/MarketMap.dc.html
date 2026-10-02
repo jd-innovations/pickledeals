@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Marketplace map</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 844px; position: relative; overflow: hidden">
+<div style="position: absolute; inset: 0"><dc-import name="MapBase" hint-size="100%,100%"></dc-import></div>
+
+<sc-for list="{{pins}}" as="p" hint-placeholder-count="8">
+<a href="MapPreview.dc.html" class="num" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; height: 30px; padding: 0 10px; border-radius: 15px; background: var(--surface-elev); box-shadow: var(--shadow); border: 0.5px solid var(--border); font-size: 13px; font-weight: 700; display: flex; align-items: center">{{p.t}}</a>
+</sc-for>
+<sc-for list="{{clusters}}" as="c" hint-placeholder-count="3">
+<a href="MapPreview.dc.html" aria-label="{{c.n}} listings" class="num" style="position: absolute; left: {{c.x}}px; top: {{c.y}}px; width: 44px; height: 44px; border-radius: 22px; background: var(--int); color: var(--on-int); border: 3px solid var(--surface-elev); box-shadow: var(--shadow); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{c.n}}</a>
+</sc-for>
+<div aria-label="Your location" style="position: absolute; left: 196px; top: 470px; width: 44px; height: 44px; border-radius: 22px; background: rgba(10,10,10,.10); display: flex; align-items: center; justify-content: center"><span style="width: 16px; height: 16px; border-radius: 8px; background: var(--text-1); border: 3px solid var(--surface-elev); box-shadow: var(--shadow)"></span></div>
+
+<div style="position: absolute; left: 16px; right: 16px; top: 58px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; gap: 8px">
+<a href="Search.dc.html" class="glass" style="flex: 1; height: 44px; border-radius: 22px; border: 0.5px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; gap: 8px; padding: 0 14px; color: var(--text-2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span style="font-size: 17px">Paddles near Sarasota</span></a>
+<a href="MarketFilters.dc.html" aria-label="Filters" class="glass" style="width: 44px; height: 44px; border-radius: 22px; border: 0.5px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></a>
+</div>
+<div class="noscroll" style="display: flex; gap: 8px; overflow-x: auto">
+<span class="glass" style="flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; border: 0.5px solid var(--border); font-size: 13px; font-weight: 700; display: flex; align-items: center">25 mi</span>
+<span style="flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; background: var(--int); color: var(--on-int); font-size: 13px; font-weight: 700; display: flex; align-items: center">Paddles</span>
+<span class="glass" style="flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; border: 0.5px solid var(--border); font-size: 13px; font-weight: 700; display: flex; align-items: center">Under $150</span>
+<span class="glass" style="flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; border: 0.5px solid var(--border); font-size: 13px; font-weight: 700; display: flex; align-items: center">Local pickup</span>
+<span class="glass" style="flex-shrink: 0; height: 32px; padding: 0 12px; border-radius: 16px; border: 0.5px solid var(--border); font-size: 13px; font-weight: 700; display: flex; align-items: center">Excellent+</span>
+</div>
+</div>
+<button style="position: absolute; left: 50%; top: 172px; transform: translateX(-50%); height: 38px; padding: 0 16px; border-radius: 19px; background: var(--int); color: var(--on-int); box-shadow: var(--shadow); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 12a8 8 0 0 1 14-5.3M20 12a8 8 0 0 1-14 5.3"/><path d="M18 3v4h-4M6 21v-4h4"/></svg>Search this area</button>
+
+<div style="position: absolute; right: 16px; top: 520px; display: flex; flex-direction: column; gap: 8px">
+<button aria-label="Recenter" class="glass" style="width: 44px; height: 44px; border-radius: 22px; border: 0.5px solid var(--border); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20 4L4 11l7 2 2 7z"/></svg></button>
+</div>
+
+<div class="glass" style="position: absolute; left: 0; right: 0; bottom: 0; height: 196px; border-radius: 28px 28px 0 0; border-top: 0.5px solid var(--border); box-shadow: var(--shadow-sheet); padding: 8px 16px 0; display: flex; flex-direction: column; gap: 8px">
+<span style="align-self: center; width: 36px; height: 5px; border-radius: 3px; background: var(--border)"></span>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span class="num" style="font-size: 17px; font-weight: 700">38 paddles in this area</span>
+<a href="MarketHome.dc.html" style="height: 32px; padding: 0 12px; border-radius: 16px; background: var(--chip); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 5px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>List</a>
+</div>
+<span style="font-size: 12px; color: var(--text-2)">Pins show approximate areas, never exact addresses.</span>
+</div>
+<div style="position: absolute; left: 16px; bottom: 24px"><dc-import name="TabBar" active="market" hint-size="358px,64px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      pins: [
+        { x: 170, y: 250, t: '$150' }, { x: 262, y: 290, t: '$125' }, { x: 150, y: 340, t: '$95' },
+        { x: 230, y: 410, t: '$130' }, { x: 290, y: 450, t: '$110' }, { x: 150, y: 530, t: '$145' },
+        { x: 250, y: 560, t: '$80' }, { x: 300, y: 230, t: '$175' }
+      ],
+      clusters: [ { x: 190, y: 600, n: 12 }, { x: 96, y: 280, n: 5 }, { x: 320, y: 360, n: 7 } ]
+    };
+  }
+}
+</script>
+</body>
+</html>

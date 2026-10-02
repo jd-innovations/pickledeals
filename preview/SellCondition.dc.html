@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sell · condition</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 1000px; position: relative; overflow: hidden; display: flex; flex-direction: column">
+<div style="padding: 54px 16px 0; display: flex; align-items: center; justify-content: space-between">
+<a href="SellPhotos.dc.html" aria-label="Back" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+<span style="font-size: 17px; font-weight: 600">Sell an item</span>
+<span class="num" style="width: 40px; text-align: right; font-size: 15px; color: var(--text-2)">3/6</span>
+</div>
+<div aria-hidden="true" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; padding: 14px 16px 0"><span style="height: 4px; border-radius: 2px; background: var(--int)"></span><span style="height: 4px; border-radius: 2px; background: var(--int)"></span><span style="height: 4px; border-radius: 2px; background: var(--int)"></span><span style="height: 4px; border-radius: 2px; background: var(--border)"></span><span style="height: 4px; border-radius: 2px; background: var(--border)"></span><span style="height: 4px; border-radius: 2px; background: var(--border)"></span></div>
+<div style="padding: 20px 16px 0; display: flex; flex-direction: column; gap: 6px">
+<h1 style="font-size: 28px; font-weight: 700; letter-spacing: -0.02em">Condition</h1>
+<span style="font-size: 15px; color: var(--text-2)">Buyers see this exact description on your listing.</span>
+</div>
+<div role="radiogroup" aria-label="Condition" style="padding: 18px 16px 0; display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{conds}}" as="c" hint-placeholder-count="5">
+<button role="radio" aria-checked="{{c.on}}" onClick="{{c.pick}}" style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; border-radius: 18px; border: {{c.border}}; text-align: left">
+<span style="margin-top: 2px; width: 22px; height: 22px; border-radius: 11px; border: {{c.ring}}; flex-shrink: 0; display: flex; align-items: center; justify-content: center"><span style="width: 10px; height: 10px; border-radius: 5px; background: {{c.dot}}"></span></span>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 17px; font-weight: 700">{{c.t}}</span><span style="font-size: 14px; line-height: 1.4; color: var(--text-2)">{{c.d}}</span></div>
+</button>
+</sc-for>
+</div>
+<div style="flex-grow: 1"></div>
+<div style="padding: 12px 16px 34px"><a href="SellPrice.dc.html" style="height: 54px; border-radius: 27px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center">Continue</a></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { pick: 2 }; }
+  renderVals() {
+    const list = [
+      { t: 'New / Sealed', d: 'Never used, in the original packaging with tags or wrap.' },
+      { t: 'Like New', d: 'Played fewer than 5 times. No visible wear on face, edge or grip.' },
+      { t: 'Excellent', d: 'Light use. Minor surface marks only; edge guard intact; grip clean.' },
+      { t: 'Good', d: 'Regular use. Scuffs or face wear; grip may need replacing. Fully playable.' },
+      { t: 'Fair', d: 'Heavy wear or cosmetic damage. Playable — every flaw shown in photos.' }
+    ];
+    const p = this.state.pick;
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      conds: list.map((c, i) => Object.assign({}, c, {
+        on: i === p, pick: () => this.setState({ pick: i }),
+        border: i === p ? '2px solid var(--int)' : '1px solid var(--border)',
+        ring: i === p ? '2px solid var(--int)' : '1.5px solid var(--border)',
+        dot: i === p ? 'var(--int)' : 'transparent'
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

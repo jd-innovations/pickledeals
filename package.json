@@ -1,0 +1,27 @@
+{
+  "name": "pickledeals",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile": "npm run start --workspace @pickledeals/mobile",
+    "admin": "npm run dev --workspace @pickledeals/admin",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "db:types": "supabase gen types typescript --local > packages/shared/src/database.types.ts",
+    "preview:design": "python -m http.server 5173 --directory preview",
+    "db:start": "supabase start",
+    "db:reset": "supabase db reset",
+    "db:test": "supabase test db"
+  },
+  "engines": {
+    "node": ">=20.19.4"
+  },
+  "devDependencies": {
+    "supabase": "^2.119.0"
+  }
+}

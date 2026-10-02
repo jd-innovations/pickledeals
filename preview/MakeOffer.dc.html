@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Make an offer</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: var(--img)">
+<div aria-hidden="true" style="position: absolute; left: 80px; right: 80px; top: 40px; height: 220px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div>
+<div style="position: absolute; inset: 0; background: var(--overlay)"></div>
+<div role="dialog" aria-label="Make an offer" style="position: absolute; left: 0; right: 0; bottom: 0; top: 58px; border-radius: 28px 28px 0 0; background: var(--surface-elev); box-shadow: var(--shadow-sheet); display: flex; flex-direction: column">
+<div style="padding: 8px 20px 0; display: flex; flex-direction: column; gap: 12px">
+<span style="align-self: center; width: 36px; height: 5px; border-radius: 3px; background: var(--border)"></span>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<a href="ListingDetail.dc.html" style="font-size: 17px; color: var(--text-2)">Cancel</a>
+<span style="font-size: 17px; font-weight: 700">Make an offer</span>
+<span style="width: 52px"></span>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 16px; background: var(--surface)">
+<div style="width: 44px; height: 44px; border-radius: 10px; background: var(--img); padding: 3px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div>
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">JOOLA Perseus Pro IV 16mm</span><span style="font-size: 12px; color: var(--text-2)">Excellent · Marcus T. · 3.2 mi</span></div>
+<div style="display: flex; flex-direction: column; align-items: flex-end"><span style="font-size: 11px; color: var(--text-2)">Asking</span><span class="num" style="font-size: 17px; font-weight: 700">$150</span></div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 6px">
+<span style="font-size: 13px; font-weight: 600; color: var(--text-2)">Your offer</span>
+<span class="num" style="font-size: 60px; font-weight: 700; letter-spacing: -0.045em; line-height: 1.05">${{amount}}<span style="display: inline-block; width: 2px; height: 50px; background: var(--int); margin-left: 3px; vertical-align: -4px"></span></span>
+<span class="num" style="font-size: 13px; color: var(--text-2)">{{delta}}</span>
+</div>
+<div style="display: flex; gap: 8px; justify-content: center">
+<sc-for list="{{presets}}" as="p" hint-placeholder-count="3">
+<button onClick="{{p.pick}}" class="num" style="height: 34px; padding: 0 12px; border-radius: 17px; background: {{p.bg}}; color: {{p.fg}}; font-size: 13px; font-weight: 600">{{p.label}}</button>
+</sc-for>
+</div>
+<label style="display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; border-radius: 14px; background: var(--surface)"><span style="font-size: 12px; font-weight: 600; color: var(--text-2)">Message (optional)</span><input value="Can pick up Saturday morning if that works." style="border: 0; outline: 0; background: transparent; font-size: 15px"></label>
+<a href="Conversation.dc.html" class="num" style="height: 52px; border-radius: 26px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center">Send offer · ${{amount}}</a>
+<span style="font-size: 12px; line-height: 1.4; color: var(--text-2); text-align: center">Expires in 48 hours. An accepted offer isn’t a purchase — you’ll arrange payment and pickup together in chat.</span>
+</div>
+<div style="flex-grow: 1"></div>
+<div style="background: var(--surface); padding: 6px 6px 30px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="12">
+<button onClick="{{k.press}}" aria-label="{{k.label}}" style="height: 46px; border-radius: 8px; background: {{k.bg}}; box-shadow: {{k.sh}}; font-size: 24px; font-weight: 400; text-align: center">{{k.t}}</button>
+</sc-for>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { amount: '125' }; }
+  renderVals() {
+    const a = this.state.amount;
+    const n = parseInt(a || '0', 10);
+    const set = (v) => () => this.setState({ amount: String(v) });
+    const mk = (v, label) => ({ label, pick: set(v), bg: n === v ? 'var(--int)' : 'var(--chip)', fg: n === v ? 'var(--on-int)' : 'var(--text-1)' });
+    const digits = ['1','2','3','4','5','6','7','8','9','','0','⌫'];
+    const keys = digits.map((d) => ({
+      t: d, label: d === '⌫' ? 'Delete' : (d || 'blank'),
+      bg: d === '' || d === '⌫' ? 'transparent' : 'var(--surface-elev)',
+      sh: d === '' || d === '⌫' ? 'none' : '0 1px 0 var(--border)',
+      press: () => {
+        if (d === '') return;
+        if (d === '⌫') this.setState({ amount: a.slice(0, -1) });
+        else if (a.length < 4) this.setState({ amount: (a === '0' ? '' : a) + d });
+      }
+    }));
+    const pct = Math.round((1 - n / 150) * 100);
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      amount: a || '0',
+      delta: n >= 150 ? 'At or above the asking price' : pct + '% under asking · $' + (179 - n) + ' under best new',
+      presets: [mk(135, '$135 · −10%'), mk(125, '$125 · −17%'), mk(120, '$120 · −20%')],
+      keys
+    };
+  }
+}
+</script>
+</body>
+</html>

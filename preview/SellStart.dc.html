@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sell · select product</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 844px; position: relative; overflow: hidden; display: flex; flex-direction: column">
+<div style="padding: 54px 16px 0; display: flex; align-items: center; justify-content: space-between">
+<a href="MarketHome.dc.html" aria-label="Close" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></a>
+<span style="font-size: 17px; font-weight: 600">Sell an item</span>
+<span class="num" style="width: 40px; text-align: right; font-size: 15px; color: var(--text-2)">1/6</span>
+</div>
+<div aria-hidden="true" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; padding: 14px 16px 0"><span style="height: 4px; border-radius: 2px; background: var(--int)"></span><span style="height: 4px; border-radius: 2px; background: var(--border)"></span><span style="height: 4px; border-radius: 2px; background: var(--border)"></span><span style="height: 4px; border-radius: 2px; background: var(--border)"></span><span style="height: 4px; border-radius: 2px; background: var(--border)"></span><span style="height: 4px; border-radius: 2px; background: var(--border)"></span></div>
+<h1 style="font-size: 28px; font-weight: 700; letter-spacing: -0.02em; padding: 20px 16px 0">What are you selling?</h1>
+<div style="padding: 14px 16px 0">
+<label style="height: 44px; border-radius: 22px; background: var(--surface); display: flex; align-items: center; gap: 8px; padding: 0 14px; border: 1.5px solid var(--int)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Search the catalog</span><input type="search" value="perseus pro iv" style="flex: 1; border: 0; outline: 0; background: transparent; font-size: 17px"></label>
+</div>
+<div role="radiogroup" aria-label="Catalog matches" style="padding: 10px 16px 0; display: flex; flex-direction: column">
+<sc-for list="{{results}}" as="r" hint-placeholder-count="3">
+<button role="radio" aria-checked="{{r.on}}" onClick="{{r.pick}}" style="display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--sep); text-align: left">
+<div style="width: 52px; height: 52px; border-radius: 12px; background: var(--img); padding: 4px; flex-shrink: 0"><dc-import name="ProductArt" kind="paddle" c1="{{r.c1}}" c2="{{r.c2}}" hint-size="100%,100%"></dc-import></div>
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 15px; font-weight: 600">{{r.name}}</span><span class="num" style="font-size: 13px; color: var(--text-2)">{{r.meta}}</span></div>
+<span style="width: 24px; height: 24px; border-radius: 12px; border: {{r.ring}}; background: {{r.fill}}; color: var(--on-int); display: flex; align-items: center; justify-content: center"><sc-if value="{{r.on}}" hint-placeholder-val="{{false}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></sc-if></span>
+</button>
+</sc-for>
+<button style="display: flex; align-items: center; gap: 12px; padding: 14px 0; text-align: left; color: var(--text-2)"><span style="width: 52px; height: 52px; border-radius: 12px; border: 1.5px dashed var(--border); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span><span style="font-size: 15px; font-weight: 600">Not listed? Add it as a custom item</span></button>
+</div>
+<div style="margin: 6px 16px 0; padding: 14px; border-radius: 18px; background: var(--surface); display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; font-weight: 700">Already filled in from the catalog</span>
+<div style="display: flex; gap: 6px; flex-wrap: wrap">
+<sc-for list="{{known}}" as="k" hint-placeholder-count="5">
+<span style="font-size: 12px; font-weight: 600; padding: 5px 9px; border-radius: 8px; background: var(--bg)">{{k}}</span>
+</sc-for>
+</div>
+</div>
+<div style="flex-grow: 1"></div>
+<div style="padding: 12px 16px 34px"><a href="SellPhotos.dc.html" style="height: 54px; border-radius: 27px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center">Continue</a></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { pick: 0 }; }
+  renderVals() {
+    const items = [
+      { c1: '#1F5FD1', c2: '#C8F03C', name: 'JOOLA Perseus Pro IV 16mm', meta: 'Paddles · MSRP $279', known: ['JOOLA', 'Perseus Pro IV', 'Paddles', '16mm', 'MSRP $279', '4 reference photos'] },
+      { c1: '#1F5FD1', c2: '#FFFFFF', name: 'JOOLA Perseus Pro IV 14mm', meta: 'Paddles · MSRP $279', known: ['JOOLA', 'Perseus Pro IV', 'Paddles', '14mm', 'MSRP $279', '4 reference photos'] },
+      { c1: '#2B2D42', c2: '#EF233C', name: 'JOOLA Perseus CFS 16mm', meta: 'Paddles · MSRP $179', known: ['JOOLA', 'Perseus CFS', 'Paddles', '16mm', 'MSRP $179', '3 reference photos'] }
+    ];
+    const p = this.state.pick;
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      results: items.map((it, i) => Object.assign({}, it, {
+        on: i === p, pick: () => this.setState({ pick: i }),
+        ring: i === p ? '0' : '1.5px solid var(--border)', fill: i === p ? 'var(--int)' : 'transparent'
+      })),
+      known: items[p].known
+    };
+  }
+}
+</script>
+</body>
+</html>

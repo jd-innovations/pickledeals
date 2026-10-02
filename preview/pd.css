@@ -1,0 +1,75 @@
+/* PickleDeals semantic tokens. Light is the base; .dark is a separately tuned palette, not an inversion. */
+.pd{
+  --bg:#FFFFFF;
+  --surface:#F4F4F3;
+  --surface-elev:#FFFFFF;
+  --surface-pressed:#E9E9E7;
+  --img:#F1F1EF;
+  --text-1:#0A0A0A;
+  --text-2:#555555;
+  --text-3:#717171;
+  --border:#E2E2E0;
+  --sep:#ECECEA;
+  --int:#0A0A0A;
+  --on-int:#FFFFFF;
+  --int-pressed:#2D2D2D;
+  --overlay:rgba(10,10,10,.38);
+  --glass:rgba(255,255,255,.80);
+  --chip:#F1F1F0;
+  --bubble-in:#EDEDEC;
+  --bubble-out:#0A0A0A;
+  --on-bubble-out:#FFFFFF;
+  --map-land:#F0F0EE;
+  --map-block:#E7E7E4;
+  --map-road:#FFFFFF;
+  --map-major:#D6D6D2;
+  --map-water:#DCDCD9;
+  --map-park:#E3E5E0;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 10px 30px rgba(0,0,0,.08);
+  --shadow-sheet:0 -1px 0 rgba(0,0,0,.04),0 -12px 40px rgba(0,0,0,.10);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Geist",system-ui,sans-serif;
+  color:var(--text-1);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-0.005em;
+  box-sizing:border-box;
+}
+.pd.dark{
+  --bg:#0B0B0C;
+  --surface:#161617;
+  --surface-elev:#1E1E20;
+  --surface-pressed:#2A2A2D;
+  --img:#1A1A1C;
+  --text-1:#F5F5F4;
+  --text-2:#A6A6A6;
+  --text-3:#8A8A8A;
+  --border:#2E2E31;
+  --sep:#232326;
+  --int:#F5F5F4;
+  --on-int:#0B0B0C;
+  --int-pressed:#D6D6D6;
+  --overlay:rgba(0,0,0,.6);
+  --glass:rgba(30,30,32,.78);
+  --chip:#1F1F21;
+  --bubble-in:#232326;
+  --bubble-out:#F5F5F4;
+  --on-bubble-out:#0B0B0C;
+  --map-land:#141415;
+  --map-block:#1A1A1C;
+  --map-road:#262628;
+  --map-major:#333336;
+  --map-water:#0E0F10;
+  --map-park:#18191A;
+  --shadow:0 1px 2px rgba(0,0,0,.5),0 10px 30px rgba(0,0,0,.5);
+  --shadow-sheet:0 -1px 0 rgba(255,255,255,.06),0 -12px 40px rgba(0,0,0,.6);
+}
+.pd *{box-sizing:border-box}
+.pd button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;text-align:inherit}
+.pd input,.pd textarea{font:inherit;color:inherit}
+.pd a{color:inherit;text-decoration:none}
+.pd h1,.pd h2,.pd h3,.pd p{margin:0}
+.pd .num{font-variant-numeric:tabular-nums}
+.pd .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pd .glass{background:var(--glass);-webkit-backdrop-filter:blur(24px) saturate(1.6);backdrop-filter:blur(24px) saturate(1.6)}
+.pd .noscroll{scrollbar-width:none}
+.pd .noscroll::-webkit-scrollbar{display:none}

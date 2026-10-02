@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Onboarding</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 844px; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 64px 24px 40px">
+<div style="display: flex; justify-content: flex-end"><a href="DealsHome.dc.html" style="font-size: 17px; color: var(--text-2); padding: 10px 0">Skip</a></div>
+<div style="position: relative; height: 380px; margin-top: 8px">
+<div style="position: absolute; left: 6px; top: 20px; width: 200px; height: 250px; border-radius: 24px; background: var(--img); padding: 22px; transform: rotate(-4deg)"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div>
+<div style="position: absolute; right: 6px; top: 70px; width: 170px; height: 170px; border-radius: 24px; background: var(--img); padding: 16px; transform: rotate(5deg)"><dc-import name="ProductArt" kind="shoe" c1="#2EC4B6" c2="#FF9F1C" hint-size="100%,100%"></dc-import></div>
+<div style="position: absolute; left: 110px; top: 220px; width: 230px; padding: 14px 16px; border-radius: 20px; background: var(--surface-elev); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--text-3)">PRICE DROP</span>
+<span style="font-size: 15px; font-weight: 600">Perseus Pro IV 16mm</span>
+<span class="num" style="font-size: 15px"><span style="color: var(--text-3); text-decoration: line-through">$199</span> <b style="font-size: 20px">$159</b></span>
+</div>
+</div>
+<div style="display: flex; gap: 6px; margin-top: 24px">
+<span style="width: 20px; height: 6px; border-radius: 3px; background: var(--int)"></span><span style="width: 6px; height: 6px; border-radius: 3px; background: var(--border)"></span><span style="width: 6px; height: 6px; border-radius: 3px; background: var(--border)"></span>
+</div>
+<h1 style="font-size: 34px; line-height: 1.1; font-weight: 800; letter-spacing: -0.03em; margin-top: 20px">Every pickleball deal. New or pre-owned.</h1>
+<p style="font-size: 17px; line-height: 1.45; color: var(--text-2); margin-top: 12px">We compare retailers, track price history and show local used listings — so you know the best way to buy, right now.</p>
+<div style="flex-grow: 1"></div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<a href="DealsHome.dc.html" style="height: 54px; border-radius: 27px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center">Continue</a>
+<span style="text-align: center; font-size: 13px; color: var(--text-2)">Next: pick brands you play · allow nearby listings</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() { return { mode: this.props.theme === 'dark' ? 'dark' : '' }; }
+}
+</script>
+</body>
+</html>

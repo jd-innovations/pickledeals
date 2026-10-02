@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Notification preferences</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 1200px; position: relative; overflow: hidden; background: var(--surface)">
+<div style="padding: 54px 16px 0; display: flex; align-items: center; gap: 12px">
+<a href="Profile.dc.html" aria-label="Back" style="width: 40px; height: 40px; border-radius: 20px; background: var(--bg); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></a>
+</div>
+<h1 style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em; padding: 12px 16px 0">Notifications</h1>
+<p style="font-size: 15px; line-height: 1.4; color: var(--text-2); padding: 6px 16px 0">Only things you asked for. No promotional pushes, ever.</p>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+<section style="padding: 22px 16px 0; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 600; color: var(--text-2); padding: 0 16px">{{g.label}}</span>
+<div style="border-radius: 16px; background: var(--bg); overflow: hidden">
+<sc-for list="{{g.rows}}" as="r" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--sep)">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 16px">{{r.t}}</span><span style="font-size: 12px; color: var(--text-2)">{{r.d}}</span></div>
+<button role="switch" aria-checked="{{r.on}}" aria-label="{{r.t}}" onClick="{{r.toggle}}" style="flex-shrink: 0; width: 51px; height: 31px; border-radius: 16px; background: {{r.bg}}; position: relative"><span style="position: absolute; left: {{r.x}}; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2)"></span></button>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-for>
+<section style="padding: 22px 16px 0; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 600; color: var(--text-2); padding: 0 16px">Delivery</span>
+<div style="border-radius: 16px; background: var(--bg); overflow: hidden">
+<div style="display: flex; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--sep)"><span style="font-size: 16px">Quiet hours</span><span class="num" style="font-size: 15px; color: var(--text-2)">10 PM – 8 AM ›</span></div>
+<div style="display: flex; justify-content: space-between; padding: 14px 16px"><span style="font-size: 16px">Deal alerts per day</span><span class="num" style="font-size: 15px; color: var(--text-2)">Up to 3 ›</span></div>
+</div>
+<span style="font-size: 12px; color: var(--text-2); padding: 0 16px">During quiet hours, offers and messages wait in a morning summary.</span>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":1200}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { drop: true, target: true, brand: true, search: true, digest: false, offer: true, msg: true, near: true, status: true };
+  }
+  renderVals() {
+    const s = this.state;
+    const row = (k, t, d) => ({ t, d, on: s[k], bg: s[k] ? 'var(--int)' : 'var(--border)', x: s[k] ? '22px' : '2px',
+      toggle: () => this.setState({ [k]: !s[k] }) });
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      groups: [
+        { label: 'Deals & prices', rows: [
+          row('drop', 'Price drops', 'On products and deals you saved'),
+          row('target', 'Target price reached', 'Your price alerts'),
+          row('brand', 'Followed brands', 'New deals from JOOLA, Selkirk'),
+          row('search', 'Saved searches', 'New matches for “16mm under $150”'),
+          row('digest', 'Weekly best deals', 'One summary, Sunday morning') ] },
+        { label: 'Pre-owned', rows: [
+          row('offer', 'Offers & counteroffers', 'Received, countered, accepted, expiring'),
+          row('msg', 'Messages', 'From buyers and sellers'),
+          row('near', 'Nearby listings', 'Matches within 25 mi'),
+          row('status', 'Listing updates', 'Pending or sold on items you saved') ] }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

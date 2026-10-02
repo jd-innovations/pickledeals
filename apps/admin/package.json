@@ -10,9 +10,10 @@
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
+    "@pickledeals/shared": "*",
+    "@supabase/supabase-js": "^2.117.2",
     "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "@pickledeals/shared": "*"
+    "react-dom": "19.2.3"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

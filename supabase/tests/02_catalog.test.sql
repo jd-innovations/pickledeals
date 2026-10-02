@@ -126,7 +126,7 @@ select is(
   public.import_catalog('{"products":[
      {"slug":"good-paddle","name":"Good","brand_slug":"joola","category_slug":"paddles","variants":[{"label":"16mm"}]},
      {"slug":"bad-paddle","name":"Bad","brand_slug":"no-such-brand","category_slug":"paddles","variants":[{"label":"16mm"}]}]}'::jsonb, false)
-    -> 'errors' -> 0 ->> 'slug', 'bad-paddle', 'import reports the failing row');
+    -> 'errors' -> 0 ->> 'message', 'unknown brand "no-such-brand"', 'import names the failing reference');
 select is((select count(*)::int from public.products where slug = 'good-paddle'), 0, 'any error rolls back the whole import');
 
 select is(

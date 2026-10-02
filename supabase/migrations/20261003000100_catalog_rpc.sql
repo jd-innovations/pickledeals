@@ -185,6 +185,12 @@ begin
         if jsonb_array_length(coalesce(rec -> 'variants', '[]')) = 0 then
           raise exception 'a product needs at least one variant';
         end if;
+        if not exists (select 1 from public.brands where slug = rec ->> 'brand_slug') then
+          raise exception 'unknown brand "%"', rec ->> 'brand_slug';
+        end if;
+        if not exists (select 1 from public.categories where slug = rec ->> 'category_slug') then
+          raise exception 'unknown category "%"', rec ->> 'category_slug';
+        end if;
 
         -- (xmax-based detection needs table-level SELECT, which clients don't have on products.)
         inserted := not exists (select 1 from public.products where slug = rec ->> 'slug');

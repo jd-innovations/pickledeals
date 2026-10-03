@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-import { useStackOptions } from '@/design/navigation';
+import { sheetOptions, useStackOptions } from '@/design/navigation';
 
 export default function DealsStack() {
   return (
@@ -14,9 +14,14 @@ export default function DealsStack() {
       <Stack.Screen name="product/[slug]/index" options={{ title: '', headerLargeTitle: false }} />
       <Stack.Screen name="product/[slug]/offers" options={{ title: 'All offers', headerLargeTitle: false }} />
       <Stack.Screen name="product/[slug]/history" options={{ title: 'Price history', headerLargeTitle: false }} />
+      <Stack.Screen name="product/[slug]/pre-owned" options={{ title: 'Pre-owned', headerLargeTitle: false }} />
       <Stack.Screen name="offer/[id]" options={{ title: '', headerLargeTitle: false }} />
       <Stack.Screen name="feed/[feed]" options={{ headerLargeTitle: false }} />
       <Stack.Screen name="collection/[slug]" options={{ headerLargeTitle: false }} />
+      <Stack.Screen name="listing/[id]" options={{ headerShown: false }} />
+      <Stack.Screen name="seller/[id]" options={{ title: '', headerLargeTitle: false }} />
+      <Stack.Screen name="manage-listing" options={sheetOptions([0.7, 0.95])} />
+      <Stack.Screen name="edit-listing" options={sheetOptions([0.9])} />
       <Stack.Screen
         name="price-alert"
         options={{ presentation: 'formSheet', headerShown: false, sheetAllowedDetents: [0.8], sheetGrabberVisible: true, sheetCornerRadius: 28 }}

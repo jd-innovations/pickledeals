@@ -15,3 +15,12 @@ export function useStackOptions() {
     contentStyle: { backgroundColor: colors.background },
   };
 }
+
+/** Sheet presentations shared by stacks (formSheet with grabber, token corner radius). */
+export const sheetOptions = (detents: number[]) => ({
+  presentation: 'formSheet' as const,
+  headerShown: false,
+  sheetAllowedDetents: detents,
+  sheetGrabberVisible: true,
+  sheetCornerRadius: 28,
+});

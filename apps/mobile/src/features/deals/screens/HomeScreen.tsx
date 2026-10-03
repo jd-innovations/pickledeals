@@ -9,6 +9,7 @@ import { CollectionBanner, DealCard, DealHero, PriceDropRow, PromoCodeRow } from
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { productImage } from '@/features/catalog/hooks';
 import { ShopByCategory } from '@/features/catalog/ShopByCategory';
+import { NearbyPreOwned } from '@/features/market/PreOwned';
 import { openDeal } from '@/features/offers/hooks';
 import { Chip, ChipRow, EmptyState, ErrorState, IconButton, SearchField, SectionHeader, Skeleton, Text } from '@/ui';
 
@@ -188,6 +189,8 @@ export default function HomeScreen() {
           )}
 
           <ShopByCategory />
+
+          <NearbyPreOwned />
 
           {data.under100.length > 0 && (
             <View style={{ gap: 12 }}>

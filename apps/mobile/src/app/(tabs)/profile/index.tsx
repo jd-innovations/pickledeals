@@ -6,6 +6,7 @@ import { useTheme } from '@/design/theme';
 import { authErrorMessage, signOut } from '@/features/auth/api';
 import { useAlerts, useSavedIds } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
+import { useHomeArea, useMyListings } from '@/features/market/hooks';
 import { Button, Group, ListRow, Text } from '@/ui';
 
 const APPEARANCE_LABEL = { system: 'System', light: 'Light', dark: 'Dark' } as const;
@@ -13,6 +14,7 @@ const APPEARANCE_LABEL = { system: 'System', light: 'Light', dark: 'Dark' } as c
 /**
  * D5 (revised): Profile is the canonical home of the Saved library, buying & selling and Messages.
  * Rows for features that land in later phases are listed without a destination.
+ * The Location row is the saved home area (approximate, D2) used for "near you" and pre-owned alerts.
  */
 export default function ProfileScreen() {
   const { colors, preference } = useTheme();
@@ -21,6 +23,8 @@ export default function ProfileScreen() {
   const [signingOut, setSigningOut] = useState(false);
   const saved = useSavedIds();
   const alerts = useAlerts();
+  const myListings = useMyListings();
+  const home = useHomeArea();
 
   const onSignOut = async () => {
     setSigningOut(true);
@@ -71,13 +75,13 @@ export default function ProfileScreen() {
       {user && (
         <>
           <Group label="Shopping">
-            <ListRow title="Saved products & deals" value={String(saved.products.size + saved.deals.size)} onPress={() => router.push('/profile/saved')} />
+            <ListRow title="Saved" value={String(saved.products.size + saved.deals.size + saved.listings.size)} onPress={() => router.push('/profile/saved')} />
             <ListRow title="Price alerts" value={String(alerts.data?.length ?? 0)} onPress={() => router.push('/alerts')} />
-            <ListRow title="Saved listings" value="Phase 6" />
             <ListRow title="Followed brands" value={String(saved.brands.size)} onPress={() => router.push('/profile/brands')} last />
           </Group>
           <Group label="Buying & selling">
-            <ListRow title="My listings" value="Phase 6" />
+            <ListRow title="My listings" value={myListings.data ? String(myListings.data.filter((l) => l.status !== 'sold').length) : undefined} onPress={() => router.push('/profile/listings')} />
+            <ListRow title="Location" value={home.data?.label ?? 'Not set'} onPress={() => router.push('/profile/location')} />
             <ListRow title="Offers" value="Phase 9" />
             <ListRow title="Messages" value="Phase 8" last />
           </Group>

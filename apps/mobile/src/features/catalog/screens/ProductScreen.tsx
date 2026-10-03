@@ -19,6 +19,7 @@ import {
 import { useTheme } from '@/design/theme';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
+import { PreOwnedSection } from '@/features/market/PreOwned';
 import type { RankedOffer } from '@/features/offers/api';
 import { AFFILIATE_DISCLOSURE, deltaLabel, offerBreakdown, qualityDetail, shippingLabel } from '@/features/offers/format';
 import { openDeal, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
@@ -217,6 +218,8 @@ export default function ProductScreen() {
                 </Pressable>
               </View>
             )}
+
+            <PreOwnedSection productId={p.id} slug={p.slug} />
 
             {specs.length > 0 && (
               <View style={{ paddingHorizontal: 16 }}>

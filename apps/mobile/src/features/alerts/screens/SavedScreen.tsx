@@ -6,29 +6,32 @@ import { brandLogoUrl } from '@/features/catalog/api';
 import { useGridCardWidth } from '@/features/catalog/components';
 import { productImage } from '@/features/catalog/hooks';
 import { DealGrid } from '@/features/deals/components';
+import { ListingGrid } from '@/features/market/components';
+import { useSavedListings } from '@/features/market/hooks';
 import { EmptyState, SectionHeader, Skeleton, Text } from '@/ui';
 
 import { useFollowedBrands, useSavedDeals, useSavedProducts } from '../hooks';
 
-/** Profile › Saved products & deals — the canonical Saved library (D5 revised). */
+/** Profile › Saved deals, pre-owned listings & products — the canonical Saved library (D5 revised). */
 export default function SavedScreen() {
   const deals = useSavedDeals();
   const products = useSavedProducts();
+  const listings = useSavedListings();
   const cardW = useGridCardWidth();
 
-  if (deals.isPending || products.isPending) {
+  if (deals.isPending || products.isPending || listings.isPending) {
     return (
       <View style={{ padding: 16, gap: 12 }}>
         <Skeleton height={200} round={16} />
       </View>
     );
   }
-  const nothing = !deals.data?.live.length && !deals.data?.endedCount && !products.data?.length;
+  const nothing = !deals.data?.live.length && !deals.data?.endedCount && !products.data?.length && !listings.data?.length;
 
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 120, gap: 20 }}>
       {nothing ? (
-        <EmptyState icon="heart" title="Nothing saved yet" message="Tap the heart on any deal or product to keep it here." actionLabel="Browse deals" onAction={() => router.push('/deals')} />
+        <EmptyState icon="heart" title="Nothing saved yet" message="Tap the heart on any deal, product or listing to keep it here." actionLabel="Browse deals" onAction={() => router.push('/deals')} />
       ) : (
         <>
           {(deals.data?.live.length ?? 0) > 0 && (
@@ -41,6 +44,12 @@ export default function SavedScreen() {
             <Text variant="footnote" tone="secondary" style={{ paddingHorizontal: 16 }}>
               {deals.data!.endedCount} saved {deals.data!.endedCount === 1 ? 'deal has' : 'deals have'} ended. Save the product to keep an eye on it.
             </Text>
+          )}
+          {(listings.data?.length ?? 0) > 0 && (
+            <View style={{ gap: 12 }}>
+              <SectionHeader title="Pre-owned" trailing={String(listings.data!.length)} />
+              <ListingGrid items={listings.data!} />
+            </View>
           )}
           {(products.data?.length ?? 0) > 0 && (
             <View style={{ gap: 12 }}>

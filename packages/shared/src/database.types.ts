@@ -1208,7 +1208,12 @@ isOneToOne: false
 { Args: { "ids"?: (string)[] }; Returns: number
                            },
 "market_feed":
-{ Args: { "brand_slugs"?: (string)[],"category_slug"?: string,"conditions"?: (string)[],"include_shipping"?: boolean,"lat"?: number,"lng"?: number,"max_cents"?: number,"max_rows"?: number,"min_cents"?: number,"pickup_only"?: boolean,"product"?: string,"radius_m"?: number,"seller"?: string,"skip"?: number,"sort"?: string,"statuses"?: (string)[] }; Returns: Json
+{ Args: { "brand_slugs"?: (string)[],"category_slug"?: string,"conditions"?: (string)[],"ids"?: (string)[],"include_shipping"?: boolean,"lat"?: number,"lng"?: number,"max_cents"?: number,"max_rows"?: number,"min_cents"?: number,"pickup_only"?: boolean,"product"?: string,"q"?: string,"radius_m"?: number,"seller"?: string,"skip"?: number,"sort"?: string,"statuses"?: (string)[],"use_home"?: boolean }; Returns: Json
+                           },
+"my_listing_save_counts":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "listing_id": string,"saves": number
+            }[]
                            },
 "notify":
 { Args: { "body": string,"dedupe": string,"extra"?: Json,"kind": string,"route": string,"title": string,"uid": string }; Returns: undefined
@@ -1249,6 +1254,9 @@ isOneToOne: false
                            },
 "reject_raw_offer":
 { Args: { "raw_id": string }; Returns: undefined
+                           },
+"resolve_listing_review":
+{ Args: { "decision": string,"notes"?: string,"review": string,"variant"?: string }; Returns: undefined
                            },
 "resolve_raw_offer":
 { Args: { "raw_id": string,"remember"?: boolean,"variant": string }; Returns: Json

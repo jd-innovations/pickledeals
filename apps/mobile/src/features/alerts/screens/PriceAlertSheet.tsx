@@ -2,7 +2,7 @@ import { formatPrice, radius } from '@pickledeals/shared';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
 
 import { ProductImage } from '@/commerce';
 import { useTheme } from '@/design/theme';
@@ -39,6 +39,8 @@ export default function PriceAlertSheet() {
   }, [existing, now, stats?.low90dCents]);
   const [target, setTarget] = useState<number | null>(null);
   const value = target ?? suggested ?? 5000;
+  const [usedChoice, setIncludeUsed] = useState<boolean | null>(null);
+  const includeUsed = usedChoice ?? existing?.includeUsed ?? true;
 
   const timesReached = (history.data ?? []).filter((d) => d.cents <= value).length;
   const quick = [
@@ -54,7 +56,7 @@ export default function PriceAlertSheet() {
 
   const save = async () => {
     if (!product) return;
-    await saveAlert.mutateAsync({ id: existing?.id, productId: product.id, variantId: scoped ? variant!.id : null, targetCents: value });
+    await saveAlert.mutateAsync({ id: existing?.id, productId: product.id, variantId: scoped ? variant!.id : null, targetCents: value, includeUsed });
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     router.back();
     // Ask for notification permission in context, right after the first alert.
@@ -134,6 +136,17 @@ export default function PriceAlertSheet() {
           </Text>
         </View>
         <Icon name="check" size={16} color={colors.textPrimary} />
+      </View>
+      <View style={[styles.option, { backgroundColor: colors.surface, marginTop: -12 }]}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text variant="subhead" weight="700">
+            Pre-owned listings
+          </Text>
+          <Text variant="caption" weight="400" tone="secondary">
+            Near your saved area, or ones that ship.
+          </Text>
+        </View>
+        <Switch accessibilityLabel="Pre-owned listings" value={includeUsed} onValueChange={setIncludeUsed} trackColor={{ true: colors.interactive, false: colors.border }} />
       </View>
 
       <Button label={existing ? 'Update alert' : 'Create alert'} fullWidth loading={saveAlert.isPending} onPress={save} />

@@ -1,5 +1,5 @@
 begin;
-select plan(34);
+select plan(45);
 
 insert into auth.users (id, email) values
   ('12121212-0000-0000-0000-000000000001', 'seller6@example.test'),
@@ -97,6 +97,22 @@ select throws_ok($$select public.set_listing_status('aaaa0000-0000-0000-0000-000
 select lives_ok($$select public.set_home_area(27.336789, -82.531234, 'Sarasota, FL', 40000)$$, 'a buyer sets an approximate home area');
 select lives_ok($$insert into public.price_alerts (user_id, product_id, target_cents, include_used)
   select '12121212-0000-0000-0000-000000000002', id, 16000, true from public.products where slug = 'crbn-1x-power-series'$$, 'a buyer alerts on pre-owned');
+select ok((public.market_feed(use_home => true) ->> 'has_origin')::boolean, 'the feed can measure from the caller’s saved home area');
+reset role;
+
+select set_config('request.jwt.claims', json_build_object('role', 'anon')::text, true);
+set local role anon;
+select ok(not (public.market_feed(use_home => true) ->> 'has_origin')::boolean, 'guests have no home area');
+select is((select count(*)::int from jsonb_array_elements(public.market_feed(q => 'vintage WOOD', radius_m => null) -> 'items') x
+            where x ->> 'id' = 'aaaa0000-0000-0000-0000-000000000005'), 1, 'search matches every word, case-insensitively');
+select is((select count(*)::int from jsonb_array_elements(public.market_feed(q => 'vintage', radius_m => null) -> 'items') x
+            where x ->> 'id' = 'aaaa0000-0000-0000-0000-000000000001'), 0, 'search excludes listings that don’t match');
+select is((public.market_feed(ids => array['aaaa0000-0000-0000-0000-000000000001'::uuid], radius_m => null) ->> 'total')::int, 1, 'the feed filters by id (Saved listings)');
+select throws_ok('select * from public.my_listing_save_counts()', '42501', null, 'save counts need a signed-in seller');
+reset role;
+
+select pg_temp.act_as('12121212-0000-0000-0000-000000000001');
+select is((select saves from public.my_listing_save_counts() where listing_id = 'aaaa0000-0000-0000-0000-000000000001'), 1, 'sellers see how many people saved their listing');
 reset role;
 
 select pg_temp.act_as('12121212-0000-0000-0000-000000000001');
@@ -117,6 +133,24 @@ select pg_temp.act_as('12121212-0000-0000-0000-000000000001');
 do $$ begin perform public.set_listing_status('aaaa0000-0000-0000-0000-000000000001', 'sold'); end $$;
 select throws_ok($$select public.set_listing_status('aaaa0000-0000-0000-0000-000000000001', 'active')$$, '22023', null, 'sold listings are final');
 reset role;
+
+-- D3 review queue -------------------------------------------------------------------------------------
+
+select pg_temp.act_as('12121212-0000-0000-0000-000000000001');
+select throws_ok($$select public.resolve_listing_review((select r.id from public.listing_catalog_reviews r where r.listing_id = 'aaaa0000-0000-0000-0000-000000000005'), 'dismissed')$$,
+  '42501', null, 'only staff resolve catalog reviews');
+reset role;
+
+select set_config('request.jwt.claims', json_build_object('sub', '12121212-0000-0000-0000-000000000002', 'role', 'authenticated', 'app_role', 'editor')::text, true);
+set local role authenticated;
+select lives_ok($$select public.resolve_listing_review(
+    (select r.id from public.listing_catalog_reviews r where r.listing_id = 'aaaa0000-0000-0000-0000-000000000005'), 'linked',
+    (select v.id from public.product_variants v join public.products p on p.id = v.product_id where p.slug = 'crbn-1x-power-series' and v.label = '16mm'))$$,
+  'staff link a custom listing to a catalog variant');
+reset role;
+select is((select p.slug from public.listings l join public.products p on p.id = l.product_id where l.id = 'aaaa0000-0000-0000-0000-000000000005'),
+  'crbn-1x-power-series', 'the linked listing now belongs to the product (and its page)');
+select is((select decision::text from public.listing_catalog_reviews where listing_id = 'aaaa0000-0000-0000-0000-000000000005'), 'linked', 'the review is closed');
 
 select * from finish();
 rollback;

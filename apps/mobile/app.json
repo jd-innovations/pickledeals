@@ -45,7 +45,20 @@
       ],
       "expo-secure-store",
       "expo-apple-authentication",
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "PickleDeals uses your approximate area to show nearby listings and to place your listing on the map. Your exact location is never shared."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Choose photos of the gear you are selling.",
+          "cameraPermission": "Take photos of the gear you are selling."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

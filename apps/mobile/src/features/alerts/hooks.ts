@@ -34,7 +34,7 @@ export const meKeys = {
   notifications: (uid: string) => ['me', uid, 'notifications'] as const,
 };
 
-const EMPTY: SavedIds = { products: new Set(), deals: new Set(), brands: new Set() };
+const EMPTY: SavedIds = { products: new Set(), deals: new Set(), brands: new Set(), listings: new Set() };
 
 export function useSavedIds() {
   const uid = useAuth((s) => s.user?.id);
@@ -42,8 +42,8 @@ export function useSavedIds() {
   return uid ? (q.data ?? EMPTY) : EMPTY;
 }
 
-const INTENT: Record<SaveKind, AuthIntent> = { product: 'save_product', deal: 'save_deal', brand: 'follow_brand' };
-const SET_KEY = { product: 'products', deal: 'deals', brand: 'brands' } as const;
+const INTENT: Record<SaveKind, AuthIntent> = { product: 'save_product', deal: 'save_deal', brand: 'follow_brand', listing: 'save_listing' };
+const SET_KEY = { product: 'products', deal: 'deals', brand: 'brands', listing: 'listings' } as const;
 
 /**
  * Save / follow toggle with the D6 auth flow: guests sign in first and the save resumes.

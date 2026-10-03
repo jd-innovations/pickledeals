@@ -185,6 +185,11 @@ begin
     insert into public.listing_private (listing_id) values (lid);
     insert into public.listing_locations (listing_id, public_point, geohash6, area_label)
     select lid, s.point, s.geohash, r.area from public.snap_point(r.lat, r.lng, 6) s;
+    -- D3: custom items wait in the admin catalog queue, exactly as publish_listing queues them.
+    if r.product_slug is null then
+      insert into public.listing_catalog_reviews (listing_id, suggestions)
+      values (lid, public.suggest_catalog_matches(r.custom_title, null));
+    end if;
   end loop;
   -- One sold listing so "what it sells for" has history.
   update public.listings set status = 'sold', sold_price_cents = 13500, sold_at = now() - interval '3 days'

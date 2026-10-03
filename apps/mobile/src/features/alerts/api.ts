@@ -4,29 +4,31 @@ import { requireSupabase } from '@/lib/supabase';
 
 /** Phase 5: the signed-in user's saves, follows, alerts, saved searches and notifications (owner-only). */
 
-export type SavedIds = { products: Set<string>; deals: Set<string>; brands: Set<string> };
+export type SavedIds = { products: Set<string>; deals: Set<string>; brands: Set<string>; listings: Set<string> };
 
 export async function fetchSavedIds(): Promise<SavedIds> {
   const client = requireSupabase();
-  const [p, d, b] = await Promise.all([
+  const [p, d, b, l] = await Promise.all([
     client.from('saved_products').select('product_id'),
     client.from('saved_deals').select('deal_id'),
     client.from('brand_follows').select('brand_id'),
+    client.from('saved_listings').select('listing_id'),
   ]);
-  for (const r of [p, d, b]) if (r.error) throw r.error;
+  for (const r of [p, d, b, l]) if (r.error) throw r.error;
   return {
     products: new Set(p.data!.map((x) => x.product_id)),
     deals: new Set(d.data!.map((x) => x.deal_id)),
     brands: new Set(b.data!.map((x) => x.brand_id)),
+    listings: new Set(l.data!.map((x) => x.listing_id)),
   };
 }
 
-export type SaveKind = 'product' | 'deal' | 'brand';
-const TABLE = { product: ['saved_products', 'product_id'], deal: ['saved_deals', 'deal_id'], brand: ['brand_follows', 'brand_id'] } as const;
+export type SaveKind = 'product' | 'deal' | 'brand' | 'listing';
+const TABLE = { product: ['saved_products', 'product_id'], deal: ['saved_deals', 'deal_id'], brand: ['brand_follows', 'brand_id'], listing: ['saved_listings', 'listing_id'] } as const;
 
 export async function setSaved(userId: string, kind: SaveKind, id: string, saved: boolean): Promise<void> {
   const [table, column] = TABLE[kind];
-  // The three tables share a shape (user_id + one target id); the union defeats per-table typing.
+  // The four tables share a shape (user_id + one target id); the union defeats per-table typing.
   const t = requireSupabase().from(table as 'saved_products');
   const col = column as 'product_id';
   const { error } = saved
@@ -81,6 +83,7 @@ export type PriceAlert = {
   product: { id: string; slug: string; name: string; brand: string; category: Ref; image: CatalogImage | null };
   variant: { id: string; label: string } | null;
   targetCents: number;
+  includeUsed: boolean;
   status: 'active' | 'paused';
   lastNotifiedCents: number | null;
   createdAt: string;
@@ -90,7 +93,7 @@ export async function fetchAlerts(): Promise<PriceAlert[]> {
   const { data, error } = await requireSupabase()
     .from('price_alerts')
     .select(
-      'id, target_cents, status, last_notified_cents, created_at, variant:product_variants(id, label), product:products!inner(id, slug, name, brand:brands(name), category:categories(slug, name), images:product_images(storage_path, is_cutout, blurhash, sort))',
+      'id, target_cents, include_used, status, last_notified_cents, created_at, variant:product_variants(id, label), product:products!inner(id, slug, name, brand:brands(name), category:categories(slug, name), images:product_images(storage_path, is_cutout, blurhash, sort))',
     )
     .order('created_at', { ascending: false });
   if (error) throw error;
@@ -109,6 +112,7 @@ export async function fetchAlerts(): Promise<PriceAlert[]> {
       product: { id: p.id, slug: p.slug, name: p.name, brand: p.brand.name, category: p.category, image: img ? { path: img.storage_path, isCutout: img.is_cutout, blurhash: img.blurhash } : null },
       variant: (r.variant as unknown as { id: string; label: string } | null) ?? null,
       targetCents: r.target_cents,
+      includeUsed: r.include_used,
       status: r.status,
       lastNotifiedCents: r.last_notified_cents,
       createdAt: r.created_at,
@@ -116,11 +120,11 @@ export async function fetchAlerts(): Promise<PriceAlert[]> {
   });
 }
 
-export async function upsertAlert(userId: string, a: { id?: string; productId: string; variantId: string | null; targetCents: number }): Promise<void> {
+export async function upsertAlert(userId: string, a: { id?: string; productId: string; variantId: string | null; targetCents: number; includeUsed: boolean }): Promise<void> {
   const client = requireSupabase();
   const { error } = a.id
-    ? await client.from('price_alerts').update({ target_cents: a.targetCents, status: 'active' }).eq('id', a.id)
-    : await client.from('price_alerts').insert({ user_id: userId, product_id: a.productId, variant_id: a.variantId, target_cents: a.targetCents });
+    ? await client.from('price_alerts').update({ target_cents: a.targetCents, include_used: a.includeUsed, status: 'active' }).eq('id', a.id)
+    : await client.from('price_alerts').insert({ user_id: userId, product_id: a.productId, variant_id: a.variantId, target_cents: a.targetCents, include_used: a.includeUsed });
   if (error) throw error;
 }
 

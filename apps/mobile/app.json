@@ -71,6 +71,12 @@
         "projectId": "0049f682-0793-4fa5-befc-09736009cbb1"
       }
     },
-    "owner": "dhjesus122"
+    "owner": "dhjesus122",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/0049f682-0793-4fa5-befc-09736009cbb1"
+    }
   }
 }

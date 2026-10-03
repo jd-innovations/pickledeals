@@ -51,6 +51,7 @@ export const AUTH_INTENTS = [
   'save_listing',
   'create_price_alert',
   'follow_brand',
+  'save_search',
   'message_seller',
   'make_offer',
   'create_listing',

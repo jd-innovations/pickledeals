@@ -1,10 +1,13 @@
+import { formatPrice } from '@pickledeals/shared';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 
+import { useMeMutations } from '@/features/alerts/hooks';
+import { useAuth } from '@/features/auth/authStore';
 import { DealList } from '@/features/deals/screens/FeedScreen';
-import { useDeals } from '@/features/deals/hooks';
-import { Chip, ChipRow, EmptyState, SegmentedControl, Text } from '@/ui';
+import { useDealFilters, useDeals } from '@/features/deals/hooks';
+import { Button, Chip, ChipRow, EmptyState, SegmentedControl, Text } from '@/ui';
 
 import { GridSkeleton, LoadError, ProductGrid } from '../components';
 import { useCategory } from '../hooks';
@@ -19,6 +22,17 @@ export default function CategoryScreen() {
   const [mode, setMode] = useState<Mode | null>(null);
   // Default to deals when the category has any.
   const active: Mode = mode ?? (deals.data && deals.data.total === 0 ? 'products' : 'deals');
+  const filters = useDealFilters(`category:${slug}`);
+  const requireAuth = useAuth((s) => s.requireAuth);
+  const { createSearch } = useMeMutations();
+
+  const saveSearch = () =>
+    data &&
+    requireAuth('save_search', async () => {
+      const label = `${data.category.name}${filters.maxCents ? ` under ${formatPrice(filters.maxCents)}` : ''}`;
+      await createSearch.mutateAsync({ label, categorySlug: slug, maxCents: filters.maxCents });
+      Alert.alert('Search saved', `We’ll tell you about new ${label.toLowerCase()} deals. Manage it in Alerts › Saved searches.`);
+    });
 
   const switcher = (
     <View style={{ paddingHorizontal: 16, gap: 8 }}>
@@ -40,7 +54,12 @@ export default function CategoryScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ title: data?.category.name ?? '' }} />
+      <Stack.Screen
+        options={{
+          title: data?.category.name ?? '',
+          headerRight: () => <Button label="Save search" variant="secondary" size="sm" icon="bell" onPress={saveSearch} />,
+        }}
+      />
       {active === 'deals' ? <DealList scope={`category:${slug}`} query={{ category: slug }} header={switcher} /> : <Products slug={slug} header={switcher} />}
     </>
   );

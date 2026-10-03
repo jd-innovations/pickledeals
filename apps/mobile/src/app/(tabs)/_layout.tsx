@@ -1,6 +1,7 @@
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 import { useTheme } from '@/design/theme';
+import { useUnreadCount } from '@/features/alerts/hooks';
 
 /**
  * D5: native iOS tab bar (Liquid Glass on iOS 26). Monochrome tint.
@@ -9,6 +10,7 @@ import { useTheme } from '@/design/theme';
  */
 export default function TabsLayout() {
   const { colors } = useTheme();
+  const unread = useUnreadCount();
   return (
     <NativeTabs tintColor={colors.textPrimary} minimizeBehavior="onScrollDown">
       <NativeTabs.Trigger name="deals">
@@ -25,6 +27,7 @@ export default function TabsLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="alerts">
         <NativeTabs.Trigger.Label>Alerts</NativeTabs.Trigger.Label>
+        {unread > 0 && <NativeTabs.Trigger.Badge>{unread > 9 ? '9+' : String(unread)}</NativeTabs.Trigger.Badge>}
         <NativeTabs.Trigger.Icon sf={{ default: 'bell', selected: 'bell.fill' }} md="notifications" />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">

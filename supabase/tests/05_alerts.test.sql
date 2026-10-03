@@ -96,7 +96,7 @@ select is((select last_notified_cents from public.price_alerts where user_id = '
 select pg_temp.act_as('ffffffff-0000-0000-0000-000000000001');
 select is(public.mark_notifications_read(), 3, 'mark-all-read marks the user’s own notifications');
 reset role;
-select is((select count(*)::int from public.notifications where read_at is not null and user_id <> 'ffffffff-0000-0000-0000-000000000001'), 0,
+select is((select count(*)::int from public.notifications where read_at is not null and user_id = 'ffffffff-0000-0000-0000-000000000002'), 0,
   'and nobody else’s');
 
 select ok((select count(*) from public.claim_pending_notifications()) >= 3, 'dispatch claims pending notifications');

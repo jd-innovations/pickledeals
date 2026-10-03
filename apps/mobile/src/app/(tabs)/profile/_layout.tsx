@@ -9,6 +9,8 @@ export default function ProfileStack() {
       <Stack.Screen name="index" options={{ title: 'Profile' }} />
       <Stack.Screen name="appearance" options={{ title: 'Appearance' }} />
       <Stack.Screen name="account" options={{ title: 'Account' }} />
+      <Stack.Screen name="saved" options={{ title: 'Saved' }} />
+      <Stack.Screen name="brands" options={{ title: 'Followed brands' }} />
       <Stack.Screen name="gallery" options={{ title: 'Components' }} />
     </Stack>
   );

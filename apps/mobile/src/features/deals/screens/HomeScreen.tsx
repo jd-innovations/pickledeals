@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
 import { CollectionBanner, DealCard, DealHero, PriceDropRow, PromoCodeRow } from '@/commerce';
+import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { productImage } from '@/features/catalog/hooks';
 import { ShopByCategory } from '@/features/catalog/ShopByCategory';
 import { openDeal } from '@/features/offers/hooks';
@@ -202,6 +203,8 @@ export default function HomeScreen() {
 
 function DealRow({ title, items, onSeeAll, sponsored = [] }: { title: string; items: Deal[]; onSeeAll: () => void; sponsored?: { campaign: string; deal: Deal }[] }) {
   // Sponsored cards sit in the second slot, labelled, and never replace organic ranking.
+  const saved = useSavedIds();
+  const toggle = useToggleSave();
   const cards: { deal: Deal; sponsoredBy?: string }[] = items.map((deal) => ({ deal }));
   sponsored.forEach((s, i) => cards.splice(Math.min(1 + i * 4, cards.length), 0, { deal: s.deal, sponsoredBy: s.campaign }));
   return (
@@ -209,7 +212,14 @@ function DealRow({ title, items, onSeeAll, sponsored = [] }: { title: string; it
       <SectionHeader title={title} actionLabel="See all" onAction={onSeeAll} />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 12, paddingHorizontal: 16 }}>
         {cards.map(({ deal, sponsoredBy }) => (
-          <DealCard key={`${deal.id}-${sponsoredBy ?? 'organic'}`} width={160} deal={toCard(deal, sponsoredBy)} onPress={() => openDealDetail(deal)} />
+          <DealCard
+            key={`${deal.id}-${sponsoredBy ?? 'organic'}`}
+            width={160}
+            deal={toCard(deal, sponsoredBy)}
+            saved={saved.deals.has(deal.id)}
+            onToggleSave={() => toggle('deal', deal.id, saved.deals.has(deal.id))}
+            onPress={() => openDealDetail(deal)}
+          />
         ))}
       </ScrollView>
     </View>

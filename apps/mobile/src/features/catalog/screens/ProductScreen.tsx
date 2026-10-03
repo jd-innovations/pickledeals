@@ -17,6 +17,8 @@ import {
   StickyDealBar,
 } from '@/commerce';
 import { useTheme } from '@/design/theme';
+import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
+import { useAuth } from '@/features/auth/authStore';
 import type { RankedOffer } from '@/features/offers/api';
 import { AFFILIATE_DISCLOSURE, deltaLabel, offerBreakdown, qualityDetail, shippingLabel } from '@/features/offers/format';
 import { openDeal, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
@@ -45,6 +47,19 @@ export default function ProductScreen() {
   const history = usePriceHistory(best ? variant?.id : undefined, 90);
   const showVariants = (p?.variants.length ?? 0) > 1;
   const specs = Object.entries(p?.specs ?? {});
+
+  const saved = useSavedIds();
+  const toggleSave = useToggleSave();
+  const requireAuth = useAuth((st) => st.requireAuth);
+  const isSaved = !!p && saved.products.has(p.id);
+  const openAlert = () =>
+    p && requireAuth('create_price_alert', () => router.push({ pathname: '/deals/price-alert', params: { slug: p.slug, variant: variant?.id ?? '' } }));
+  const actions = p ? (
+    <View style={{ flexDirection: 'row', gap: 10 }}>
+      <Button label={isSaved ? 'Saved' : 'Save'} variant="secondary" size="md" icon="heart" style={{ flex: 1 }} onPress={() => toggleSave('product', p.id, isSaved)} />
+      <Button label="Price alert" variant="secondary" size="md" icon="bell" style={{ flex: 1 }} onPress={openAlert} />
+    </View>
+  ) : null;
 
   const share = () => p && Share.share({ message: `${p.brand.name} ${p.name} on PickleDeals` }).catch(() => {});
   const getDeal = async (o: RankedOffer, placement: string) => {
@@ -128,6 +143,7 @@ export default function ProductScreen() {
                     fullWidth
                     onPress={() => getDeal(best, 'product_best')}
                   />
+                  {actions}
                   <Text variant="caption" weight="400" tone="tertiary">
                     {AFFILIATE_DISCLOSURE}
                   </Text>
@@ -141,6 +157,7 @@ export default function ProductScreen() {
                     {checkPriceOnly.retailer.name} prices change often, so we show the current price on their site.
                   </Text>
                   <Button label={`Check price at ${checkPriceOnly.retailer.name}`} icon="external" iconPosition="trailing" fullWidth onPress={() => openDeal(checkPriceOnly.offerId, 'product_check_price')} />
+                  {actions}
                 </View>
               ) : (
                 <View style={{ padding: 16, borderRadius: radius.hero, backgroundColor: colors.surface, gap: 4 }}>
@@ -148,6 +165,7 @@ export default function ProductScreen() {
                   <Text variant="footnote" tone="secondary">
                     {msrp != null ? `MSRP ${formatPrice(msrp)}. ` : ''}We’ll show prices here as retailers list this {showVariants ? 'version' : 'product'}.
                   </Text>
+                  <View style={{ marginTop: 10 }}>{actions}</View>
                 </View>
               )}
             </View>

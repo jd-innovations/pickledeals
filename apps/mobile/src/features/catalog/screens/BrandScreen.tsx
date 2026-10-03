@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { BrandMark, PromoCodeRow } from '@/commerce';
+import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { DealGrid } from '@/features/deals/components';
 import { useDeals } from '@/features/deals/hooks';
 import { useLivePromos } from '@/features/offers/hooks';
@@ -23,6 +24,9 @@ export default function BrandScreen() {
   const codeRetailers = [...new Set((deals.data?.items ?? []).filter((d) => d.promo).map((d) => d.retailer.slug))];
   const promos = useLivePromos(codeRetailers);
   const [category, setCategory] = useState<string | null>(null);
+  const saved = useSavedIds();
+  const toggleSave = useToggleSave();
+  const following = !!data && saved.brands.has(data.brand.id);
 
   const categories = useMemo(() => {
     const counts = new Map<string, { slug: string; name: string; n: number }>();
@@ -66,6 +70,20 @@ export default function BrandScreen() {
                     .join(' · ')
                 : ' '}
             </Text>
+            {data ? (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <Button
+                  label={following ? 'Following' : 'Follow'}
+                  variant={following ? 'outline' : 'primary'}
+                  size="sm"
+                  icon={following ? 'check' : undefined}
+                  onPress={() => toggleSave('brand', data.brand.id, following)}
+                />
+                <Text variant="caption" weight="400" tone="secondary" style={{ flex: 1 }}>
+                  Get notified about new {data.brand.name} deals.
+                </Text>
+              </View>
+            ) : null}
             {website ? (
               <View style={{ alignItems: 'flex-start' }}>
                 <Button

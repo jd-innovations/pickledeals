@@ -5,11 +5,13 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { ThemeProvider, useTheme } from '@/design/theme';
+import { usePush } from '@/features/alerts/push';
 import { startAuthListener } from '@/features/auth/authStore';
 import { queryClient } from '@/lib/queryClient';
 
 function RootNavigator() {
   const { colors, scheme } = useTheme();
+  usePush();
   const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
   const sheet: NativeStackNavigationOptions = {
     presentation: 'formSheet',

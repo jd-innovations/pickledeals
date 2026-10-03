@@ -4,6 +4,7 @@ import { Alert, ScrollView, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { authErrorMessage, signOut } from '@/features/auth/api';
+import { useAlerts, useSavedIds } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { Button, Group, ListRow, Text } from '@/ui';
 
@@ -18,6 +19,8 @@ export default function ProfileScreen() {
   const user = useAuth((s) => s.user);
   const profile = useAuth((s) => s.profile);
   const [signingOut, setSigningOut] = useState(false);
+  const saved = useSavedIds();
+  const alerts = useAlerts();
 
   const onSignOut = async () => {
     setSigningOut(true);
@@ -68,9 +71,10 @@ export default function ProfileScreen() {
       {user && (
         <>
           <Group label="Shopping">
-            <ListRow title="Saved products & deals" value="Phase 5" />
+            <ListRow title="Saved products & deals" value={String(saved.products.size + saved.deals.size)} onPress={() => router.push('/profile/saved')} />
+            <ListRow title="Price alerts" value={String(alerts.data?.length ?? 0)} onPress={() => router.push('/alerts')} />
             <ListRow title="Saved listings" value="Phase 6" />
-            <ListRow title="Followed brands" value="Phase 5" last />
+            <ListRow title="Followed brands" value={String(saved.brands.size)} onPress={() => router.push('/profile/brands')} last />
           </Group>
           <Group label="Buying & selling">
             <ListRow title="My listings" value="Phase 6" />

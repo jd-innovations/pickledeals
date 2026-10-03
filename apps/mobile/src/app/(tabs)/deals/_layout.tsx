@@ -18,6 +18,10 @@ export default function DealsStack() {
       <Stack.Screen name="feed/[feed]" options={{ headerLargeTitle: false }} />
       <Stack.Screen name="collection/[slug]" options={{ headerLargeTitle: false }} />
       <Stack.Screen
+        name="price-alert"
+        options={{ presentation: 'formSheet', headerShown: false, sheetAllowedDetents: [0.8], sheetGrabberVisible: true, sheetCornerRadius: 28 }}
+      />
+      <Stack.Screen
         name="filters"
         options={{ presentation: 'formSheet', headerShown: false, sheetAllowedDetents: [0.75, 1], sheetGrabberVisible: true, sheetCornerRadius: 28 }}
       />

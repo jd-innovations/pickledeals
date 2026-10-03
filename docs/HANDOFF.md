@@ -179,6 +179,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Apple Team `ZSH27U747N`, bundle `app.pickledeals` (`app.json` → `ios.appleTeamId`). `expo-dev-client` is installed.
   - Option a: the phone uses local Supabase over Wi-Fi. `npm run device:lan` / `device:local` switch `EXPO_PUBLIC_SUPABASE_URL`. Development builds relax ATS for this (`app.config.ts`, `APP_ENV=development` only).
   - The user runs `eas login` / `eas init` (projectId → `app.json` extra.eas.projectId and owner), `eas device:create`, `eas build --profile development --platform ios` and the Windows Firewall rule (the Wi-Fi is a Public network).
+- **Sign in with Apple fails on device ("Sign Up Not Complete" in Apple's sheet; Oct 3, 2026).** Email sign-in works. The capability is ticked on `app.pickledeals`, and the same team's other app (dreambreaker) signs in fine, so this matches Apple's known server-side issue with new App IDs (forum thread 837986: "Invalid client"; fixed by Apple re-registering the App ID). The user is filing a DTS request. No code change is expected; retest after Apple replies.
 - **Need the user:**
   - Sign in with Apple key (.p8 and Key ID) for token revocation
   - a decision on a staging Supabase project (costs money; the user prefers local)

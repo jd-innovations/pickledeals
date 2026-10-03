@@ -138,4 +138,5 @@ export const INTENT_COPY: Record<AuthIntent, string> = {
   make_offer: 'Sign in to make an offer.',
   create_listing: 'Sign in to sell your gear. Listing is free.',
   manage_listings: 'Sign in to manage your listings.',
+  report: 'Sign in to report this, so we can follow up.',
 };

@@ -1,9 +1,10 @@
 import { radius } from '@pickledeals/shared';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
+import { useAuth } from '@/features/auth/authStore';
 import { Button, EmptyState, SegmentedControl, Skeleton, Text } from '@/ui';
 
 import { ListingGrid, ListingGridSkeleton, MarketLoadError } from '../components';
@@ -17,6 +18,8 @@ export default function SellerScreen() {
   const { colors } = useTheme();
   const { data: s, isError, refetch } = useSeller(id);
   const [tab, setTab] = useState<'active' | 'sold'>('active');
+  const requireAuth = useAuth((x) => x.requireAuth);
+  const uid = useAuth((x) => x.user?.id);
 
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 120, gap: 20 }}>
@@ -76,13 +79,15 @@ export default function SellerScreen() {
             <EmptyState icon="tag" title={tab === 'active' ? 'Nothing for sale right now' : 'No sales yet'} message="Save a listing to hear when it changes." />
           )}
 
-          <Button
-            label="Report this seller"
-            variant="link"
-            size="sm"
-            style={{ alignSelf: 'flex-start', marginHorizontal: 16 }}
-            onPress={() => Alert.alert('Report seller', 'Thanks for looking out. Reporting opens alongside messaging in the next update.')}
-          />
+          {id !== uid && (
+            <Button
+              label="Report this seller"
+              variant="link"
+              size="sm"
+              style={{ alignSelf: 'flex-start', marginHorizontal: 16 }}
+              onPress={() => requireAuth('report', () => router.push({ pathname: '/report', params: { type: 'user', id, name: s.name } }))}
+            />
+          )}
         </>
       )}
     </ScrollView>

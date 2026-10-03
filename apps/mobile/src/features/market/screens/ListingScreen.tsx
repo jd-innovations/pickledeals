@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ConditionBadge, FavoriteButton, ProductImage, UsedVsNew, type ImageSource } from '@/commerce';
 import { productArt } from '@/commerce/catalogArt';
 import { useTheme } from '@/design/theme';
+import { startConversation } from '@/features/chat/api';
 import { AreaMap } from '@/features/map';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
@@ -37,7 +38,7 @@ export default function ListingScreen() {
   const toggleSave = useToggleSave();
   const uid = useAuth((s) => s.user?.id);
   const requireAuth = useAuth((s) => s.requireAuth);
-  const { openSeller, openManage } = useMarketNav();
+  const { openSeller, openManage, openConversation } = useMarketNav();
   const [page, setPage] = useState(0);
 
   if (isError) {
@@ -62,10 +63,16 @@ export default function ListingScreen() {
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => setPage(Math.round(e.nativeEvent.contentOffset.x / width));
   const share = () => l && Share.share({ message: `${fullTitle} — ${formatPrice(l.priceCents)} on PickleDeals` }).catch(() => {});
-  const soon = (what: string) => Alert.alert(what, 'Messaging and offers open in the next update. Save the listing to get notified if it changes.');
-  const message = () => requireAuth('message_seller', () => soon('Message the seller'));
-  const offer = () => requireAuth('make_offer', () => soon('Make an offer'));
-  const report = () => Alert.alert('Report listing', 'Thanks for looking out. Reporting opens alongside messaging in the next update.');
+  const message = () =>
+    requireAuth('message_seller', async () => {
+      try {
+        openConversation(await startConversation(id));
+      } catch (e) {
+        Alert.alert('Can’t message right now', (e as Error).message);
+      }
+    });
+  const offer = () => requireAuth('make_offer', () => Alert.alert('Make an offer', 'Offers open in the next update. Message the seller in the meantime.'));
+  const report = () => requireAuth('report', () => router.push({ pathname: '/report', params: { type: 'listing', id, name: fullTitle, user: l?.sellerId } }));
 
   return (
     <View style={{ flex: 1 }}>

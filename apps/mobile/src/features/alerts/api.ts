@@ -170,7 +170,10 @@ export async function deleteSavedSearch(id: string) {
 export type AppNotification = { id: string; type: string; title: string; body: string; route: string | null; createdAt: string; readAt: string | null };
 
 export async function fetchNotifications(): Promise<AppNotification[]> {
-  const { data, error } = await requireSupabase().from('notifications').select('id, type, title, body, route, created_at, read_at').order('created_at', { ascending: false }).limit(100);
+  const { data, error } = await requireSupabase().from('notifications').select('id, type, title, body, route, created_at, read_at')
+    // Messages have their own inbox and badge (Profile → Messages), not the Activity feed.
+    .neq('type', 'new_message')
+    .order('created_at', { ascending: false }).limit(100);
   if (error) throw error;
   return data.map((n) => ({ id: n.id, type: n.type, title: n.title, body: n.body, route: n.route, createdAt: n.created_at, readAt: n.read_at }));
 }

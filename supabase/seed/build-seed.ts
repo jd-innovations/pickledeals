@@ -158,7 +158,11 @@ begin
                             created_at, updated_at, confirmation_token, recovery_token, email_change, email_change_token_new)
     values ('00000000-0000-0000-0000-000000000000', ids[i], 'authenticated', 'authenticated', format('seller%s@pickledeals.test', i),
             now(), '{"provider":"email","providers":["email"]}', '{}', now() - interval '200 days', now(), '', '', '', '');
-    update public.profiles set display_name = sellers[i], member_since = now() - interval '200 days' where id = ids[i];
+    -- Identities let the dev sellers sign in with an email code too (two-account chat testing).
+    insert into auth.identities (provider_id, user_id, identity_data, provider, last_sign_in_at, created_at, updated_at)
+    values (ids[i]::text, ids[i], jsonb_build_object('sub', ids[i]::text, 'email', format('seller%s@pickledeals.test', i), 'email_verified', true),
+            'email', now(), now(), now());
+    update public.profiles set display_name = sellers[i], display_name_source = 'provided', member_since = now() - interval '200 days' where id = ids[i];
   end loop;
 
   for r in select * from (values
@@ -195,6 +199,18 @@ begin
   update public.listings set status = 'sold', sold_price_cents = 13500, sold_at = now() - interval '3 days'
    where id = (select l.id from public.listings l join public.products p on p.id = l.product_id
                 where p.slug = 'joola-perseus-pro-iv' and l.price_cents = 14500);
+
+  -- A demo thread (Phase 8): Priya asks Marcus about his Perseus. Inserted as the participants,
+  -- through the same triggers the app uses (previews, read state, Realtime, push rows).
+  lid := (select l.id from public.listings l join public.products p on p.id = l.product_id
+           where p.slug = 'joola-perseus-pro-iv' and l.price_cents = 15000);
+  insert into public.conversations (id, listing_id, buyer_id, seller_id) values (gen_random_uuid(), lid, ids[2], ids[1])
+  returning id into lid;
+  insert into public.conversation_participants (conversation_id, user_id, role) values (lid, ids[2], 'buyer'), (lid, ids[1], 'seller');
+  insert into public.messages (conversation_id, sender_id, body) values
+    (lid, ids[2], 'Hi! Is this still available?'),
+    (lid, ids[1], 'Yes! About 15 sessions on it, edge guard is clean.'),
+    (lid, ids[2], 'Great. Could I see it this weekend?');
 end;
 $market$;
 

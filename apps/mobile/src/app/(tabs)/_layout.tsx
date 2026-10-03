@@ -2,6 +2,7 @@ import { NativeTabs } from 'expo-router/unstable-native-tabs';
 
 import { useTheme } from '@/design/theme';
 import { useUnreadCount } from '@/features/alerts/hooks';
+import { useUnreadThreads } from '@/features/chat/hooks';
 
 /**
  * D5: native iOS tab bar (Liquid Glass on iOS 26). Monochrome tint.
@@ -11,6 +12,8 @@ import { useUnreadCount } from '@/features/alerts/hooks';
 export default function TabsLayout() {
   const { colors } = useTheme();
   const unread = useUnreadCount();
+  // D5: Messages live in Profile, so the Profile tab carries the unread-thread badge.
+  const unreadThreads = useUnreadThreads();
   return (
     <NativeTabs tintColor={colors.textPrimary} minimizeBehavior="onScrollDown">
       <NativeTabs.Trigger name="deals">
@@ -32,6 +35,7 @@ export default function TabsLayout() {
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
+        {unreadThreads > 0 && <NativeTabs.Trigger.Badge>{unreadThreads > 9 ? '9+' : String(unreadThreads)}</NativeTabs.Trigger.Badge>}
         <NativeTabs.Trigger.Icon sf={{ default: 'person.crop.circle', selected: 'person.crop.circle.fill' }} md="account_circle" />
       </NativeTabs.Trigger>
     </NativeTabs>

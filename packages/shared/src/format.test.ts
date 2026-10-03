@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { pickDealBadge } from './domain';
-import { formatAgo, formatApproxDistance, formatEndsIn, formatPercentOff, formatPrice, percentOff } from './format';
+import { formatAgo, formatApproxDistance, formatChatSeparator, formatEndsIn, formatPercentOff, formatPrice, formatReadReceipt, formatThreadTime, percentOff } from './format';
 
 describe('formatPrice', () => {
   it('drops zero cents', () => expect(formatPrice(17900)).toBe('$179'));
@@ -38,5 +38,25 @@ describe('formatAgo / formatEndsIn', () => {
     expect(formatEndsIn('2026-10-02T15:30:00Z', now)).toBe('Ends in 3h');
     expect(formatEndsIn('2026-10-03T13:00:00Z', now)).toBe('Ends in 1 day');
     expect(formatEndsIn('2026-10-02T11:00:00Z', now)).toBe('Ended');
+  });
+});
+
+describe('chat times', () => {
+  const now = new Date(2026, 9, 3, 19, 0); // Sat Oct 3 2026, 7:00 PM local
+  const at = (d: number, h: number, m = 0) => new Date(2026, 9, d, h, m);
+  it('labels inbox rows', () => {
+    expect(formatThreadTime(at(3, 18, 44), now)).toBe('6:44 PM');
+    expect(formatThreadTime(at(2, 8, 40), now)).toBe('Yesterday');
+    expect(formatThreadTime(new Date(2026, 8, 30, 9), now)).toBe('Wed');
+    expect(formatThreadTime(new Date(2026, 8, 24, 9), now)).toBe('Sep 24');
+  });
+  it('labels separators', () => {
+    expect(formatChatSeparator(at(3, 18, 20), now)).toBe('Today 6:20 PM');
+    expect(formatChatSeparator(at(2, 17, 58), now)).toBe('Yesterday 5:58 PM');
+    expect(formatChatSeparator(new Date(2026, 8, 24, 9, 0), now)).toBe('Sep 24, 9:00 AM');
+  });
+  it('labels receipts', () => {
+    expect(formatReadReceipt(at(3, 18, 44), now)).toBe('Read 6:44 PM');
+    expect(formatReadReceipt(at(1, 10), now)).toBe('Read Thu');
   });
 });

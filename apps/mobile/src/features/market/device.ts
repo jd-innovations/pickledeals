@@ -61,8 +61,8 @@ export async function pickPhotos(source: 'library' | 'camera', remaining: number
 
 const MAX_EDGE = 2048;
 
-/** Resize + re-encode (strips EXIF/GPS) and upload to listing-images/{uid}/{listingId}/{uuid}.jpg. */
-export async function uploadListingPhoto(uid: string, listingId: string, photo: PickedPhoto): Promise<{ path: string; width: number; height: number }> {
+/** Resize + re-encode to JPEG (strips EXIF/GPS) and upload to `bucket/path`. */
+export async function uploadJpeg(bucket: 'listing-images' | 'chat-images', path: string, photo: PickedPhoto): Promise<{ path: string; width: number; height: number }> {
   const ctx = ImageManipulator.manipulate(photo.localUri);
   if (Math.max(photo.width, photo.height) > MAX_EDGE) {
     // Pass only the constrained edge; the other follows the aspect ratio (explicit nulls break on web).
@@ -72,11 +72,16 @@ export async function uploadListingPhoto(uid: string, listingId: string, photo: 
   const saved = await rendered.saveAsync({ compress: 0.8, format: SaveFormat.JPEG });
 
   const body = await (await fetch(saved.uri)).arrayBuffer();
-  const path = `${uid}/${listingId}/${Crypto.randomUUID()}.jpg`;
-  const { error } = await requireSupabase().storage.from('listing-images').upload(path, body, { contentType: 'image/jpeg', cacheControl: '31536000' });
+  const { error } = await requireSupabase().storage.from(bucket).upload(path, body, { contentType: 'image/jpeg', cacheControl: '31536000' });
   if (error) throw error;
   return { path, width: saved.width, height: saved.height };
 }
+
+/** Listing photo → listing-images/{uid}/{listingId}/{uuid}.jpg. */
+export const uploadListingPhoto = (uid: string, listingId: string, photo: PickedPhoto) => uploadJpeg('listing-images', `${uid}/${listingId}/${Crypto.randomUUID()}.jpg`, photo);
+
+/** Chat photo → chat-images/{conversationId}/{uuid}.jpg (private; participants only). */
+export const uploadChatPhoto = (conversationId: string, photo: PickedPhoto) => uploadJpeg('chat-images', `${conversationId}/${Crypto.randomUUID()}.jpg`, photo);
 
 export async function deleteListingPhoto(path: string) {
   await requireSupabase().storage.from('listing-images').remove([path]);

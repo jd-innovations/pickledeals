@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (after Phase 7)
+# PickleDeals — session handoff (after Phase 8)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -28,9 +28,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - Add mobile packages with `npx expo install`, and check the SDK 57 docs before using an Expo/RN API.
 
 ## Status
-- Phases 0–7 are done and pushed. The last commit is "Phase 7: marketplace map …".
-- **Next: Phase 8, chat** (conversations, messages, image messages, Realtime private channels, read state, typing, inbox, blocks and reports). Check the §13 Phase 8 scope and its exit criterion first, then propose the plan to the user.
-- D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. Meet-up spots are only voluntary `location_share` chat messages (Phase 8).
+- Phases 0–8 are done and pushed. The last commit is "Phase 8: chat …".
+- **Next: Phase 9, structured offers** (offer RPCs and state machine, offer cards in chat, Make offer and Counter sheets, expiry cron, agreements, status events). The `offer_event` message kind and `messages.offer_id` already exist; add the `marketplace_offers` FK there. Check the §13 Phase 9 scope and its exit criterion first, then propose the plan to the user.
+- D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. The one exception is a meet-up spot, which is an exact point but lives only in a private `location_share` message.
 
 ## Local environment
 - **Supabase CLI 2.119 on Docker.**
@@ -67,6 +67,20 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Photos: `features/market/device.ts` resizes, re-encodes to JPEG (stripping EXIF) and uploads to `listing-images/{uid}/{listingId}/{uuid}.jpg`.
   - Saves: `useToggleSave()` covers `product | deal | brand | listing`.
   - Grid and map share one filter predicate, `market_match` (internal, definer). Grid and map also share `useMarketFilters`, `useMarketSearch` and `MarketQuickChips`.
+- **Chat (Phase 8, §7):**
+  - Tables: `conversations` (one per listing and buyer), `conversation_participants` (`last_read_message_id`, mute, archive), `messages` (bigint id, `client_id` idempotency), `user_blocks`, `reports`.
+  - Clients insert `text`/`image`/`location_share` rows directly (RLS plus a before-insert trigger for blocks, a 30/min rate limit and attachment shape). System lines come only from RPCs.
+  - The after-insert trigger updates the thread preview, `realtime.send`s to the private `conversation:{id}` and `user:{id}` topics, and creates one `new_message` push per unread streak (not when muted).
+  - Realtime RLS lives on `realtime.messages` via `can_use_topic()`. Typing is client Broadcast only, throttled to 3 s with a 5 s expiry.
+  - RPCs: `start_conversation`, `mark_conversation_read`, `set_conversation_state`, `my_conversations(only_id)`, `unread_conversation_count`, `block_user`/`unblock_user`, `file_report`, and for staff `staff_reports`/`resolve_report`. `set_listing_status` now writes status lines into threads.
+  - App:
+    - `features/chat` holds the hooks (optimistic sends, backfill, channels) and the screens
+    - root routes: `conversation/[id]`, `meetup` and `report` sheets, plus `listing/[id]` and `seller/[id]` so chat can open details above the tabs
+    - Inbox is `profile/messages`
+    - `useInboxChannel` runs in the root layout
+    - the Profile tab badge counts unread threads
+    - Activity excludes `new_message`
+  - Admin: the Reports page (`#/reports`).
 - **Map (Phase 7, D4):**
   - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
   - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).
@@ -101,10 +115,14 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - a decision on a staging Supabase project (costs money; the user prefers local)
   - Vault secrets for production push dispatch
 - **Placeholders to wire up later:**
-  - Message and Make offer on the listing detail, plus offer/chat counts on My listings (messaging and offers phases)
-  - "Report listing/seller"
-  - the Notifications settings row
+  - Make offer on the listing detail, the inbox "Open offers" filter, and offer/chat counts on My listings (Phase 9)
+  - the Notifications settings row (Phase 10)
+- **Chat follow-ups:**
+  - Push suppression while the recipient is viewing the thread (presence) is not built; muting does suppress.
+  - Blocks hide threads and stop messages, but blocked sellers' listings still appear in the marketplace.
+  - Swiping the inbox and the native composer and keyboard behaviour need checking on a device.
 - **Known web-only quirks; iOS is unaffected:**
   - the native tab bar renders on top of headers
   - Switch thumbs are teal
   - the map is a flat stand-in (drag to pan, +/− to zoom), and the tab bar covers the map's search row
+  - `chooseAction` uses `window.prompt` and the photo picker needs the file-input stub

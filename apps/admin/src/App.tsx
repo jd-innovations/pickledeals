@@ -12,13 +12,14 @@ import { OffersPage } from './pages/Offers';
 import { ProductEditPage } from './pages/ProductEdit';
 import { ProductsPage } from './pages/Products';
 import { PromosPage } from './pages/Promos';
+import { ReportsPage } from './pages/Reports';
 import { RetailersPage } from './pages/Retailers';
 import { ReviewPage } from './pages/Review';
 
 /**
  * Internal admin (D7): catalog CRUD, images with provenance (D8), CSV import (Phase 2); offers via
  * the ingestion pipeline, review queue, promo codes and retailers (Phase 3); deals and collections
- * (Phase 4); the custom-listing catalog queue (Phase 6).
+ * (Phase 4); the custom-listing catalog queue (Phase 6); reports (Phase 8).
  * Staff only — the UI checks the app_role claim, and RLS enforces it on every write.
  */
 export default function App() {
@@ -75,6 +76,7 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
           Marketplace
         </span>
         {link('custom-listings', 'Custom listings')}
+        {link('reports', 'Reports')}
         <span className="spacer" />
         <span className="muted" style={{ padding: '0 10px', fontSize: 12 }}>
           Signed in as {role}
@@ -95,6 +97,7 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
         {section === 'deals' && <DealsPage />}
         {section === 'collections' && <CollectionsPage />}
         {section === 'custom-listings' && <ListingReviewPage />}
+        {section === 'reports' && <ReportsPage />}
       </main>
     </div>
   );

@@ -39,48 +39,56 @@ export function toCardData(l: ListingCardItem): ListingCardData {
   };
 }
 
-type Tab = 'deals' | 'market' | 'profile';
+type Tab = 'deals' | 'market' | 'profile' | 'root';
 function currentTab(segments: string[]): Tab {
+  // Root-level detail routes (opened from a conversation) stay above the tabs.
+  if (segments[0] !== '(tabs)') return 'root';
   const t = segments[1];
   return t === 'deals' || t === 'profile' ? t : 'market';
 }
 
-/** Listing + seller routes exist in the Deals, Marketplace and Profile stacks; push within the current one. */
+/** Listing + seller routes exist in the Deals, Marketplace and Profile stacks (and at the root, above chat); push within the current one. */
 export function useMarketNav() {
   const tab = currentTab(useSegments() as string[]);
   return {
     openListing: (id: string) =>
       router.push(
-        tab === 'deals'
-          ? { pathname: '/deals/listing/[id]', params: { id } }
-          : tab === 'profile'
-            ? { pathname: '/profile/listing/[id]', params: { id } }
-            : { pathname: '/market/listing/[id]', params: { id } },
+        tab === 'root'
+          ? { pathname: '/listing/[id]', params: { id } }
+          : tab === 'deals'
+            ? { pathname: '/deals/listing/[id]', params: { id } }
+            : tab === 'profile'
+              ? { pathname: '/profile/listing/[id]', params: { id } }
+              : { pathname: '/market/listing/[id]', params: { id } },
       ),
     openSeller: (id: string) =>
       router.push(
-        tab === 'deals'
-          ? { pathname: '/deals/seller/[id]', params: { id } }
-          : tab === 'profile'
-            ? { pathname: '/profile/seller/[id]', params: { id } }
-            : { pathname: '/market/seller/[id]', params: { id } },
+        tab === 'root'
+          ? { pathname: '/seller/[id]', params: { id } }
+          : tab === 'deals'
+            ? { pathname: '/deals/seller/[id]', params: { id } }
+            : tab === 'profile'
+              ? { pathname: '/profile/seller/[id]', params: { id } }
+              : { pathname: '/market/seller/[id]', params: { id } },
       ),
+    // Sheets for the seller's own listing only exist in the tab stacks; from the root use Profile's.
     openManage: (id: string) =>
       router.push(
         tab === 'deals'
           ? { pathname: '/deals/manage-listing', params: { id } }
-          : tab === 'profile'
-            ? { pathname: '/profile/manage-listing', params: { id } }
-            : { pathname: '/market/manage-listing', params: { id } },
+          : tab === 'market'
+            ? { pathname: '/market/manage-listing', params: { id } }
+            : { pathname: '/profile/manage-listing', params: { id } },
       ),
     openEdit: (id: string) =>
       router.push(
         tab === 'deals'
           ? { pathname: '/deals/edit-listing', params: { id } }
-          : tab === 'profile'
-            ? { pathname: '/profile/edit-listing', params: { id } }
-            : { pathname: '/market/edit-listing', params: { id } },
+          : tab === 'market'
+            ? { pathname: '/market/edit-listing', params: { id } }
+            : { pathname: '/profile/edit-listing', params: { id } },
       ),
+    openConversation: (id: string) => router.push({ pathname: '/conversation/[id]', params: { id } }),
   };
 }
 

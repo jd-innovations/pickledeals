@@ -50,3 +50,40 @@ export function formatEndsIn(at: Date | string, now: Date = new Date()): string 
   const d = Math.floor(h / 24);
   return `Ends in ${d} ${d === 1 ? 'day' : 'days'}`;
 }
+
+// --- Chat times (local time zone) -----------------------------------------------------------
+
+const clock = (d: Date) => d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+const dayDiff = (d: Date, now: Date) => {
+  const a = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const b = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  return Math.round((b - a) / 86_400_000);
+};
+const weekday = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'short' });
+const monthDay = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+/** Inbox row: "6:44 PM", "Yesterday", "Mon", "Sep 24". */
+export function formatThreadTime(at: Date | string, now: Date = new Date()): string {
+  const d = new Date(at);
+  const days = dayDiff(d, now);
+  if (days <= 0) return clock(d);
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return weekday(d);
+  return monthDay(d);
+}
+
+/** Thread separators: "Today 6:20 PM", "Yesterday 5:58 PM", "Mon 9:12 AM", "Sep 24, 9:00 AM". */
+export function formatChatSeparator(at: Date | string, now: Date = new Date()): string {
+  const d = new Date(at);
+  const days = dayDiff(d, now);
+  if (days <= 0) return `Today ${clock(d)}`;
+  if (days === 1) return `Yesterday ${clock(d)}`;
+  if (days < 7) return `${weekday(d)} ${clock(d)}`;
+  return `${monthDay(d)}, ${clock(d)}`;
+}
+
+/** Read receipts: "Read 6:44 PM" today, otherwise "Read Mon" / "Read Sep 24". */
+export function formatReadReceipt(at: Date | string, now: Date = new Date()): string {
+  const d = new Date(at);
+  return `Read ${dayDiff(d, now) <= 0 ? clock(d) : formatThreadTime(d, now)}`;
+}

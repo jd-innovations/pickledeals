@@ -161,6 +161,44 @@ isOneToOne: false
                   Relationships: [
                     
                   ]
+                },"conversation_participants": {
+                  Row: {
+                    "archived_at": string | null,"conversation_id": string,"last_read_at": string | null,"last_read_message_id": number,"muted": boolean,"role": string,"user_id": string
+                  }
+                  Insert: {
+                    "archived_at"?: string | null,"conversation_id": string,"last_read_at"?: string | null,"last_read_message_id"?: number,"muted"?: boolean,"role": string,"user_id": string
+                  }
+                  Update: {
+                    "archived_at"?: string | null,"conversation_id"?: string,"last_read_at"?: string | null,"last_read_message_id"?: number,"muted"?: boolean,"role"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "conversation_participants_conversation_id_fkey"
+      columns: ["conversation_id"]
+isOneToOne: false
+      referencedRelation: "conversations"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"conversations": {
+                  Row: {
+                    "buyer_id": string | null,"created_at": string,"id": string,"last_message_at": string | null,"last_message_id": number | null,"last_message_preview": string | null,"last_message_sender": string | null,"listing_id": string,"seller_id": string | null
+                  }
+                  Insert: {
+                    "buyer_id"?: string | null,"created_at"?: string,"id"?: string,"last_message_at"?: string | null,"last_message_id"?: number | null,"last_message_preview"?: string | null,"last_message_sender"?: string | null,"listing_id": string,"seller_id"?: string | null
+                  }
+                  Update: {
+                    "buyer_id"?: string | null,"created_at"?: string,"id"?: string,"last_message_at"?: string | null,"last_message_id"?: number | null,"last_message_preview"?: string | null,"last_message_sender"?: string | null,"listing_id"?: string,"seller_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "conversations_listing_id_fkey"
+      columns: ["listing_id"]
+isOneToOne: false
+      referencedRelation: "listings"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"deals": {
                   Row: {
                     "created_at": string,"created_by": string | null,"drop_7d_cents": number,"ends_at": string | null,"headline": string,"id": string,"is_staff_pick": boolean,"kind": Database["public"]['Enums']["deal_kind"],"offer_id": string | null,"origin": Database["public"]['Enums']["deal_origin"],"reference_cents": number | null,"starts_at": string,"status": Database["public"]['Enums']["deal_status"],"updated_at": string,"variant_id": string
@@ -376,6 +414,25 @@ isOneToOne: false
       columns: ["variant_id"]
 isOneToOne: false
       referencedRelation: "product_variants"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"messages": {
+                  Row: {
+                    "body": string | null,"client_id": string | null,"conversation_id": string,"created_at": string,"id": number,"image_path": string | null,"kind": Database["public"]['Enums']["message_kind"],"meta": NonNullable<Json>,"offer_id": string | null,"sender_id": string | null
+                  }
+                  Insert: {
+                    "body"?: string | null,"client_id"?: string | null,"conversation_id": string,"created_at"?: string,"id"?: never,"image_path"?: string | null,"kind"?: Database["public"]['Enums']["message_kind"],"meta"?: NonNullable<Json>,"offer_id"?: string | null,"sender_id"?: string | null
+                  }
+                  Update: {
+                    "body"?: string | null,"client_id"?: string | null,"conversation_id"?: string,"created_at"?: string,"id"?: never,"image_path"?: string | null,"kind"?: Database["public"]['Enums']["message_kind"],"meta"?: NonNullable<Json>,"offer_id"?: string | null,"sender_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "messages_conversation_id_fkey"
+      columns: ["conversation_id"]
+isOneToOne: false
+      referencedRelation: "conversations"
       referencedColumns: ["id"]
     }
                   ]
@@ -882,6 +939,19 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"reports": {
+                  Row: {
+                    "created_at": string,"details": string | null,"id": string,"reason": string,"reporter_id": string | null,"resolution_note": string | null,"resolved_at": string | null,"resolved_by": string | null,"status": Database["public"]['Enums']["report_status"],"target_id": string,"target_type": string
+                  }
+                  Insert: {
+                    "created_at"?: string,"details"?: string | null,"id"?: string,"reason": string,"reporter_id"?: string | null,"resolution_note"?: string | null,"resolved_at"?: string | null,"resolved_by"?: string | null,"status"?: Database["public"]['Enums']["report_status"],"target_id": string,"target_type": string
+                  }
+                  Update: {
+                    "created_at"?: string,"details"?: string | null,"id"?: string,"reason"?: string,"reporter_id"?: string | null,"resolution_note"?: string | null,"resolved_at"?: string | null,"resolved_by"?: string | null,"status"?: Database["public"]['Enums']["report_status"],"target_id"?: string,"target_type"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"retailer_offers": {
                   Row: {
                     "available_sizes": (string)[],"created_at": string,"external_ref": string | null,"first_seen_at": string,"id": string,"in_stock": boolean,"last_changed_at": string,"last_checked_at": string,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"],"price_source": Database["public"]['Enums']["price_source"],"retailer_id": string,"shipping_cents": number,"source_id": string | null,"status": Database["public"]['Enums']["offer_status"],"updated_at": string,"url": string,"variant_id": string
@@ -1004,6 +1074,19 @@ isOneToOne: false
                   }
                   Update: {
                     "brand_slug"?: string | null,"category_slug"?: string | null,"created_at"?: string,"filters"?: NonNullable<Json>,"id"?: string,"label"?: string,"max_cents"?: number | null,"notify"?: boolean,"query"?: string | null,"scope"?: string,"user_id"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"user_blocks": {
+                  Row: {
+                    "blocked_id": string,"blocker_id": string,"created_at": string
+                  }
+                  Insert: {
+                    "blocked_id": string,"blocker_id": string,"created_at"?: string
+                  }
+                  Update: {
+                    "blocked_id"?: string,"blocker_id"?: string,"created_at"?: string
                   }
                   Relationships: [
                     
@@ -1163,6 +1246,12 @@ isOneToOne: false
             "apply_raw_offer":
 { Args: { "raw_id": string,"vid": string }; Returns: Json
                            },
+"block_user":
+{ Args: { "target": string }; Returns: undefined
+                           },
+"can_use_topic":
+{ Args: { "topic": string }; Returns: boolean
+                           },
 "check_listing_text":
 { Args: { "body": string,"title": string }; Returns: undefined
                            },
@@ -1186,6 +1275,9 @@ isOneToOne: false
 "evaluate_price_alerts":
 { Args: { "vid": string }; Returns: number
                            },
+"file_report":
+{ Args: { "details"?: string,"reason": string,"target_id": string,"target_type": string }; Returns: string
+                           },
 "format_usd":
 { Args: { "cents": number }; Returns: string
                            },
@@ -1198,11 +1290,20 @@ isOneToOne: false
 "is_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
+"is_blocked_between":
+{ Args: { "a": string,"b": string }; Returns: boolean
+                           },
+"is_participant":
+{ Args: { "conversation": string }; Returns: boolean
+                           },
 "is_staff":
 { Args: Record<PropertyKey, never>; Returns: boolean
                            },
 "listing_is_public":
 { Args: { "lid": string }; Returns: boolean
+                           },
+"mark_conversation_read":
+{ Args: { "conversation": string,"up_to": number }; Returns: undefined
                            },
 "mark_notifications_read":
 { Args: { "ids"?: (string)[] }; Returns: number
@@ -1215,6 +1316,11 @@ isOneToOne: false
                            },
 "market_match":
 { Args: { "brand_slugs"?: (string)[],"category_slug"?: string,"conditions"?: (string)[],"ids"?: (string)[],"max_cents"?: number,"min_cents"?: number,"pickup_only"?: boolean,"product"?: string,"q"?: string,"seller"?: string,"statuses"?: (string)[] }; Returns: string[]
+                           },
+"my_conversations":
+{ Args: { "only_id"?: string }; Returns: {
+              "archived": boolean,"category_slug": string,"id": string,"last_message_at": string,"last_message_id": number,"last_message_mine": boolean,"last_message_preview": string,"listing_id": string,"listing_image": string,"listing_price_cents": number,"listing_status": string,"listing_title": string,"muted": boolean,"other_id": string,"other_last_read_at": string,"other_last_read_message_id": number,"other_name": string,"product_slug": string,"role": string,"unread": number
+            }[]
                            },
 "my_listing_save_counts":
 { Args: Record<PropertyKey, never>; Returns: {
@@ -1267,8 +1373,14 @@ isOneToOne: false
 "resolve_raw_offer":
 { Args: { "raw_id": string,"remember"?: boolean,"variant": string }; Returns: Json
                            },
+"resolve_report":
+{ Args: { "decision": string,"note"?: string,"remove_listing"?: boolean,"report": string }; Returns: undefined
+                           },
 "search_catalog":
 { Args: { "product_limit"?: number,"q": string }; Returns: Json
+                           },
+"set_conversation_state":
+{ Args: { "archived"?: boolean,"conversation": string,"muted"?: boolean }; Returns: undefined
                            },
 "set_home_area":
 { Args: { "label": string,"lat": number,"lng": number,"radius_m"?: number }; Returns: undefined
@@ -1284,11 +1396,28 @@ isOneToOne: false
               "geohash": string,"point": unknown
             }[]
                            },
+"staff_reports":
+{ Args: { "include_closed"?: boolean }; Returns: {
+              "created_at": string,"details": string,"id": string,"listing_status": string,"open_reports": number,"reason": string,"reporter_name": string,"status": string,"target_id": string,"target_label": string,"target_owner": string,"target_owner_name": string,"target_type": string,"transcript": Json
+            }[]
+                           },
+"start_conversation":
+{ Args: { "listing": string }; Returns: string
+                           },
 "suggest_catalog_matches":
 { Args: { "brand"?: string,"max_rows"?: number,"title": string }; Returns: Json
                            },
 "trigger_dispatch":
 { Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"try_uuid":
+{ Args: { "v": string }; Returns: string
+                           },
+"unblock_user":
+{ Args: { "target": string }; Returns: undefined
+                           },
+"unread_conversation_count":
+{ Args: Record<PropertyKey, never>; Returns: number
                            },
 "update_listing":
 { Args: { "changes": Json,"listing": string }; Returns: undefined
@@ -1303,7 +1432,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "alert_status": "active"|"paused","app_role": "admin"|"editor","catalog_review_decision": "pending"|"linked"|"promoted"|"dismissed","collection_kind": "editorial"|"sponsored","deal_kind": "price_drop"|"sale"|"promo"|"editorial","deal_origin": "auto"|"curated","deal_quality": "above_typical"|"typical"|"good"|"excellent"|"all_time_low","deal_status": "active"|"expired"|"removed","discount_type": "percent"|"amount"|"free_ship","display_name_source": "generated"|"provided","identifier_kind": "gtin"|"upc"|"ean"|"asin"|"mpn"|"retailer_sku","image_source": "brand_supplied"|"manufacturer_site"|"retailer_feed"|"affiliate_feed"|"owned","image_status": "active"|"pending_review"|"removed","ingestion_kind": "manual"|"csv"|"feed"|"api","listing_condition": "new_sealed"|"like_new"|"excellent"|"good"|"fair","listing_status": "draft"|"active"|"pending"|"sold"|"removed","match_status": "matched"|"unmatched"|"rejected","offer_status": "active"|"inactive","placement_kind": "sponsored_deal"|"sponsored_product"|"sponsored_collection","price_display": "show"|"check_price","price_source": "manual"|"feed"|"api","product_status": "draft"|"active"|"discontinued","promo_status": "active"|"removed","push_status": "pending"|"sending"|"sent"|"skipped"|"failed","retailer_kind": "marketplace"|"retailer"|"manufacturer"
+            "alert_status": "active"|"paused","app_role": "admin"|"editor","catalog_review_decision": "pending"|"linked"|"promoted"|"dismissed","collection_kind": "editorial"|"sponsored","deal_kind": "price_drop"|"sale"|"promo"|"editorial","deal_origin": "auto"|"curated","deal_quality": "above_typical"|"typical"|"good"|"excellent"|"all_time_low","deal_status": "active"|"expired"|"removed","discount_type": "percent"|"amount"|"free_ship","display_name_source": "generated"|"provided","identifier_kind": "gtin"|"upc"|"ean"|"asin"|"mpn"|"retailer_sku","image_source": "brand_supplied"|"manufacturer_site"|"retailer_feed"|"affiliate_feed"|"owned","image_status": "active"|"pending_review"|"removed","ingestion_kind": "manual"|"csv"|"feed"|"api","listing_condition": "new_sealed"|"like_new"|"excellent"|"good"|"fair","listing_status": "draft"|"active"|"pending"|"sold"|"removed","match_status": "matched"|"unmatched"|"rejected","message_kind": "text"|"image"|"offer_event"|"status_event"|"location_share","offer_status": "active"|"inactive","placement_kind": "sponsored_deal"|"sponsored_product"|"sponsored_collection","price_display": "show"|"check_price","price_source": "manual"|"feed"|"api","product_status": "draft"|"active"|"discontinued","promo_status": "active"|"removed","push_status": "pending"|"sending"|"sent"|"skipped"|"failed","report_status": "open"|"actioned"|"dismissed","retailer_kind": "marketplace"|"retailer"|"manufacturer"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1423,7 +1552,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "alert_status": ["active", "paused"],"app_role": ["admin", "editor"],"catalog_review_decision": ["pending", "linked", "promoted", "dismissed"],"collection_kind": ["editorial", "sponsored"],"deal_kind": ["price_drop", "sale", "promo", "editorial"],"deal_origin": ["auto", "curated"],"deal_quality": ["above_typical", "typical", "good", "excellent", "all_time_low"],"deal_status": ["active", "expired", "removed"],"discount_type": ["percent", "amount", "free_ship"],"display_name_source": ["generated", "provided"],"identifier_kind": ["gtin", "upc", "ean", "asin", "mpn", "retailer_sku"],"image_source": ["brand_supplied", "manufacturer_site", "retailer_feed", "affiliate_feed", "owned"],"image_status": ["active", "pending_review", "removed"],"ingestion_kind": ["manual", "csv", "feed", "api"],"listing_condition": ["new_sealed", "like_new", "excellent", "good", "fair"],"listing_status": ["draft", "active", "pending", "sold", "removed"],"match_status": ["matched", "unmatched", "rejected"],"offer_status": ["active", "inactive"],"placement_kind": ["sponsored_deal", "sponsored_product", "sponsored_collection"],"price_display": ["show", "check_price"],"price_source": ["manual", "feed", "api"],"product_status": ["draft", "active", "discontinued"],"promo_status": ["active", "removed"],"push_status": ["pending", "sending", "sent", "skipped", "failed"],"retailer_kind": ["marketplace", "retailer", "manufacturer"]
+            "alert_status": ["active", "paused"],"app_role": ["admin", "editor"],"catalog_review_decision": ["pending", "linked", "promoted", "dismissed"],"collection_kind": ["editorial", "sponsored"],"deal_kind": ["price_drop", "sale", "promo", "editorial"],"deal_origin": ["auto", "curated"],"deal_quality": ["above_typical", "typical", "good", "excellent", "all_time_low"],"deal_status": ["active", "expired", "removed"],"discount_type": ["percent", "amount", "free_ship"],"display_name_source": ["generated", "provided"],"identifier_kind": ["gtin", "upc", "ean", "asin", "mpn", "retailer_sku"],"image_source": ["brand_supplied", "manufacturer_site", "retailer_feed", "affiliate_feed", "owned"],"image_status": ["active", "pending_review", "removed"],"ingestion_kind": ["manual", "csv", "feed", "api"],"listing_condition": ["new_sealed", "like_new", "excellent", "good", "fair"],"listing_status": ["draft", "active", "pending", "sold", "removed"],"match_status": ["matched", "unmatched", "rejected"],"message_kind": ["text", "image", "offer_event", "status_event", "location_share"],"offer_status": ["active", "inactive"],"placement_kind": ["sponsored_deal", "sponsored_product", "sponsored_collection"],"price_display": ["show", "check_price"],"price_source": ["manual", "feed", "api"],"product_status": ["draft", "active", "discontinued"],"promo_status": ["active", "removed"],"push_status": ["pending", "sending", "sent", "skipped", "failed"],"report_status": ["open", "actioned", "dismissed"],"retailer_kind": ["marketplace", "retailer", "manufacturer"]
           }
         }
 } as const

@@ -35,3 +35,5 @@ export type AreaMapProps = {
   /** Place name for screen readers ("Lakewood Ranch, FL"). */
   areaName?: string | null;
 };
+
+export type SpotMapProps = { point: LatLng; height: number };

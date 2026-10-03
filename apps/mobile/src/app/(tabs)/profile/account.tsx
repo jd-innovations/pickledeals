@@ -5,6 +5,7 @@ import { Alert, ScrollView, View } from 'react-native';
 import { useTheme } from '@/design/theme';
 import { AuthCanceled, deleteAccount } from '@/features/auth/api';
 import { useAuth } from '@/features/auth/authStore';
+import { BlockedPeople } from '@/features/chat/components';
 import { Button, Group, ListRow, Text } from '@/ui';
 
 const PROVIDER_LABEL: Record<string, string> = { apple: 'Apple', email: 'Email code' };
@@ -50,6 +51,8 @@ export default function AccountScreen() {
         <ListRow title="Email" value={user.email ?? 'Hidden by Apple'} />
         <ListRow title="Signed in with" value={user.providers.map((p) => PROVIDER_LABEL[p] ?? p).join(', ')} last />
       </Group>
+
+      <BlockedPeople />
 
       <View style={{ gap: 10 }}>
         <Button label="Delete account" variant="outline" onPress={confirmDelete} loading={deleting} />

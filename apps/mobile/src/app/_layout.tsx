@@ -4,14 +4,18 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { useStackOptions } from '@/design/navigation';
 import { ThemeProvider, useTheme } from '@/design/theme';
 import { usePush } from '@/features/alerts/push';
 import { startAuthListener } from '@/features/auth/authStore';
+import { useInboxChannel } from '@/features/chat/hooks';
 import { queryClient } from '@/lib/queryClient';
 
 function RootNavigator() {
   const { colors, scheme } = useTheme();
   usePush();
+  useInboxChannel();
+  const stack = useStackOptions();
   const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
   const sheet: NativeStackNavigationOptions = {
     presentation: 'formSheet',
@@ -38,6 +42,12 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="sign-in" options={sheet} />
         <Stack.Screen name="display-name" options={sheet} />
+        {/* Chat lives above the tabs (no tab bar), reachable from listings, Profile → Messages and pushes. */}
+        <Stack.Screen name="conversation/[id]" />
+        <Stack.Screen name="meetup" options={{ ...sheet, sheetAllowedDetents: [0.9] }} />
+        <Stack.Screen name="report" options={{ ...sheet, sheetAllowedDetents: [0.85, 1] }} />
+        <Stack.Screen name="listing/[id]" />
+        <Stack.Screen name="seller/[id]" options={{ ...stack, headerShown: true, title: '' }} />
       </Stack>
     </NavigationThemeProvider>
   );

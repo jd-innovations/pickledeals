@@ -45,6 +45,8 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - **Seeded local accounts:**
   - Dev admin `admin@pickledeals.test` (admin role) signs in with an email code from Mailpit.
   - Three fictional sellers (Marcus T., Priya K., Jordan R.) with 8 listings around Sarasota, FL. One custom wooden paddle sits in the review queue.
+  - The sellers also sign in with email codes: `seller1@` (Marcus), `seller2@` (Priya) and `seller3@pickledeals.test` (Jordan). A demo thread has Priya asking Marcus about his Perseus.
+  - Two-account testing (chat, offers): use two tabs on different origins, `localhost:8081` and `127.0.0.1:8081`, so each keeps its own session. A `db reset` invalidates existing sessions, so sign in again afterwards.
   - The seed is generated: edit `supabase/seed/build-seed.ts`, then run `npm run catalog:seed`.
 - **Browser testing tips:**
   - Geolocation: stub `navigator.geolocation.getCurrentPosition` in the page.
@@ -151,7 +153,6 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - a decision on a staging Supabase project (costs money; the user prefers local)
   - Vault secrets for production push dispatch
 - **Chat follow-ups:**
-  - Push suppression while the recipient is viewing the thread (presence) is not built; muting does suppress.
   - Blocks hide threads and stop messages, but blocked sellers' listings still appear in the marketplace.
   - Swiping the inbox and the native composer and keyboard behaviour need checking on a device.
 - **Known web-only quirks; iOS is unaffected:**

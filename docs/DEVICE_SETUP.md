@@ -79,6 +79,11 @@ Notes:
 - `npx supabase db reset` signs everyone out; sign in again on the phone.
 - If the PC's IP changes (new network, router restart), run `npm run device:lan` again and restart Metro.
 - Two-account tests (chat, offers): phone as one seller, the web preview on the PC as the other.
+- "Port 8081 is being used by another process": another Metro or web preview is running. Stop it and
+  answer **n**. Don't switch to 8082, because the firewall rule only opens 8081. While Metro runs,
+  the web preview is also at http://localhost:8081 on the PC.
+- The app shows no data: `apps/mobile/.env.local` still says `127.0.0.1`. Run `npm run device:lan`, then
+  restart Metro.
 
 ## On-device checklist (open items from the handoff)
 

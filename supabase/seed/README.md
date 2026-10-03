@@ -40,3 +40,6 @@ select vault.create_secret('<service role key>', 'dispatch_key');
 ```
 
 The local seed sets them to the local gateway and the CLI's public demo service key.
+
+The same two secrets let `public.schedule_ingestion()` (every 5 minutes) start the `ingest` function
+for automated offer sources (Phase 12); without them, integrations only run when invoked directly.

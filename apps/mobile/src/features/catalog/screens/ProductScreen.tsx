@@ -21,7 +21,7 @@ import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { PreOwnedSection } from '@/features/market/PreOwned';
 import type { RankedOffer } from '@/features/offers/api';
-import { AFFILIATE_DISCLOSURE, deltaLabel, offerBreakdown, qualityDetail, shippingLabel } from '@/features/offers/format';
+import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, deltaLabel, isApiPrice, offerBreakdown, priceAsOf, qualityDetail, shippingLabel } from '@/features/offers/format';
 import { openDeal, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
 import { Button, Chip, ChipRow, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
 
@@ -130,7 +130,9 @@ export default function ProductScreen() {
                     referenceCents={msrp && msrp > best.deliveredCents ? msrp : undefined}
                   />
                   <Text variant="footnote" tone="secondary" numeric>
-                    {[best.promo ? `with code ${best.promo.code}` : null, shippingLabel(best), best.inStock ? 'in stock' : 'out of stock'].filter(Boolean).join(' · ')}
+                    {[best.promo ? `with code ${best.promo.code}` : null, shippingLabel(best), best.inStock ? 'in stock' : 'out of stock', isApiPrice(best) ? priceAsOf(best).toLowerCase() : null]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </Text>
                   {stats?.quality && (
                     <View style={{ padding: 12, borderRadius: radius.card, backgroundColor: colors.surfaceElevated }}>
@@ -146,7 +148,7 @@ export default function ProductScreen() {
                   />
                   {actions}
                   <Text variant="caption" weight="400" tone="tertiary">
-                    {AFFILIATE_DISCLOSURE}
+                    {[AFFILIATE_DISCLOSURE, apiPriceDisclaimer([best, ...others])].filter(Boolean).join(' ')}
                   </Text>
                 </View>
               ) : checkPriceOnly ? (
@@ -181,7 +183,10 @@ export default function ProductScreen() {
                       offer={{
                         retailer: o.retailer.name,
                         monogram: retailerMonogram(o.retailer.name),
-                        detail: o.priceDisplay === 'check_price' ? 'Price shown at retailer' : `${o.inStock ? 'In stock' : 'Out of stock'} · ${offerBreakdown(o)}`,
+                        detail:
+                          o.priceDisplay === 'check_price'
+                            ? 'Price shown at retailer'
+                            : [o.inStock ? 'In stock' : 'Out of stock', offerBreakdown(o), isApiPrice(o) ? priceAsOf(o).toLowerCase() : null].filter(Boolean).join(' · '),
                         priceCents: o.deliveredCents,
                         deltaLabel: deltaLabel(o, best?.deliveredCents ?? null),
                       }}

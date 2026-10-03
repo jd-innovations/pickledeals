@@ -12,13 +12,14 @@ type Retailer = {
   price_display_default: 'show' | 'check_price';
   is_active: boolean;
 };
-type Affiliate = { retailer_id: string; network: string; tag_template: string; is_active: boolean };
+type Affiliate = { retailer_id: string; network: string; tag_template: string | null; link_template: string | null; is_active: boolean };
 
 const EMPTY: Retailer = { id: '', slug: '', name: '', kind: 'retailer', domain: '', price_display_default: 'show', is_active: true };
 
 /**
  * Retailers. "Check price" retailers (D1) never show a number in the app; only an approved API
- * source can change that. Affiliate programs are admin-only and never affect ranking.
+ * source can change that. Affiliate programs are admin-only and never affect ranking: a query tag
+ * (Amazon: tag=…) and/or a network click URL with {url} (AvantLink, Impact, CJ) applied by the go function.
  */
 export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
   const [rows, setRows] = useState<Retailer[]>([]);
@@ -31,7 +32,7 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
     if (error) setMessage({ error: true, text: error.message });
     setRows(data ?? []);
     if (role === 'admin') {
-      const { data: aff } = await supabase.from('affiliate_programs').select('retailer_id, network, tag_template, is_active');
+      const { data: aff } = await supabase.from('affiliate_programs').select('retailer_id, network, tag_template, link_template, is_active');
       setAffiliates(aff ?? []);
     }
   }, [role]);
@@ -51,9 +52,14 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
     load();
   };
 
-  const saveAffiliate = async (retailerId: string, network: string, tag: string) => {
-    const { error } = await supabase.from('affiliate_programs').upsert({ retailer_id: retailerId, network, tag_template: tag, is_active: true }, { onConflict: 'retailer_id' });
-    setMessage(error ? { error: true, text: error.message.includes('check') ? 'Tag must be query parameters like tag=pickledeals-20' : error.message } : { error: false, text: 'Affiliate program saved.' });
+  const saveAffiliate = async (retailerId: string, network: string, tag: string, link: string) => {
+    const { error } = await supabase
+      .from('affiliate_programs')
+      .upsert({ retailer_id: retailerId, network, tag_template: tag || null, link_template: link || null, is_active: true }, { onConflict: 'retailer_id' });
+    const hint = error?.message.includes('link_template')
+      ? 'Click URL must be https and contain {url}, e.g. https://www.avantlink.com/click.php?tt=cl&mi=…&pw=…&url={url}'
+      : 'Tag must be query parameters like tag=pickledeals-20';
+    setMessage(error ? { error: true, text: error.message.includes('check') ? hint : error.message } : { error: false, text: 'Affiliate program saved.' });
     load();
   };
 
@@ -74,7 +80,7 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
             <th>Kind</th>
             <th>Domain</th>
             <th>Prices</th>
-            {role === 'admin' && <th>Affiliate tag (admin)</th>}
+            {role === 'admin' && <th>Affiliate link (admin)</th>}
             <th />
           </tr>
         </thead>
@@ -97,7 +103,7 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
                 </td>
                 {role === 'admin' && (
                   <td>
-                    <AffiliateEditor current={aff} onSave={(network, tag) => saveAffiliate(r.id, network, tag)} />
+                    <AffiliateEditor current={aff} onSave={(network, tag, link) => saveAffiliate(r.id, network, tag, link)} />
                   </td>
                 )}
                 <td>
@@ -114,16 +120,20 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
   );
 }
 
-function AffiliateEditor({ current, onSave }: { current?: Affiliate; onSave: (network: string, tag: string) => void }) {
+function AffiliateEditor({ current, onSave }: { current?: Affiliate; onSave: (network: string, tag: string, link: string) => void }) {
   const [network, setNetwork] = useState(current?.network ?? '');
   const [tag, setTag] = useState(current?.tag_template ?? '');
+  const [link, setLink] = useState(current?.link_template ?? '');
   return (
-    <div className="row">
-      <input style={{ width: 100 }} placeholder="network" value={network} onChange={(e) => setNetwork(e.target.value)} />
-      <input style={{ width: 170 }} placeholder="tag=pickledeals-20" value={tag} onChange={(e) => setTag(e.target.value)} />
-      <button className="btn" disabled={!network || !tag} onClick={() => onSave(network, tag)}>
-        Save
-      </button>
+    <div style={{ display: 'grid', gap: 4 }}>
+      <div className="row">
+        <input style={{ width: 100 }} placeholder="network" value={network} onChange={(e) => setNetwork(e.target.value)} />
+        <input style={{ width: 170 }} placeholder="tag=pickledeals-20" value={tag} onChange={(e) => setTag(e.target.value.trim())} />
+        <button className="btn" disabled={!network || (!tag && !link)} onClick={() => onSave(network, tag, link)}>
+          Save
+        </button>
+      </div>
+      <input placeholder="or click URL: https://www.avantlink.com/click.php?tt=cl&mi=…&pw=…&url={url}" value={link} onChange={(e) => setLink(e.target.value.trim())} />
     </div>
   );
 }

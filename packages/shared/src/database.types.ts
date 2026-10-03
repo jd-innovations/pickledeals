@@ -25,13 +25,13 @@ export type Database = {
           Tables: {
             "affiliate_programs": {
                   Row: {
-                    "commission_notes": string | null,"created_at": string,"id": string,"is_active": boolean,"network": string,"retailer_id": string,"tag_template": string,"updated_at": string
+                    "commission_notes": string | null,"created_at": string,"id": string,"is_active": boolean,"link_template": string | null,"network": string,"retailer_id": string,"tag_template": string | null,"updated_at": string
                   }
                   Insert: {
-                    "commission_notes"?: string | null,"created_at"?: string,"id"?: string,"is_active"?: boolean,"network": string,"retailer_id": string,"tag_template": string,"updated_at"?: string
+                    "commission_notes"?: string | null,"created_at"?: string,"id"?: string,"is_active"?: boolean,"link_template"?: string | null,"network": string,"retailer_id": string,"tag_template"?: string | null,"updated_at"?: string
                   }
                   Update: {
-                    "commission_notes"?: string | null,"created_at"?: string,"id"?: string,"is_active"?: boolean,"network"?: string,"retailer_id"?: string,"tag_template"?: string,"updated_at"?: string
+                    "commission_notes"?: string | null,"created_at"?: string,"id"?: string,"is_active"?: boolean,"link_template"?: string | null,"network"?: string,"retailer_id"?: string,"tag_template"?: string | null,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -282,13 +282,13 @@ isOneToOne: false
                   ]
                 },"ingestion_sources": {
                   Row: {
-                    "created_at": string,"id": string,"is_active": boolean,"kind": Database["public"]['Enums']["ingestion_kind"],"name": string,"retailer_id": string | null,"slug": string
+                    "config": NonNullable<Json>,"consecutive_failures": number,"created_at": string,"id": string,"interval_minutes": number | null,"is_active": boolean,"kind": Database["public"]['Enums']["ingestion_kind"],"last_error": string | null,"last_finished_at": string | null,"last_started_at": string | null,"last_success_at": string | null,"max_age_minutes": number | null,"name": string,"next_run_at": string | null,"retailer_id": string | null,"running_since": string | null,"slug": string,"updated_at": string
                   }
                   Insert: {
-                    "created_at"?: string,"id"?: string,"is_active"?: boolean,"kind": Database["public"]['Enums']["ingestion_kind"],"name": string,"retailer_id"?: string | null,"slug": string
+                    "config"?: NonNullable<Json>,"consecutive_failures"?: number,"created_at"?: string,"id"?: string,"interval_minutes"?: number | null,"is_active"?: boolean,"kind": Database["public"]['Enums']["ingestion_kind"],"last_error"?: string | null,"last_finished_at"?: string | null,"last_started_at"?: string | null,"last_success_at"?: string | null,"max_age_minutes"?: number | null,"name": string,"next_run_at"?: string | null,"retailer_id"?: string | null,"running_since"?: string | null,"slug": string,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["ingestion_kind"],"name"?: string,"retailer_id"?: string | null,"slug"?: string
+                    "config"?: NonNullable<Json>,"consecutive_failures"?: number,"created_at"?: string,"id"?: string,"interval_minutes"?: number | null,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["ingestion_kind"],"last_error"?: string | null,"last_finished_at"?: string | null,"last_started_at"?: string | null,"last_success_at"?: string | null,"max_age_minutes"?: number | null,"name"?: string,"next_run_at"?: string | null,"retailer_id"?: string | null,"running_since"?: string | null,"slug"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -711,16 +711,22 @@ isOneToOne: false
                   ]
                 },"product_identifiers": {
                   Row: {
-                    "created_at": string,"id": string,"kind": Database["public"]['Enums']["identifier_kind"],"retailer_id": string | null,"value": string,"variant_id": string
+                    "created_at": string,"id": string,"kind": Database["public"]['Enums']["identifier_kind"],"learned_from": string | null,"retailer_id": string | null,"source": string,"value": string,"variant_id": string
                   }
                   Insert: {
-                    "created_at"?: string,"id"?: string,"kind": Database["public"]['Enums']["identifier_kind"],"retailer_id"?: string | null,"value": string,"variant_id": string
+                    "created_at"?: string,"id"?: string,"kind": Database["public"]['Enums']["identifier_kind"],"learned_from"?: string | null,"retailer_id"?: string | null,"source"?: string,"value": string,"variant_id": string
                   }
                   Update: {
-                    "created_at"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["identifier_kind"],"retailer_id"?: string | null,"value"?: string,"variant_id"?: string
+                    "created_at"?: string,"id"?: string,"kind"?: Database["public"]['Enums']["identifier_kind"],"learned_from"?: string | null,"retailer_id"?: string | null,"source"?: string,"value"?: string,"variant_id"?: string
                   }
                   Relationships: [
                     {
+      foreignKeyName: "product_identifiers_learned_from_fkey"
+      columns: ["learned_from"]
+isOneToOne: false
+      referencedRelation: "raw_offer_records"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "product_identifiers_retailer_fk"
       columns: ["retailer_id"]
 isOneToOne: false
@@ -998,13 +1004,13 @@ isOneToOne: false
                   ]
                 },"raw_offer_records": {
                   Row: {
-                    "asin": string | null,"available_sizes": (string)[] | null,"brand_text": string | null,"created_at": string,"ean": string | null,"error": string | null,"external_ref": string | null,"gtin": string | null,"id": string,"in_stock": boolean | null,"match_confidence": number | null,"match_method": string | null,"match_status": Database["public"]['Enums']["match_status"],"matched_variant_id": string | null,"mpn": string | null,"offer_id": string | null,"payload": NonNullable<Json>,"price_cents": number | null,"resolved_at": string | null,"resolved_by": string | null,"retailer_id": string | null,"retailer_sku": string | null,"run_id": string,"shipping_cents": number | null,"suggestions": NonNullable<Json>,"title": string | null,"upc": string | null,"url": string | null
+                    "asin": string | null,"available_sizes": (string)[] | null,"brand_text": string | null,"created_at": string,"ean": string | null,"error": string | null,"external_ref": string | null,"gtin": string | null,"id": string,"in_stock": boolean | null,"last_seen_at": string | null,"match_confidence": number | null,"match_method": string | null,"match_status": Database["public"]['Enums']["match_status"],"matched_variant_id": string | null,"mpn": string | null,"offer_id": string | null,"payload": NonNullable<Json>,"price_cents": number | null,"resolved_at": string | null,"resolved_by": string | null,"retailer_id": string | null,"retailer_sku": string | null,"run_id": string,"shipping_cents": number | null,"suggestions": NonNullable<Json>,"title": string | null,"upc": string | null,"url": string | null
                   }
                   Insert: {
-                    "asin"?: string | null,"available_sizes"?: (string)[] | null,"brand_text"?: string | null,"created_at"?: string,"ean"?: string | null,"error"?: string | null,"external_ref"?: string | null,"gtin"?: string | null,"id"?: string,"in_stock"?: boolean | null,"match_confidence"?: number | null,"match_method"?: string | null,"match_status"?: Database["public"]['Enums']["match_status"],"matched_variant_id"?: string | null,"mpn"?: string | null,"offer_id"?: string | null,"payload": NonNullable<Json>,"price_cents"?: number | null,"resolved_at"?: string | null,"resolved_by"?: string | null,"retailer_id"?: string | null,"retailer_sku"?: string | null,"run_id": string,"shipping_cents"?: number | null,"suggestions"?: NonNullable<Json>,"title"?: string | null,"upc"?: string | null,"url"?: string | null
+                    "asin"?: string | null,"available_sizes"?: (string)[] | null,"brand_text"?: string | null,"created_at"?: string,"ean"?: string | null,"error"?: string | null,"external_ref"?: string | null,"gtin"?: string | null,"id"?: string,"in_stock"?: boolean | null,"last_seen_at"?: string | null,"match_confidence"?: number | null,"match_method"?: string | null,"match_status"?: Database["public"]['Enums']["match_status"],"matched_variant_id"?: string | null,"mpn"?: string | null,"offer_id"?: string | null,"payload": NonNullable<Json>,"price_cents"?: number | null,"resolved_at"?: string | null,"resolved_by"?: string | null,"retailer_id"?: string | null,"retailer_sku"?: string | null,"run_id": string,"shipping_cents"?: number | null,"suggestions"?: NonNullable<Json>,"title"?: string | null,"upc"?: string | null,"url"?: string | null
                   }
                   Update: {
-                    "asin"?: string | null,"available_sizes"?: (string)[] | null,"brand_text"?: string | null,"created_at"?: string,"ean"?: string | null,"error"?: string | null,"external_ref"?: string | null,"gtin"?: string | null,"id"?: string,"in_stock"?: boolean | null,"match_confidence"?: number | null,"match_method"?: string | null,"match_status"?: Database["public"]['Enums']["match_status"],"matched_variant_id"?: string | null,"mpn"?: string | null,"offer_id"?: string | null,"payload"?: NonNullable<Json>,"price_cents"?: number | null,"resolved_at"?: string | null,"resolved_by"?: string | null,"retailer_id"?: string | null,"retailer_sku"?: string | null,"run_id"?: string,"shipping_cents"?: number | null,"suggestions"?: NonNullable<Json>,"title"?: string | null,"upc"?: string | null,"url"?: string | null
+                    "asin"?: string | null,"available_sizes"?: (string)[] | null,"brand_text"?: string | null,"created_at"?: string,"ean"?: string | null,"error"?: string | null,"external_ref"?: string | null,"gtin"?: string | null,"id"?: string,"in_stock"?: boolean | null,"last_seen_at"?: string | null,"match_confidence"?: number | null,"match_method"?: string | null,"match_status"?: Database["public"]['Enums']["match_status"],"matched_variant_id"?: string | null,"mpn"?: string | null,"offer_id"?: string | null,"payload"?: NonNullable<Json>,"price_cents"?: number | null,"resolved_at"?: string | null,"resolved_by"?: string | null,"retailer_id"?: string | null,"retailer_sku"?: string | null,"run_id"?: string,"shipping_cents"?: number | null,"suggestions"?: NonNullable<Json>,"title"?: string | null,"upc"?: string | null,"url"?: string | null
                   }
                   Relationships: [
                     {
@@ -1325,7 +1331,7 @@ isOneToOne: false
                   ]
                 },"variant_offer_ranking": {
                   Row: {
-                    "available_sizes": (string)[] | null,"delivered_cents": number | null,"in_stock": boolean | null,"last_checked_at": string | null,"offer_id": string | null,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"] | null,"product_id": string | null,"promo_code": string | null,"promo_discount_cents": number | null,"promo_id": string | null,"rank": number | null,"retailer_id": string | null,"retailer_kind": Database["public"]['Enums']["retailer_kind"] | null,"retailer_name": string | null,"retailer_slug": string | null,"shipping_cents": number | null,"variant_id": string | null
+                    "available_sizes": (string)[] | null,"delivered_cents": number | null,"in_stock": boolean | null,"last_checked_at": string | null,"offer_id": string | null,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"] | null,"price_source": Database["public"]['Enums']["price_source"] | null,"product_id": string | null,"promo_code": string | null,"promo_discount_cents": number | null,"promo_id": string | null,"rank": number | null,"retailer_id": string | null,"retailer_kind": Database["public"]['Enums']["retailer_kind"] | null,"retailer_name": string | null,"retailer_slug": string | null,"shipping_cents": number | null,"variant_id": string | null
                   }
                   Relationships: [
                     {
@@ -1375,6 +1381,11 @@ isOneToOne: false
 "check_listing_text":
 { Args: { "body": string,"title": string }; Returns: undefined
                            },
+"claim_ingestion_runs":
+{ Args: { "only_source"?: string }; Returns: {
+              "config": Json,"kind": string,"name": string,"retailer_slug": string,"slug": string
+            }[]
+                           },
 "claim_pending_notifications":
 { Args: { "at"?: string,"max_rows"?: number }; Returns: {
               "badge": number,"body": string,"id": string,"route": string,"title": string,"user_id": string
@@ -1398,6 +1409,9 @@ isOneToOne: false
 "detect_deal":
 { Args: { "vid": string }; Returns: undefined
                            },
+"enforce_offer_freshness":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
 "evaluate_price_alerts":
 { Args: { "vid": string }; Returns: number
                            },
@@ -1406,6 +1420,9 @@ isOneToOne: false
                            },
 "file_report":
 { Args: { "details"?: string,"reason": string,"target_id": string,"target_type": string }; Returns: string
+                           },
+"finish_ingestion_run":
+{ Args: { "complete"?: boolean,"message"?: string,"ok": boolean,"run": string,"source_slug": string }; Returns: Json
                            },
 "first_name":
 { Args: { "uid": string }; Returns: string
@@ -1420,7 +1437,7 @@ isOneToOne: false
 { Args: { "dry_run"?: boolean,"payload": Json }; Returns: Json
                            },
 "ingest_offers":
-{ Args: { "dry_run"?: boolean,"records": Json,"source": string }; Returns: Json
+{ Args: { "automated"?: boolean,"dry_run"?: boolean,"records": Json,"source": string }; Returns: Json
                            },
 "is_admin":
 { Args: Record<PropertyKey, never>; Returns: boolean
@@ -1436,6 +1453,9 @@ isOneToOne: false
                            },
 "is_suspended":
 { Args: { "uid": string }; Returns: boolean
+                           },
+"learn_identifiers":
+{ Args: { "raw_id": string,"vid": string }; Returns: Json
                            },
 "listing_is_public":
 { Args: { "lid": string }; Returns: boolean
@@ -1548,6 +1568,9 @@ isOneToOne: false
 "publish_listing":
 { Args: { "listing": Json }; Returns: string
                            },
+"purge_api_payloads":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
 "quiet_window":
 { Args: { "at"?: string,"uid": string }; Returns: {
               "ends_at": string,"quiet": boolean
@@ -1579,6 +1602,9 @@ isOneToOne: false
 "reopen_raw_offer":
 { Args: { "raw_id": string }; Returns: undefined
                            },
+"request_ingestion_run":
+{ Args: { "source_slug": string }; Returns: undefined
+                           },
 "resolve_listing_review":
 { Args: { "decision": string,"notes"?: string,"review": string,"variant"?: string }; Returns: undefined
                            },
@@ -1590,6 +1616,9 @@ isOneToOne: false
                            },
 "restore_listing":
 { Args: { "lid": string,"tell_seller"?: boolean }; Returns: boolean
+                           },
+"schedule_ingestion":
+{ Args: { "only_source"?: string }; Returns: undefined
                            },
 "search_catalog":
 { Args: { "product_limit"?: number,"q": string }; Returns: Json
@@ -1626,6 +1655,16 @@ isOneToOne: false
 "staff_activity":
 { Args: { "for_id"?: string,"for_type"?: string,"max_rows"?: number }; Returns: {
               "action": string,"actor_name": string,"created_at": string,"data": Json,"id": number,"note": string,"target_id": string,"target_type": string
+            }[]
+                           },
+"staff_integrations":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "active_offers": number,"config": Json,"consecutive_failures": number,"interval_minutes": number,"is_active": boolean,"kind": string,"last_error": string,"last_run": Json,"last_started_at": string,"last_success_at": string,"max_age_minutes": number,"name": string,"next_run_at": string,"priced_offers": number,"retailer_name": string,"running_since": string,"slug": string,"stale_offers": number
+            }[]
+                           },
+"staff_learned_identifiers":
+{ Args: { "max_rows"?: number }; Returns: {
+              "created_at": string,"id": string,"kind": string,"product_name": string,"product_slug": string,"retailer_name": string,"source": string,"value": string,"variant_label": string
             }[]
                            },
 "staff_listings":

@@ -9,7 +9,7 @@ import { useTheme } from '@/design/theme';
 import { productImage, useProduct, useProductSlug } from '@/features/catalog/hooks';
 import { Chip, ErrorState, Group, Icon, ListRow, Skeleton, Text } from '@/ui';
 
-import { AFFILIATE_DISCLOSURE, shippingLabel } from '../format';
+import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, priceAsOf, shippingLabel } from '../format';
 import { openDeal, useLivePromos, useOffer } from '../hooks';
 
 /** Deal detail (design: "Deal detail (promo code)"): one offer, its code and what you pay. */
@@ -89,6 +89,11 @@ export default function DealScreen() {
                   referenceCents={msrp}
                 />
               )}
+              {isApiPrice(o) && (
+                <Text variant="footnote" tone="secondary" numeric style={{ paddingTop: 8 }}>
+                  {priceAsOf(o)}
+                </Text>
+              )}
             </View>
 
             {o.promo && (
@@ -127,6 +132,7 @@ export default function DealScreen() {
             <View style={{ paddingHorizontal: 16 }}>
               <Text variant="caption" weight="400" tone="tertiary">
                 Opens {o.retailer.name}.{o.promo ? ' The code is copied for you.' : ''} PickleDeals doesn’t handle checkout. {AFFILIATE_DISCLOSURE.replace('Affiliate links — ', '')}
+                {apiPriceDisclaimer([o]) ? ` ${apiPriceDisclaimer([o])}` : ''}
               </Text>
             </View>
           </>

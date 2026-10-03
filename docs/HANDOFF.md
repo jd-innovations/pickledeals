@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (after Phase 11)
+# PickleDeals — session handoff (after Phase 12)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -28,8 +28,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - Add mobile packages with `npx expo install`, and check the SDK 57 docs before using an Expo/RN API.
 
 ## Status
-- Phases 0–11 are done and pushed. The last commit is "Phase 11: admin and deal operations …".
-- **Next: Phase 12, affiliate and API integrations** (Amazon product API, one affiliate network feed, a price-monitoring scheduler, automatic identifier learning; exit: automated prices stay fresh within the required windows). It needs external accounts and credentials from the user, so start by listing what's needed and proposing the plan.
+- Phases 0–12 are done and pushed. The last commit is "Phase 12: affiliate and API integrations …".
+- Phase 12 runs end to end against a local mock. Real Amazon and AvantLink credentials are still needed (see Open items).
+- **Next: Phase 13, hardening and launch** (accessibility, performance, offline cache, analytics, App Store review prep, TestFlight). Propose the plan first.
 - D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. The one exception is a meet-up spot, which is an exact point but lives only in a private `location_share` message.
 
 ## Local environment
@@ -139,6 +140,15 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - `reopen_raw_offer`; `promo_codes.verified_by` (set by trigger on every verification).
   - Metrics: `staff_queue_counts()` (all staff) and `staff_metrics(days)` (admins; UTC days, clicks by retailer/placement/product, per-placement clicks approximated as clicks on the promoted variant's offers while the placement ran).
   - Only `sponsored_deal` placements are offered, because the app renders only those.
+- **Integrations (Phase 12, §9):**
+  - Sources are `ingestion_sources` rows with `config` (adapter, retailer_slug, url_env, column mapping), `interval_minutes`, `max_age_minutes` and run state. `amazon-creators` (api, every 30 min, 60-min freshness) and `avantlink-selkirk` (feed, every 6 h, 48 h) ship **off**; turn them on in admin → Integrations.
+  - Flow: pg_cron `schedule_ingestion()` (every 5 min) → `net.http_post` to the `ingest` edge function (Vault `project_url` + `dispatch_key`) → `claim_ingestion_runs` → adapter → `ingest_offers(source, records, dry_run => false, automated => true)` → `finish_ingestion_run` (backoff on failure; a complete feed hides offers it no longer lists unless it looks truncated). Admin "Run now" = `request_ingestion_run`.
+  - Automated matching adds "previously matched SKU" and skips items already in (or rejected from) the review queue. Exact matches learn the record's other identifiers (`product_identifiers.source = 'learned'`, never overwriting; conflicts counted). Review matches are `source = 'review'`. Admin → Integrations lists them with Forget.
+  - Pure adapter code: `supabase/functions/_shared/integrations.ts` (Creators API mapping, delimited feeds, tracking-URL unwrapping, affiliate links), tested by `packages/shared/src/integrations.test.ts`.
+  - **Amazon compliance:** API prices show only while < 60 minutes old (a `variant_offer_ranking` read-time guard plus `enforce_offer_freshness` every 5 min; `max_age_minutes` ≤ 60 is a check constraint). They're never written to `price_points`, raw API records are purged after 24 h (`purge_api_payloads`), MAP-restricted prices aren't shown, and the app shows "Price as of …" and Amazon's required disclaimer on Product, All offers and Deal detail.
+  - Affiliate links: `affiliate_programs.tag_template` (query tag, e.g. Amazon `tag=…`) and/or `link_template` (network click URL with `{url}`, e.g. AvantLink). `go` applies them; wrapper hosts must be on `AFFILIATE_LINK_HOSTS`.
+  - Secrets are Edge Function env only (`supabase/functions/.env.example`): `AMAZON_CREATORS_CLIENT_ID/_SECRET`, `AMAZON_PARTNER_TAG`, `FEED_URL_*`.
+  - Local run: `npm run mock:integrations` (port 54399), put the mock URLs in `supabase/functions/.env` (see `.env.example`), `npx supabase functions serve --env-file supabase/functions/.env`, then turn the sources on.
 - **Database:**
   - Every table gets RLS in the migration that creates it, plus pgTAP tests in `supabase/tests`.
   - Definer functions use `set search_path = ''`.
@@ -147,6 +157,10 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - **React Compiler lint:** no `setState` in effects (adjust state during render instead), and use Reanimated `.get()`/`.set()`.
 
 ## Open items
+- **Integrations need the user:**
+  - Amazon Creators API credentials (Associates Central). New accounts start at 1 request/second and 8,640/day, and API access depends on qualifying sales. Verify the resource names in `AMAZON_RESOURCES` and the `externalIds` casing against a live response.
+  - An AvantLink account approved for Selkirk (or another network/merchant). Get the datafeed download URL and check its column names against the source config (editable in admin → Integrations → Settings). Add the AvantLink click URL (`mi`/`pw`) on Retailers.
+  - Legal review: price-alert and price-drop notifications can quote an Amazon API price, and notifications are kept longer than 24 hours.
 - **Admin follow-ups:**
   - Sponsored clicks aren't attributed exactly: the app opens a deal's detail from the trending row, so `outbound_clicks.placement` never says "sponsored". Exact attribution needs the placement passed through navigation.
   - A pending listing hidden by a suspension comes back as active when the suspension is lifted.

@@ -8,7 +8,7 @@ import { useProduct } from '@/features/catalog/hooks';
 import { EmptyState, SegmentedControl, Skeleton, Text } from '@/ui';
 
 import type { RankedOffer } from '../api';
-import { offerBreakdown, stockLabel } from '../format';
+import { apiPriceDisclaimer, isApiPrice, offerBreakdown, priceAsOf, stockLabel } from '../format';
 import { openDeal, useProductOffers } from '../hooks';
 
 type Mode = 'delivered' | 'item';
@@ -69,7 +69,7 @@ export default function OffersScreen() {
                 priceCents: value,
                 deltaLabel: !checkPrice && bestValue != null && value != null ? (value - bestValue <= 0 ? 'Best' : `+${formatPrice(value - bestValue)}`) : undefined,
                 detail: checkPrice ? `${o.retailer.name} shows the current price on its site` : offerBreakdown(o),
-                checked: `Checked ${formatAgo(o.checkedAt)}`,
+                checked: isApiPrice(o) ? priceAsOf(o) : `Checked ${formatAgo(o.checkedAt)}`,
                 best: isBest,
               }}
               actionLabel={checkPrice ? `Check price at ${o.retailer.name}` : isBest ? 'Get deal' : 'View offer'}
@@ -81,6 +81,7 @@ export default function OffersScreen() {
       <View style={{ paddingTop: 4 }}>
         <Text variant="caption" weight="400" tone="tertiary">
           Ranked by what you pay, including shipping and verified codes. PickleDeals may earn a commission on some links; it never changes the order.
+          {apiPriceDisclaimer(offers) ? ` ${apiPriceDisclaimer(offers)}` : ''}
         </Text>
       </View>
     </ScrollView>

@@ -26,6 +26,8 @@ const TABLES: Record<string, string> = {
   prohibited_terms: 'prohibited term',
   raw_offer_records: 'import record',
   listing_catalog_reviews: 'custom listing review',
+  ingestion_sources: 'integration',
+  affiliate_programs: 'affiliate program',
 };
 
 /** Plain-English line for an audit entry. */
@@ -43,6 +45,8 @@ export function describeAction(a: Action): string {
     case 'report.actioned':
     case 'report.dismissed':
       return `${a.action === 'report.actioned' ? 'actioned' : 'dismissed'} a ${d.target_type} report${d.remove_listing ? ' and removed the listing' : ''}`;
+    case 'integration.run':
+      return `ran the ${d.slug} integration`;
     case 'listing_review.promote':
       return `promoted a custom listing to draft product ${d.slug}`;
   }

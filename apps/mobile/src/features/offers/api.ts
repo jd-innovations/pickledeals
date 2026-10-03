@@ -21,6 +21,8 @@ export type RankedOffer = {
   inStock: boolean;
   sizes: string[];
   checkedAt: string;
+  /** 'api' = live Amazon Creators API price: shown with an "as of" time and Amazon's disclaimer. */
+  priceSource: 'manual' | 'feed' | 'api';
 };
 
 export type VariantStats = {
@@ -68,10 +70,11 @@ type RankingRow = {
   in_stock: boolean;
   available_sizes: string[];
   last_checked_at: string;
+  price_source: RankedOffer['priceSource'];
 };
 
 const RANKING_COLUMNS =
-  'offer_id, variant_id, retailer_slug, retailer_name, retailer_kind, price_display, price_cents, shipping_cents, delivered_cents, promo_id, promo_code, promo_discount_cents, rank, in_stock, available_sizes, last_checked_at';
+  'offer_id, variant_id, retailer_slug, retailer_name, retailer_kind, price_display, price_cents, shipping_cents, delivered_cents, promo_id, promo_code, promo_discount_cents, rank, in_stock, available_sizes, last_checked_at, price_source';
 
 const toOffer = (r: RankingRow): RankedOffer => ({
   offerId: r.offer_id,
@@ -86,6 +89,7 @@ const toOffer = (r: RankingRow): RankedOffer => ({
   inStock: r.in_stock,
   sizes: r.available_sizes ?? [],
   checkedAt: r.last_checked_at,
+  priceSource: r.price_source,
 });
 
 /** Priced offers in rank order, then check-price offers (D1: listed, never ranked). */

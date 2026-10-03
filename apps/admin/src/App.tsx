@@ -8,6 +8,7 @@ import { DashboardPage } from './pages/Dashboard';
 import { DealsPage } from './pages/Deals';
 import { CategoriesPage } from './pages/Categories';
 import { ImportPage } from './pages/Import';
+import { IntegrationsPage } from './pages/Integrations';
 import { ListingReviewPage } from './pages/ListingReview';
 import { ListingsPage } from './pages/Listings';
 import { OffersPage } from './pages/Offers';
@@ -75,6 +76,7 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
         </span>
         {link('offers', 'Offers')}
         {link('review', 'Review queue')}
+        {link('integrations', 'Integrations')}
         {link('promos', 'Promo codes')}
         {link('retailers', 'Retailers')}
         <span className="muted" style={{ padding: '14px 10px 4px', fontSize: 12 }}>
@@ -107,6 +109,7 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
         {section === 'import' && <ImportPage />}
         {section === 'offers' && <OffersPage />}
         {section === 'review' && <ReviewPage />}
+        {section === 'integrations' && <IntegrationsPage />}
         {section === 'promos' && <PromosPage />}
         {section === 'retailers' && <RetailersPage role={role} />}
         {section === 'deals' && <DealsPage />}

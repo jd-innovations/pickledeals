@@ -6,6 +6,14 @@
 // Public by design (verify_jwt = false): the in-app browser can't send auth headers.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
+import { affiliateUrl, type AffiliateProgram } from '../_shared/integrations.ts';
+
+// Affiliate networks whose click URLs may wrap a product link (AFFILIATE_LINK_HOSTS overrides).
+const LINK_HOSTS = (Deno.env.get('AFFILIATE_LINK_HOSTS') ?? 'avantlink.com,sjv.io,anrdoezrs.net,jdoqocy.com,kqzyfj.com,tkqlhce.com,dpbolvw.net,awin1.com,linksynergy.com')
+  .split(',')
+  .map((h) => h.trim().toLowerCase())
+  .filter(Boolean);
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function serviceKey(): string {
@@ -39,11 +47,11 @@ Deno.serve(async (req) => {
 
   const { data: offer } = await db
     .from('retailer_offers')
-    .select('id, url, status, retailer:retailers!inner(id, domain, is_active, affiliate:affiliate_programs(tag_template, is_active))')
+    .select('id, url, status, retailer:retailers!inner(id, domain, is_active, affiliate:affiliate_programs(tag_template, link_template, is_active))')
     .eq('id', offerId)
     .maybeSingle();
 
-  type Retailer = { id: string; domain: string; is_active: boolean; affiliate: { tag_template: string; is_active: boolean } | null };
+  type Retailer = { id: string; domain: string; is_active: boolean; affiliate: AffiliateProgram | null };
   const retailer = offer?.retailer as unknown as Retailer | undefined;
   if (!offer || offer.status !== 'active' || !retailer?.is_active) {
     return page(404, 'This offer has ended', 'The retailer no longer lists it at this price. Open PickleDeals to see current offers.');
@@ -57,10 +65,8 @@ Deno.serve(async (req) => {
   }
   if (!onDomain(target, retailer.domain)) return page(502, 'Link not available', 'We couldn’t open this retailer link.');
 
-  // Affiliate tag from the retailer's program (never stored on the client or in offer URLs).
-  if (retailer.affiliate?.is_active) {
-    for (const [k, v] of new URLSearchParams(retailer.affiliate.tag_template)) target.searchParams.set(k, v);
-  }
+  // Affiliate tag or network click URL from the retailer's program (never stored on the client or in offer URLs).
+  target = affiliateUrl(target, retailer.affiliate, LINK_HOSTS);
 
   // Only log promo ids that belong to this retailer.
   let promo: string | null = null;

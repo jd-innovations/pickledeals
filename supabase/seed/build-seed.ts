@@ -84,6 +84,16 @@ begin
 end;
 $offers$;
 
+-- Dev Amazon ASINs (the /dp/ part of the seeded URLs), so the Creators API source has items to
+-- refresh (scripts/mock-integrations.mjs answers for them), and source → retailer links.
+insert into public.product_identifiers (variant_id, kind, value, retailer_id)
+select o.variant_id, 'asin', substring(o.url from '/dp/([A-Z0-9]{10})'), o.retailer_id
+  from public.retailer_offers o join public.retailers r on r.id = o.retailer_id
+ where r.slug = 'amazon' and o.url ~ '/dp/[A-Z0-9]{10}'
+on conflict on constraint product_identifiers_unique do nothing;
+update public.ingestion_sources s set retailer_id = r.id
+  from public.retailers r where r.slug = s.config ->> 'retailer_slug' and s.retailer_id is null;
+
 -- Synthetic 120-day history for priced offers, so charts and deal quality have data: a gentle
 -- random walk with retail-style prices ($x.99), changing every few days.
 do $history$

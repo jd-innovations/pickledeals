@@ -13,6 +13,7 @@ type Queues = {
   promos_due: number;
   placements_ending: number;
   suspended_users: number;
+  integrations_failing: number;
 };
 type Day = { day: string; clicks: number; new_users: number; listings_published: number; listings_sold: number; messages: number; offers: number; reports_opened: number };
 type Metrics = {
@@ -48,6 +49,7 @@ export function DashboardPage({ role }: { role: 'admin' | 'editor' }) {
       {queues && (
         <div className="tiles">
           <Queue href="#/reports" n={queues.open_reports} label="Open reports" hint={queues.oldest_report_at ? `oldest ${formatAgo(queues.oldest_report_at)}` : 'Act within 24 hours'} />
+          <Queue href="#/integrations" n={queues.integrations_failing} label="Integrations failing" hint="Automated price sources" />
           <Queue href="#/review" n={queues.unmatched_offers} label="Unmatched offers" hint="Not visible until matched" />
           <Queue href="#/custom-listings" n={queues.custom_listings} label="Custom listings" hint="Link to the catalog" />
           <Queue href="#/promos" n={queues.promos_stale} label="Promo codes hidden" hint={`${queues.promos_due} more go stale within 3 days`} />

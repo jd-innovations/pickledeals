@@ -1,4 +1,4 @@
-import { formatPrice } from '@pickledeals/shared';
+import { formatChatSeparator, formatPrice } from '@pickledeals/shared';
 
 import type { RankedOffer, VariantStats } from './api';
 
@@ -34,6 +34,20 @@ export function qualityDetail(s: VariantStats): string | undefined {
   const parts = [s.typicalCents != null ? `Typical ${formatPrice(s.typicalCents)}` : null, s.low90dCents != null ? `90-day low ${formatPrice(s.low90dCents)}` : null];
   const text = parts.filter(Boolean).join(' · ');
   return text || undefined;
+}
+
+/** Live API prices (Amazon). The database hides them after 60 minutes; screens still show the time. */
+export const isApiPrice = (o: RankedOffer) => o.priceSource === 'api' && o.priceDisplay === 'show';
+
+/** "Price as of 3:05 PM" (or "Yesterday 9:12 PM" for an old cached screen). */
+export const priceAsOf = (o: RankedOffer) => `Price as of ${formatChatSeparator(o.checkedAt).replace(/^Today /, '')}`;
+
+/** Amazon Associates' required disclaimer, whenever an API price is on screen. */
+export function apiPriceDisclaimer(offers: RankedOffer[]): string | null {
+  const o = offers.find(isApiPrice);
+  if (!o) return null;
+  const site = o.retailer.slug === 'amazon' ? 'Amazon.com' : o.retailer.name;
+  return `Product prices and availability are accurate as of the date/time indicated and are subject to change. Any price and availability information displayed on ${site} at the time of purchase will apply to the purchase of this product.`;
 }
 
 export const AFFILIATE_DISCLOSURE = 'Affiliate links — PickleDeals may earn a commission. Offers are ranked by what you pay, never by commission.';

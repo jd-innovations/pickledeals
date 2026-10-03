@@ -91,6 +91,57 @@ select 'sponsored_deal', d.id, 'CRBN', 1
   from public.deals d join public.product_variants v on v.id = d.variant_id join public.products p on p.id = v.product_id
  where d.status = 'active' and p.slug = 'crbn-3x-power-series' and v.label = '14mm';
 
+-- Dev marketplace (local only): fictional sellers around Sarasota, FL with pre-owned listings.
+-- Locations are snapped exactly as set_listing_location does (D2). No photos: the app shows
+-- placeholder art for listings without images.
+do $market$
+declare
+  sellers text[] := array['Marcus T.', 'Priya K.', 'Jordan R.'];
+  ids uuid[] := array[gen_random_uuid(), gen_random_uuid(), gen_random_uuid()];
+  i int;
+  r record;
+  lid uuid;
+begin
+  for i in 1..3 loop
+    insert into auth.users (instance_id, id, aud, role, email, email_confirmed_at, raw_app_meta_data, raw_user_meta_data,
+                            created_at, updated_at, confirmation_token, recovery_token, email_change, email_change_token_new)
+    values ('00000000-0000-0000-0000-000000000000', ids[i], 'authenticated', 'authenticated', format('seller%s@pickledeals.test', i),
+            now(), '{"provider":"email","providers":["email"]}', '{}', now() - interval '200 days', now(), '', '', '', '');
+    update public.profiles set display_name = sellers[i], member_since = now() - interval '200 days' where id = ids[i];
+  end loop;
+
+  for r in select * from (values
+      (1, 'joola-perseus-pro-iv', '16mm', null, 'excellent', 15000, true, false, 27.399, -82.401, 'Lakewood Ranch, FL', 2, 'About 15 sessions on it — moved to the 14mm. Edge guard is clean, face still has good grit. Original cover included.'),
+      (2, 'selkirk-vanguard-power-air-invikta', '16mm', null, 'excellent', 12500, true, false, 27.402, -82.395, 'Lakewood Ranch, FL', 4, 'Light use, one small scuff on the edge guard. Pickup weekday evenings.'),
+      (3, 'asics-gel-renma', 'Standard', null, 'like_new', 7000, true, false, 27.336, -82.531, 'Sarasota, FL', 1, 'Size 10.5, worn twice. Too narrow for me.'),
+      (1, 'lobster-pickle-elite', 'Standard', null, 'good', 52000, true, false, 27.498, -82.575, 'Bradenton, FL', 9, 'Works perfectly; battery holds about 3 hours. Remote included.'),
+      (2, 'crbn-3x-power-series', '16mm', null, 'like_new', 13000, true, true, 27.341, -82.540, 'Sarasota, FL', 3, 'Played twice, switching to 14mm. Happy to ship.'),
+      (3, 'selkirk-core-line-backpack', 'Standard', null, 'excellent', 4500, true, true, 27.100, -82.454, 'Venice, FL', 6, 'Clean, all zippers work.'),
+      (1, 'joola-perseus-pro-iv', '16mm', null, 'like_new', 14500, false, true, 27.950, -82.457, 'Tampa, FL', 5, 'Ships only — like new, under 5 sessions.'),
+      (2, null, null, 'Wooden practice paddle (1990s)', 'fair', 2000, true, false, 27.336, -82.530, 'Sarasota, FL', 7, 'Old-school wooden paddle, fun for drills. Heavy.')
+    ) as t(seller, product_slug, variant_label, custom_title, cond, price, pickup, ships, lat, lng, area, days_ago, body)
+  loop
+    insert into public.listings (seller_id, product_id, variant_id, category_id, custom_title, condition, price_cents,
+                                 description, pickup, ships, status, published_at, created_at)
+    select ids[r.seller], p.id, v.id, coalesce(p.category_id, (select id from public.categories where slug = 'paddles')),
+           r.custom_title, r.cond::public.listing_condition, r.price, r.body, r.pickup, r.ships,
+           case when r.product_slug = 'lobster-pickle-elite' then 'pending' else 'active' end::public.listing_status,
+           now() - make_interval(days => r.days_ago), now() - make_interval(days => r.days_ago)
+      from (select 1) one
+      left join public.products p on p.slug = r.product_slug
+      left join public.product_variants v on v.product_id = p.id and v.label = r.variant_label
+    returning id into lid;
+    insert into public.listing_private (listing_id) values (lid);
+    insert into public.listing_locations (listing_id, public_point, geohash6, area_label)
+    select lid, s.point, s.geohash, r.area from public.snap_point(r.lat, r.lng, 6) s;
+  end loop;
+  -- One sold listing so "what it sells for" has history.
+  update public.listings set status = 'sold', sold_price_cents = 13500, sold_at = now() - interval '3 days'
+   where id = (select l.id from public.listings l join public.products p on p.id = l.product_id
+                where p.slug = 'joola-perseus-pro-iv' and l.price_cents = 14500);
+end;
+$market$;
+
 -- Local push dispatch: pg_cron → pg_net → the local API gateway (inside the Docker network).
 -- Staging/production set these with their own URL and a service key (see supabase/seed/README.md).
 select vault.create_secret('http://supabase_kong_pickledeals:8000', 'project_url');

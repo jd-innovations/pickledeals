@@ -125,6 +125,23 @@ select pc.id,
 
 select public.refresh_variant_price_stats(variant_id) from (select distinct variant_id from public.retailer_offers) v;
 
+-- Dev curation: a staff pick, an editorial collection and a labelled sponsored placement.
+update public.deals d set is_staff_pick = true
+  from public.product_variants v join public.products p on p.id = v.product_id
+ where d.variant_id = v.id and d.status = 'active' and p.slug = 'selkirk-vanguard-power-air-invikta';
+
+insert into public.collections (slug, title, subtitle, eyebrow, sort)
+values ('court-shoes-on-sale', 'Court shoes on sale', 'Pickleball-specific shoes at their best prices', 'STAFF PICKS · UPDATED DAILY', 1);
+insert into public.collection_items (collection_id, product_id, sort)
+select c.id, p.id, row_number() over (order by p.name)
+  from public.collections c, public.products p join public.categories cat on cat.id = p.category_id
+ where c.slug = 'court-shoes-on-sale' and cat.slug = 'shoes';
+
+insert into public.placements (kind, deal_id, campaign, sort)
+select 'sponsored_deal', d.id, 'CRBN', 1
+  from public.deals d join public.product_variants v on v.id = d.variant_id join public.products p on p.id = v.product_id
+ where d.status = 'active' and p.slug = 'crbn-3x-power-series' and v.label = '14mm';
+
 -- DEV ADMIN (local only): admin@pickledeals.test signs in with an email code from Mailpit
 -- (http://127.0.0.1:54324). Never created outside a local db reset.
 do $admin$

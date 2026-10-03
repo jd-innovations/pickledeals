@@ -1,10 +1,14 @@
+import { formatEndsIn } from '@pickledeals/shared';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
-import { BrandMark } from '@/commerce';
-import { Button, Chip, ChipRow, Skeleton, Text } from '@/ui';
+import { BrandMark, PromoCodeRow } from '@/commerce';
+import { DealGrid } from '@/features/deals/components';
+import { useDeals } from '@/features/deals/hooks';
+import { useLivePromos } from '@/features/offers/hooks';
+import { Button, Chip, ChipRow, SectionHeader, Skeleton, Text } from '@/ui';
 
 import { brandLogoUrl } from '../api';
 import { GridSkeleton, LoadError, ProductGrid } from '../components';
@@ -14,6 +18,10 @@ import { useBrand } from '../hooks';
 export default function BrandScreen() {
   const { slug = '' } = useLocalSearchParams<{ slug: string }>();
   const { data, isError, refetch } = useBrand(slug);
+  const deals = useDeals({ brand: slug, sort: 'discount', limit: 40 });
+  // The brand's codes: live codes at the retailers carrying its current deals.
+  const codeRetailers = [...new Set((deals.data?.items ?? []).filter((d) => d.promo).map((d) => d.retailer.slug))];
+  const promos = useLivePromos(codeRetailers);
   const [category, setCategory] = useState<string | null>(null);
 
   const categories = useMemo(() => {
@@ -48,7 +56,15 @@ export default function BrandScreen() {
             )}
             <Text variant="largeTitle">{data?.brand.name ?? ' '}</Text>
             <Text variant="subhead" weight="400" tone="secondary" numeric>
-              {data ? `${data.products.length} ${data.products.length === 1 ? 'product' : 'products'}` : ' '}
+              {data
+                ? [
+                    deals.data ? `${deals.data.total} live ${deals.data.total === 1 ? 'deal' : 'deals'}` : null,
+                    promos.data?.length ? `${promos.data.length} promo ${promos.data.length === 1 ? 'code' : 'codes'}` : null,
+                    `${data.products.length} ${data.products.length === 1 ? 'product' : 'products'}`,
+                  ]
+                    .filter(Boolean)
+                    .join(' · ')
+                : ' '}
             </Text>
             {website ? (
               <View style={{ alignItems: 'flex-start' }}>
@@ -64,6 +80,30 @@ export default function BrandScreen() {
             ) : null}
           </View>
 
+          {(promos.data?.length ?? 0) > 0 && (
+            <View style={{ gap: 10 }}>
+              <SectionHeader title="Promo codes" />
+              <View style={{ paddingHorizontal: 16, gap: 10 }}>
+                {promos.data!.map((p) => (
+                  <PromoCodeRow
+                    key={p.id}
+                    title={p.title}
+                    detail={[p.retailerName, p.endsAt ? formatEndsIn(p.endsAt).replace('Ends in', 'ends in') : null, p.isExclusive ? 'exclusive' : null].filter(Boolean).join(' · ')}
+                    code={p.code}
+                  />
+                ))}
+              </View>
+            </View>
+          )}
+
+          {(deals.data?.items.length ?? 0) > 0 && data && (
+            <View style={{ gap: 12 }}>
+              <SectionHeader title={`Best ${data.brand.name} deals`} trailing="By discount" />
+              <DealGrid deals={deals.data!.items.slice(0, 4)} />
+            </View>
+          )}
+
+          {data && <SectionHeader title={`All ${data.brand.name} products`} />}
           {categories.length > 1 && (
             <ChipRow>
               <Chip label="All" selected={!category} onPress={() => setCategory(null)} />

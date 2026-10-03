@@ -2,14 +2,51 @@ import { Stack, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
-import { Chip, ChipRow, EmptyState, Text } from '@/ui';
+import { DealList } from '@/features/deals/screens/FeedScreen';
+import { useDeals } from '@/features/deals/hooks';
+import { Chip, ChipRow, EmptyState, SegmentedControl, Text } from '@/ui';
 
 import { GridSkeleton, LoadError, ProductGrid } from '../components';
 import { useCategory } from '../hooks';
 
-/** Category detail: every active product in the category, filterable by brand. Deals join in Phase 4. */
+type Mode = 'deals' | 'products';
+
+/** Category detail (design: "Paddles on sale"): live deals with filters, or every product. */
 export default function CategoryScreen() {
   const { slug = '' } = useLocalSearchParams<{ slug: string }>();
+  const { data } = useCategory(slug);
+  const deals = useDeals({ category: slug, limit: 1 });
+  const [mode, setMode] = useState<Mode | null>(null);
+  // Default to deals when the category has any.
+  const active: Mode = mode ?? (deals.data && deals.data.total === 0 ? 'products' : 'deals');
+
+  const switcher = (
+    <View style={{ paddingHorizontal: 16, gap: 8 }}>
+      {data && deals.data ? (
+        <Text variant="subhead" weight="400" tone="secondary" numeric>
+          {deals.data.total} live {deals.data.total === 1 ? 'deal' : 'deals'} · {data.products.length} {data.products.length === 1 ? 'product' : 'products'}
+        </Text>
+      ) : null}
+      <SegmentedControl
+        options={[
+          { value: 'deals', label: 'Deals' },
+          { value: 'products', label: 'All products' },
+        ]}
+        value={active}
+        onChange={setMode}
+      />
+    </View>
+  );
+
+  return (
+    <>
+      <Stack.Screen options={{ title: data?.category.name ?? '' }} />
+      {active === 'deals' ? <DealList scope={`category:${slug}`} query={{ category: slug }} header={switcher} /> : <Products slug={slug} header={switcher} />}
+    </>
+  );
+}
+
+function Products({ slug, header }: { slug: string; header: React.ReactNode }) {
   const { data, isError, refetch } = useCategory(slug);
   const [brand, setBrand] = useState<string | null>(null);
 
@@ -27,7 +64,7 @@ export default function CategoryScreen() {
 
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 120, gap: 16 }}>
-      <Stack.Screen options={{ title: data?.category.name ?? '' }} />
+      {header}
       {isError ? (
         <LoadError onRetry={refetch} />
       ) : !data ? (
@@ -36,9 +73,6 @@ export default function CategoryScreen() {
         <EmptyState icon="grid" title="Nothing here yet" message="Products in this category will appear as the catalog grows." />
       ) : (
         <>
-          <Text variant="subhead" weight="400" tone="secondary" style={{ paddingHorizontal: 16 }} numeric>
-            {products.length} {products.length === 1 ? 'product' : 'products'}
-          </Text>
           {brands.length > 1 && (
             <ChipRow>
               <Chip label="All brands" selected={!brand} onPress={() => setBrand(null)} />
@@ -47,9 +81,7 @@ export default function CategoryScreen() {
               ))}
             </ChipRow>
           )}
-          <View>
-            <ProductGrid products={products} />
-          </View>
+          <ProductGrid products={products} />
         </>
       )}
     </ScrollView>

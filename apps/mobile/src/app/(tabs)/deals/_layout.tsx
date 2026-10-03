@@ -15,6 +15,12 @@ export default function DealsStack() {
       <Stack.Screen name="product/[slug]/offers" options={{ title: 'All offers', headerLargeTitle: false }} />
       <Stack.Screen name="product/[slug]/history" options={{ title: 'Price history', headerLargeTitle: false }} />
       <Stack.Screen name="offer/[id]" options={{ title: '', headerLargeTitle: false }} />
+      <Stack.Screen name="feed/[feed]" options={{ headerLargeTitle: false }} />
+      <Stack.Screen name="collection/[slug]" options={{ headerLargeTitle: false }} />
+      <Stack.Screen
+        name="filters"
+        options={{ presentation: 'formSheet', headerShown: false, sheetAllowedDetents: [0.75, 1], sheetGrabberVisible: true, sheetCornerRadius: 28 }}
+      />
     </Stack>
   );
 }

@@ -56,8 +56,9 @@ export function DealCard({
 }: {
   deal: DealCardData;
   width: number;
-  saved: boolean;
-  onToggleSave: () => void;
+  /** Omit to hide the save heart (e.g. before saving is available). */
+  saved?: boolean;
+  onToggleSave?: () => void;
   onPress?: () => void;
 }) {
   const { colors } = useTheme();
@@ -109,9 +110,11 @@ export function DealCard({
           </Text>
         </View>
       </Pressable>
-      <View style={styles.favPos}>
-        <FavoriteButton saved={saved} onToggle={onToggleSave} />
-      </View>
+      {onToggleSave && (
+        <View style={styles.favPos}>
+          <FavoriteButton saved={!!saved} onToggle={onToggleSave} />
+        </View>
+      )}
     </View>
   );
 }

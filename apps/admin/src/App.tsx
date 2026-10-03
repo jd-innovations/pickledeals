@@ -3,6 +3,8 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useSession } from './lib/session';
 import { supabase } from './lib/supabase';
 import { BrandsPage } from './pages/Brands';
+import { CollectionsPage } from './pages/Collections';
+import { DealsPage } from './pages/Deals';
 import { CategoriesPage } from './pages/Categories';
 import { ImportPage } from './pages/Import';
 import { OffersPage } from './pages/Offers';
@@ -62,6 +64,11 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
         {link('review', 'Review queue')}
         {link('promos', 'Promo codes')}
         {link('retailers', 'Retailers')}
+        <span className="muted" style={{ padding: '14px 10px 4px', fontSize: 12 }}>
+          Discovery
+        </span>
+        {link('deals', 'Live deals')}
+        {link('collections', 'Collections & sponsored')}
         <span className="spacer" />
         <span className="muted" style={{ padding: '0 10px', fontSize: 12 }}>
           Signed in as {role}
@@ -79,6 +86,8 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
         {section === 'review' && <ReviewPage />}
         {section === 'promos' && <PromosPage />}
         {section === 'retailers' && <RetailersPage role={role} />}
+        {section === 'deals' && <DealsPage />}
+        {section === 'collections' && <CollectionsPage />}
       </main>
     </div>
   );

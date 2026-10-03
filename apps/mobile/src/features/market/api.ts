@@ -1,10 +1,11 @@
-import type { ListingCondition } from '@pickledeals/shared';
+import { geohashCenter, type Bounds, type ListingCondition } from '@pickledeals/shared';
 
 import { requireSupabase } from '@/lib/supabase';
 
 /**
- * Marketplace reads/writes (Phase 6). D2: the client never receives coordinates — only an area
- * label and an approximate distance computed server-side from snapped points.
+ * Marketplace reads/writes (Phase 6). D2: the client never receives an exact coordinate — feeds carry
+ * an area label and a server-computed approximate distance; the map and the listing's area use the
+ * public geohash-6 cell centre only.
  */
 
 export type ListingStatus = 'draft' | 'active' | 'pending' | 'sold' | 'removed';
@@ -125,6 +126,78 @@ export async function fetchMarket(q: MarketQuery): Promise<{ total: number; hasO
   return { total: raw.total, hasOrigin: raw.has_origin, items: raw.items.map(toItem) };
 }
 
+/**
+ * A listing on the map (Phase 7). `point` is the listing's public geohash-6 cell centre — the only
+ * coordinate the server ever returns (D2); many listings in one cell share it.
+ */
+export type MapListing = Pick<
+  ListingCardItem,
+  'id' | 'status' | 'condition' | 'priceCents' | 'pickup' | 'ships' | 'title' | 'productSlug' | 'variantLabel' | 'hasVariants' | 'brandName' | 'categorySlug' | 'areaLabel' | 'distanceM' | 'bestNewCents' | 'imagePath'
+> & { sellerName: string; imageCount: number; point: { lat: number; lng: number } };
+
+type MapRow = Pick<FeedRow, 'id' | 'status' | 'condition' | 'price_cents' | 'pickup' | 'ships' | 'title' | 'product_slug' | 'variant_label' | 'has_variants' | 'brand_name' | 'category_slug' | 'area_label' | 'distance_m' | 'best_new_cents' | 'image_path'> & {
+  seller_name: string;
+  image_count: number;
+  lat: number;
+  lng: number;
+};
+
+export type BoundsQuery = Pick<MarketQuery, 'origin' | 'useHome' | 'category' | 'conditions' | 'brands' | 'minCents' | 'maxCents' | 'pickupOnly' | 'text'> & { bounds: Bounds };
+
+export async function fetchMarketInBounds(q: BoundsQuery): Promise<{ total: number; truncated: boolean; items: MapListing[] }> {
+  const { data, error } = await requireSupabase().rpc('market_in_bounds', {
+    min_lng: q.bounds.minLng,
+    min_lat: q.bounds.minLat,
+    max_lng: q.bounds.maxLng,
+    max_lat: q.bounds.maxLat,
+    lat: q.origin?.lat,
+    lng: q.origin?.lng,
+    use_home: q.useHome ?? false,
+    category_slug: q.category,
+    conditions: q.conditions,
+    brand_slugs: q.brands,
+    min_cents: q.minCents,
+    max_cents: q.maxCents,
+    pickup_only: q.pickupOnly ?? false,
+    q: q.text?.trim() || undefined,
+  });
+  if (error) throw error;
+  const raw = data as unknown as { total: number; truncated: boolean; items: MapRow[] };
+  return {
+    total: raw.total,
+    truncated: raw.truncated,
+    items: raw.items.map((r) => ({
+      id: r.id,
+      status: r.status,
+      condition: r.condition,
+      priceCents: r.price_cents,
+      pickup: r.pickup,
+      ships: r.ships,
+      title: r.title,
+      productSlug: r.product_slug,
+      variantLabel: r.variant_label,
+      hasVariants: r.has_variants,
+      brandName: r.brand_name,
+      categorySlug: r.category_slug,
+      areaLabel: r.area_label,
+      distanceM: r.distance_m,
+      bestNewCents: r.best_new_cents,
+      imagePath: r.image_path,
+      sellerName: r.seller_name,
+      imageCount: r.image_count,
+      point: { lat: r.lat, lng: r.lng },
+    })),
+  };
+}
+
+/** Public cell centres (D2) of a few listings, from their public geohash. */
+export async function fetchListingCells(ids: string[]): Promise<Map<string, { lat: number; lng: number }>> {
+  if (!ids.length) return new Map();
+  const { data, error } = await requireSupabase().from('listing_locations').select('listing_id, geohash6').in('listing_id', ids);
+  if (error) throw error;
+  return new Map(data.map((r) => [r.listing_id, geohashCenter(r.geohash6)]));
+}
+
 export function listingImageUrl(path: string): string {
   return requireSupabase().storage.from('listing-images').getPublicUrl(path).data.publicUrl;
 }
@@ -158,6 +231,8 @@ export type ListingDetail = {
   variant: { id: string; label: string } | null;
   category: { slug: string; name: string };
   areaLabel: string | null;
+  /** Public cell centre (D2) for the approximate-area map. */
+  areaCenter: { lat: number; lng: number } | null;
   images: { path: string; width: number | null; height: number | null }[];
   seller: { id: string; name: string; memberSince: string; areaLabel: string | null };
   bestNewCents: number | null;
@@ -173,7 +248,7 @@ export async function fetchListing(id: string): Promise<ListingDetail> {
     .select(
       'id, seller_id, status, condition, price_cents, accepts_offers, description, pickup, ships, published_at, custom_title, custom_brand_text, variant_id, ' +
         'product:products(id, slug, name, specs, msrp_cents, brand:brands(name), category:categories(slug)), variant:product_variants(id, label, msrp_cents), category:categories(slug, name), ' +
-        'images:listing_images(storage_path, width, height, sort), location:listing_locations(area_label)',
+        'images:listing_images(storage_path, width, height, sort), location:listing_locations(area_label, geohash6)',
     )
     .eq('id', id)
     .single();
@@ -196,7 +271,7 @@ export async function fetchListing(id: string): Promise<ListingDetail> {
     variant: { id: string; label: string; msrp_cents: number | null } | null;
     category: { slug: string; name: string };
     images: { storage_path: string; width: number | null; height: number | null; sort: number }[];
-    location: { area_label: string } | null;
+    location: { area_label: string; geohash6: string } | null;
   };
 
   const [seller, best, market] = await Promise.all([
@@ -227,6 +302,7 @@ export async function fetchListing(id: string): Promise<ListingDetail> {
     variant: row.variant ? { id: row.variant.id, label: row.variant.label } : null,
     category: row.category,
     areaLabel: row.location?.area_label ?? null,
+    areaCenter: row.location ? geohashCenter(row.location.geohash6) : null,
     images: [...row.images].sort((a, b) => a.sort - b.sort).map((i) => ({ path: i.storage_path, width: i.width, height: i.height })),
     seller: { id: seller.data.id, name: seller.data.display_name, memberSince: seller.data.member_since, areaLabel: seller.data.area_label },
     bestNewCents: (best.data as { delivered_cents: number | null } | null)?.delivered_cents ?? null,

@@ -8,7 +8,7 @@ import { productArt } from '@/commerce/catalogArt';
 import type { ImageSource } from '@/commerce';
 import { useAuth } from '@/features/auth/authStore';
 
-import { fetchHomeArea, fetchListing, fetchMarket, fetchMyListings, fetchPriceGuide, fetchSavedListings, fetchSeller, listingImageUrl, setListingStatus, updateListing, type ListingCardItem, type MarketQuery, type MarketSort } from './api';
+import { fetchHomeArea, fetchListing, fetchMarket, fetchMarketInBounds, fetchMyListings, fetchPriceGuide, fetchSavedListings, fetchSeller, listingImageUrl, setListingStatus, updateListing, type BoundsQuery, type ListingCardItem, type MarketQuery, type MarketSort } from './api';
 
 export const marketKeys = {
   feed: (q: MarketQuery) => ['market', 'feed', q] as const,
@@ -31,6 +31,20 @@ export function useMarket(q: Omit<MarketQuery, 'origin' | 'useHome'>, enabled = 
   const signedIn = useAuth((s) => !!s.user);
   const query: MarketQuery = { ...q, origin: point, useHome: !point && signedIn };
   return useQuery({ queryKey: marketKeys.feed(query), queryFn: () => fetchMarket(query), enabled, placeholderData: keepPreviousData, staleTime: 60_000 });
+}
+
+/** Listings inside a searched map area (null until the map knows its viewport). */
+export function useMarketInBounds(q: Omit<BoundsQuery, 'origin' | 'useHome'> | null) {
+  const point = useViewer((s) => s.point);
+  const signedIn = useAuth((s) => !!s.user);
+  const query: BoundsQuery | null = q && { ...q, origin: point, useHome: !point && signedIn };
+  return useQuery({
+    queryKey: ['market', 'bounds', query],
+    queryFn: () => fetchMarketInBounds(query!),
+    enabled: !!query,
+    placeholderData: keepPreviousData,
+    staleTime: 60_000,
+  });
 }
 
 export const useListing = (id: string) => useQuery({ queryKey: marketKeys.listing(id), queryFn: () => fetchListing(id), enabled: !!id, staleTime: 30_000 });
@@ -77,7 +91,7 @@ export function listingImage(l: Pick<ListingCardItem, 'imagePath' | 'title' | 'p
 export const listingTitle = (l: Pick<ListingCardItem, 'title' | 'variantLabel' | 'hasVariants' | 'brandName'>) =>
   [l.brandName, l.title, l.hasVariants && l.variantLabel ? l.variantLabel : null].filter(Boolean).join(' ');
 
-/** Marketplace filters (shared by grid and, in Phase 7, the map). */
+/** Marketplace filters, shared by the grid and the map. */
 export type MarketFilters = { radiusM: number | null; conditions: ListingCondition[]; category: string | null; brands: string[]; minCents?: number; maxCents?: number; pickupOnly: boolean; includeShipping: boolean; sort: MarketSort };
 export const DEFAULT_MARKET_FILTERS: MarketFilters = { radiusM: 40234, conditions: [], category: null, brands: [], pickupOnly: false, includeShipping: true, sort: 'nearest' };
 
@@ -92,6 +106,8 @@ export const filtersToQuery = (f: MarketFilters) => ({
   pickupOnly: f.pickupOnly,
   sort: f.sort,
 });
+/** Marketplace search text, shared by the grid and the map. */
+export const useMarketSearch = create<{ text: string; setText: (text: string) => void }>((set) => ({ text: '', setText: (text) => set({ text }) }));
 export const useMarketFilters = create<{ f: MarketFilters; set: (f: MarketFilters) => void }>((set) => ({ f: DEFAULT_MARKET_FILTERS, set: (f) => set({ f }) }));
 
 // --- Sell draft (persisted on this device so a half-finished listing survives a restart) -------

@@ -1,9 +1,10 @@
-import { radius } from '@pickledeals/shared';
+import { radius, snapToCell } from '@pickledeals/shared';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, StyleSheet, Switch, TextInput, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
+import { AreaMap } from '@/features/map';
 import { Button, Icon, Text, TextField } from '@/ui';
 
 import { getDeviceArea, type DeviceArea } from '../device';
@@ -88,18 +89,9 @@ export default function SellDetailsStep() {
             />
           </View>
         ) : draft.location ? (
-          <View style={[styles.area, { backgroundColor: colors.surface }]}>
-            <View style={[styles.circle, { borderColor: colors.textTertiary }]}>
-              <Icon name="pin" size={22} color={colors.textPrimary} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text variant="headline" weight="700">
-                {draft.location.label}
-              </Text>
-              <Text variant="footnote" tone="secondary">
-                Approximate area (about 1 km)
-              </Text>
-            </View>
+          <View style={{ borderRadius: 18, overflow: 'hidden' }}>
+            {/* Preview the exact cell the server will snap to — what buyers will see (D2). */}
+            <AreaMap center={snapToCell(draft.location.lat, draft.location.lng)} height={150} label={draft.location.label} labelStyle="title" areaName={draft.location.label} />
           </View>
         ) : (
           <Button label="Use my approximate location" icon="pin" iconPosition="leading" variant="secondary" loading={busy} onPress={locate} />
@@ -141,7 +133,5 @@ export default function SellDetailsStep() {
 
 const styles = StyleSheet.create({
   field: { padding: 12, paddingHorizontal: 14, borderRadius: radius.card, gap: 6 },
-  area: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14, borderRadius: 18 },
-  circle: { width: 52, height: 52, borderRadius: 26, borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12 },
 });

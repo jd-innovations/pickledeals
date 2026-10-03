@@ -4,27 +4,18 @@ import { useDeferredValue, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
-import { Chip, ChipRow, EmptyState, Icon, IconButton, SearchField, SectionHeader, SegmentedControl, Text } from '@/ui';
+import { ChipRow, EmptyState, Icon, IconButton, SearchField, SectionHeader, SegmentedControl, Text } from '@/ui';
 
-import { ListingGrid, ListingGridSkeleton, ListingRail, MarketLoadError, radiusLabel } from '../components';
-import { DEFAULT_MARKET_FILTERS, filtersToQuery, useHomeArea, useMarket, useMarketFilters, useViewer, type MarketFilters } from '../hooks';
-
-const CATEGORY_CHIPS = [
-  { slug: 'paddles', label: 'Paddles' },
-  { slug: 'shoes', label: 'Shoes' },
-  { slug: 'bags', label: 'Bags' },
-  { slug: 'ball-machines', label: 'Ball machines' },
-];
-const LIKE_NEW_PLUS: MarketFilters['conditions'] = ['new_sealed', 'like_new'];
+import { ListingGrid, ListingGridSkeleton, ListingRail, MarketLoadError, MarketQuickChips, radiusLabel } from '../components';
+import { DEFAULT_MARKET_FILTERS, filtersToQuery, useHomeArea, useMarket, useMarketFilters, useMarketSearch, useViewer } from '../hooks';
 
 /** Marketplace home (design: "Pre-owned marketplace"). Browsing is open to guests. */
 export default function MarketHomeScreen() {
   const { colors } = useTheme();
-  const { f, set } = useMarketFilters();
+  const f = useMarketFilters((s) => s.f);
   const viewerLabel = useViewer((s) => s.label);
   const home = useHomeArea();
-  const [view, setView] = useState<'grid' | 'map'>('grid');
-  const [text, setText] = useState('');
+  const { text, setText } = useMarketSearch();
   const search = useDeferredValue(text.trim());
   const feed = useMarket({ ...filtersToQuery(f), text: search || undefined, limit: 60 });
   const [pulling, setPulling] = useState(false);
@@ -35,7 +26,6 @@ export default function MarketHomeScreen() {
   const near = items.filter((l) => within(l.distanceM));
   const shipping = items.filter((l) => !within(l.distanceM));
   const areaLabel = viewerLabel ?? home.data?.label ?? null;
-  const likeNewPlus = f.conditions.length === 2 && LIKE_NEW_PLUS.every((c) => f.conditions.includes(c));
   const filtered = JSON.stringify(f) !== JSON.stringify(DEFAULT_MARKET_FILTERS);
 
   const onRefresh = async () => {
@@ -71,8 +61,8 @@ export default function MarketHomeScreen() {
                 { value: 'grid', label: 'Grid' },
                 { value: 'map', label: 'Map' },
               ]}
-              value={view}
-              onChange={setView}
+              value="grid"
+              onChange={(v) => v === 'map' && router.push('/market/map')}
             />
           </View>
         </View>
@@ -81,18 +71,11 @@ export default function MarketHomeScreen() {
         </View>
         <ChipRow>
           <IconButton icon="sliders" label={filtered ? 'Filters (on)' : 'Filters'} size={36} tone={filtered ? 'solid' : 'surface'} onPress={() => router.push('/market/filters')} />
-          <Chip label="All" selected={!f.category} onPress={() => set({ ...f, category: null })} />
-          {CATEGORY_CHIPS.map((c) => (
-            <Chip key={c.slug} label={c.label} selected={f.category === c.slug} onPress={() => set({ ...f, category: f.category === c.slug ? null : c.slug })} />
-          ))}
-          <Chip label="Local pickup" selected={f.pickupOnly} onPress={() => set({ ...f, pickupOnly: !f.pickupOnly })} />
-          <Chip label="Like New+" selected={likeNewPlus} onPress={() => set({ ...f, conditions: likeNewPlus ? [] : LIKE_NEW_PLUS })} />
+          <MarketQuickChips />
         </ChipRow>
       </View>
 
-      {view === 'map' ? (
-        <EmptyState icon="map" title="Map view is coming soon" message="Listings show an approximate area, never an address. Use the grid for now." />
-      ) : feed.isError ? (
+      {feed.isError ? (
         <MarketLoadError onRetry={() => feed.refetch()} />
       ) : feed.isPending ? (
         <ListingGridSkeleton count={6} />

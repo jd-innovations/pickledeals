@@ -27,6 +27,11 @@ export const palette = {
     mapLand: '#F0F0EE',
     mapRoad: '#FFFFFF',
     mapWater: '#DCDCD9',
+    /** Approximate-area circle and "your location" halo. */
+    mapArea: 'rgba(10,10,10,0.10)',
+    /** CSS box-shadow strings (pd.css --shadow / --shadow-sheet); RN accepts them via `boxShadow`. */
+    shadow: '0 1px 2px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.08)',
+    shadowSheet: '0 -1px 0 rgba(0,0,0,0.04), 0 -12px 40px rgba(0,0,0,0.10)',
   },
   dark: {
     background: '#0B0B0C',
@@ -51,6 +56,9 @@ export const palette = {
     mapLand: '#141415',
     mapRoad: '#262628',
     mapWater: '#0E0F10',
+    mapArea: 'rgba(245,245,244,0.10)',
+    shadow: '0 1px 2px rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.5)',
+    shadowSheet: '0 -1px 0 rgba(255,255,255,0.06), 0 -12px 40px rgba(0,0,0,0.6)',
   },
 } as const;
 

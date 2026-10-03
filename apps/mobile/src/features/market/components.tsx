@@ -1,14 +1,14 @@
-import { formatApproxDistance, LISTING_CONDITIONS, type ListingCondition } from '@pickledeals/shared';
+import { formatApproxDistance, formatPrice, LISTING_CONDITIONS, type ListingCondition } from '@pickledeals/shared';
 import { router, useSegments } from 'expo-router';
 import { View } from 'react-native';
 
 import { ListingCard, type ListingCardData } from '@/commerce';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useGridCardWidth } from '@/features/catalog/components';
-import { CardSkeleton, ErrorState } from '@/ui';
+import { CardSkeleton, Chip, ErrorState } from '@/ui';
 
 import type { ListingCardItem } from './api';
-import { listingImage, listingTitle } from './hooks';
+import { listingImage, listingTitle, useMarketFilters, type MarketFilters } from './hooks';
 
 export const conditionLabel = (c: ListingCondition) => LISTING_CONDITIONS.find((x) => x.value === c)?.label ?? c;
 
@@ -141,4 +141,38 @@ export function ListingGridSkeleton({ count = 4 }: { count?: number }) {
 
 export function MarketLoadError({ onRetry }: { onRetry: () => void }) {
   return <ErrorState title="Couldn’t load listings" message="Check your connection and try again." onRetry={onRetry} />;
+}
+
+const CATEGORY_CHIPS = [
+  { slug: 'paddles', label: 'Paddles' },
+  { slug: 'shoes', label: 'Shoes' },
+  { slug: 'bags', label: 'Bags' },
+  { slug: 'ball-machines', label: 'Ball machines' },
+];
+const LIKE_NEW_PLUS: MarketFilters['conditions'] = ['new_sealed', 'like_new'];
+
+/** Quick filter chips shared by the grid and the map (one MarketFilters store, §8). */
+export function MarketQuickChips({ glass }: { glass?: boolean }) {
+  const { f, set } = useMarketFilters();
+  const likeNewPlus = f.conditions.length === 2 && LIKE_NEW_PLUS.every((c) => f.conditions.includes(c));
+  return (
+    <>
+      <Chip glass={glass} label="All" selected={!f.category} onPress={() => set({ ...f, category: null })} />
+      {CATEGORY_CHIPS.map((c) => (
+        <Chip key={c.slug} glass={glass} label={c.label} selected={f.category === c.slug} onPress={() => set({ ...f, category: f.category === c.slug ? null : c.slug })} />
+      ))}
+      <Chip glass={glass} label="Local pickup" selected={f.pickupOnly} onPress={() => set({ ...f, pickupOnly: !f.pickupOnly })} />
+      <Chip glass={glass} label="Like New+" selected={likeNewPlus} onPress={() => set({ ...f, conditions: likeNewPlus ? [] : LIKE_NEW_PLUS })} />
+    </>
+  );
+}
+
+/** "Paddles · 25 mi · under $150" — a one-line summary of the active filters. */
+export function filterSummary(f: MarketFilters, text?: string): string {
+  const cat = CATEGORY_CHIPS.find((c) => c.slug === f.category)?.label ?? (text ? `“${text}”` : 'All gear');
+  const parts = [cat, radiusLabel(f.radiusM)];
+  if (f.maxCents != null) parts.push(`under ${formatPrice(f.maxCents)}`);
+  else if (f.minCents != null) parts.push(`over ${formatPrice(f.minCents)}`);
+  if (f.pickupOnly) parts.push('pickup');
+  return parts.join(' · ');
 }

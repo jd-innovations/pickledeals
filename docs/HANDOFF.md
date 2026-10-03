@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (after Phase 6)
+# PickleDeals — session handoff (after Phase 7)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -28,13 +28,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - Add mobile packages with `npx expo install`, and check the SDK 57 docs before using an Expo/RN API.
 
 ## Status
-- Phases 0–6 are done. The last commit is `748279d` ("Phase 6: marketplace app …"), pushed.
-- **Next: Phase 7, the map.** It covers:
-  - the Market map view (the Grid/Map toggle currently shows "Map view is coming soon")
-  - the approximate-area map on the listing detail and on the sell Details step (each currently a pin card)
-  - MapPreview / MarketMap / DarkMap designs in `preview/`
-- D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. Never return exact coordinates from a public table, view or RPC. A map RPC must return snapped cell points or cluster counts only, never `listing_locations.public_point` per listing beyond the snapped centre.
-- Check the §13 Phase 7 scope and its exit criterion first, then propose the plan to the user.
+- Phases 0–7 are done and pushed. The last commit is "Phase 7: marketplace map …".
+- **Next: Phase 8, chat** (conversations, messages, image messages, Realtime private channels, read state, typing, inbox, blocks and reports). Check the §13 Phase 8 scope and its exit criterion first, then propose the plan to the user.
+- D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. Meet-up spots are only voluntary `location_share` chat messages (Phase 8).
 
 ## Local environment
 - **Supabase CLI 2.119 on Docker.**
@@ -70,6 +66,17 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Home area: `set_home_area`; the client can't read `home_point`.
   - Photos: `features/market/device.ts` resizes, re-encodes to JPEG (stripping EXIF) and uploads to `listing-images/{uid}/{listingId}/{uuid}.jpg`.
   - Saves: `useToggleSave()` covers `product | deal | brand | listing`.
+  - Grid and map share one filter predicate, `market_match` (internal, definer). Grid and map also share `useMarketFilters`, `useMarketSearch` and `MarketQuickChips`.
+- **Map (Phase 7, D4):**
+  - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
+  - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).
+  - `features/map` is the adapter:
+    - `ListingMap`: react-native-maps, Apple Maps `mutedStandard`
+    - `ListingMap.web.tsx`: a plain pannable stand-in, because react-native-maps has no web build
+    - `AreaMap` (+ `.web`)
+    - `useClusters` (supercluster; same-cell clusters open a carousel instead of zooming)
+    - `useMapViewport` ("Search this area")
+  - Route: `market/map` (full screen, no header). The Grid/Map toggle pushes it, and "List" goes back.
 - **Database:**
   - Every table gets RLS in the migration that creates it, plus pgTAP tests in `supabase/tests`.
   - Definer functions use `set search_path = ''`.
@@ -84,6 +91,10 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - native dialogs
   - push delivery (Expo → APNs)
   - the "list in under 60 seconds" timing. The automated browser run took 77 s, inflated by tool overhead.
+  - **the Phase 7 exit criterion**: Apple Maps rendering and a smooth 500-pin map on a mid-range iPhone. So far only measured off-device:
+    - the bounds RPC takes ~190 ms locally with 2,000 listings in view (500 returned)
+    - supercluster takes ~2 ms to index 500 pins and ~0.2 ms per pan (Node)
+    - Markers use `tracksViewChanges={false}`, except the selected one.
 - **Need the user:**
   - Apple key and Team ID (Sign in with Apple token revocation)
   - Expo/EAS project setup and a dev build
@@ -96,3 +107,4 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - **Known web-only quirks; iOS is unaffected:**
   - the native tab bar renders on top of headers
   - Switch thumbs are teal
+  - the map is a flat stand-in (drag to pan, +/− to zoom), and the tab bar covers the map's search row

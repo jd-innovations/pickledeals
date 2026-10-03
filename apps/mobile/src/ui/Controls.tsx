@@ -47,12 +47,15 @@ export function Chip({
   count,
   onPress,
   outlined,
+  glass,
 }: {
   label: string;
   selected?: boolean;
   count?: number;
   onPress?: () => void;
   outlined?: boolean;
+  /** Floating over a map (design: MarketMap chips). */
+  glass?: boolean;
 }) {
   const { colors } = useTheme();
   return (
@@ -66,8 +69,8 @@ export function Chip({
       style={({ pressed }) => [
         styles.chip,
         {
-          backgroundColor: selected ? colors.interactive : outlined ? 'transparent' : colors.surface,
-          borderWidth: outlined && !selected ? 1 : 0,
+          backgroundColor: selected ? colors.interactive : outlined ? 'transparent' : glass ? colors.glass : colors.surface,
+          borderWidth: selected ? 0 : outlined ? 1 : glass ? StyleSheet.hairlineWidth : 0,
           borderColor: colors.border,
           opacity: pressed ? 0.75 : 1,
         },

@@ -1210,6 +1210,12 @@ isOneToOne: false
 "market_feed":
 { Args: { "brand_slugs"?: (string)[],"category_slug"?: string,"conditions"?: (string)[],"ids"?: (string)[],"include_shipping"?: boolean,"lat"?: number,"lng"?: number,"max_cents"?: number,"max_rows"?: number,"min_cents"?: number,"pickup_only"?: boolean,"product"?: string,"q"?: string,"radius_m"?: number,"seller"?: string,"skip"?: number,"sort"?: string,"statuses"?: (string)[],"use_home"?: boolean }; Returns: Json
                            },
+"market_in_bounds":
+{ Args: { "brand_slugs"?: (string)[],"category_slug"?: string,"conditions"?: (string)[],"lat"?: number,"lng"?: number,"max_cents"?: number,"max_lat": number,"max_lng": number,"max_rows"?: number,"min_cents"?: number,"min_lat": number,"min_lng": number,"pickup_only"?: boolean,"q"?: string,"statuses"?: (string)[],"use_home"?: boolean }; Returns: Json
+                           },
+"market_match":
+{ Args: { "brand_slugs"?: (string)[],"category_slug"?: string,"conditions"?: (string)[],"ids"?: (string)[],"max_cents"?: number,"min_cents"?: number,"pickup_only"?: boolean,"product"?: string,"q"?: string,"seller"?: string,"statuses"?: (string)[] }; Returns: string[]
+                           },
 "my_listing_save_counts":
 { Args: Record<PropertyKey, never>; Returns: {
               "listing_id": string,"saves": number

@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ConditionBadge, FavoriteButton, ProductImage, UsedVsNew, type ImageSource } from '@/commerce';
 import { productArt } from '@/commerce/catalogArt';
 import { useTheme } from '@/design/theme';
+import { AreaMap } from '@/features/map';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { openProduct } from '@/features/catalog/components';
@@ -140,7 +141,13 @@ export default function ListingScreen() {
             <View style={{ borderRadius: 20, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
               {l.pickup && <DeliveryRow icon="pin" title="Local pickup" detail={`${l.areaLabel ?? 'Seller’s'} area · meet spot agreed in chat`} />}
               {l.ships && <DeliveryRow icon="ship" title="Will ship" detail="Buyer and seller arrange postage directly" divider={l.pickup} />}
-              <DeliveryRow icon="shield" title="Approximate area" detail="Buyers see the area and a distance — never an address." divider />
+              {l.areaCenter ? (
+                <View style={{ borderTopWidth: 1, borderTopColor: colors.separator }}>
+                  <AreaMap center={l.areaCenter} height={140} label="Approximate area" areaName={l.areaLabel} />
+                </View>
+              ) : (
+                <DeliveryRow icon="shield" title="Approximate area" detail="Buyers see the area and a distance — never an address." divider />
+              )}
             </View>
 
             <Pressable accessibilityRole="button" onPress={() => openSeller(l.sellerId)} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>

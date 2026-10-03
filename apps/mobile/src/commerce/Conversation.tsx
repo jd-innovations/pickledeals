@@ -1,5 +1,5 @@
 import { formatPrice, radius, type OfferStatus } from '@pickledeals/shared';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { Button, Icon, Text } from '@/ui';
@@ -26,7 +26,8 @@ const STATUS_LABEL: Record<OfferStatus, string> = {
 
 /**
  * Offers are structured records rendered inside the chat. Actions only appear for the party who
- * must respond to a pending offer; the RPC layer enforces the same rule server-side.
+ * must respond to a pending offer (or the proposer, to withdraw); the RPCs enforce the same rules.
+ * An accepted offer keeps its card (bold border, "Accepted ✓"); the AcceptedBanner follows it.
  */
 export function OfferCard({
   offer,
@@ -42,45 +43,40 @@ export function OfferCard({
   onWithdraw?: () => void;
 }) {
   const { colors } = useTheme();
-
-  if (offer.status === 'accepted') {
-    return (
-      <View accessibilityRole="summary" style={[styles.accepted, { backgroundColor: colors.interactive }]}>
-        <View style={[styles.check, { backgroundColor: colors.onInteractive }]}>
-          <Icon name="check" size={18} color={colors.interactive} weight="bold" />
-        </View>
-        <Text variant="badge" style={{ color: colors.onInteractive }}>
-          OFFER ACCEPTED
-        </Text>
-        <Text variant="priceLarge" style={{ fontSize: 34, color: colors.onInteractive }} numeric>
-          {formatPrice(offer.amountCents)}
-        </Text>
-        <Text variant="footnote" align="center" style={{ color: colors.onInteractive, opacity: 0.8 }}>
-          This isn’t a purchase yet. Agree on payment and pickup or shipping in chat.
-        </Text>
-      </View>
-    );
-  }
-
-  const resolved = offer.status !== 'pending';
+  const accepted = offer.status === 'accepted';
+  const closed = !accepted && offer.status !== 'pending';
   const mustRespond = offer.status === 'pending' && !offer.fromMe;
-  const title = offer.kind === 'counter' ? 'COUNTEROFFER' : offer.fromMe ? 'YOUR OFFER' : 'OFFER';
+  const title = offer.kind === 'counter' ? (offer.fromMe ? 'YOUR COUNTER' : 'COUNTEROFFER') : offer.fromMe ? 'YOUR OFFER' : 'OFFER';
+  const label = accepted ? 'Accepted ✓' : offer.status === 'pending' && offer.expiresLabel ? offer.expiresLabel : STATUS_LABEL[offer.status];
 
   return (
-    <View style={[styles.card, { borderColor: colors.border, backgroundColor: colors.background, opacity: resolved ? 0.7 : 1 }]}>
+    <View
+      accessibilityLabel={`${title.toLowerCase()}, ${formatPrice(offer.amountCents)}, ${label}`}
+      style={[
+        styles.card,
+        { borderColor: accepted ? colors.interactive : colors.border, borderWidth: accepted ? 2 : 1, backgroundColor: colors.background, opacity: closed ? 0.72 : 1 },
+        { alignSelf: offer.fromMe ? 'flex-end' : 'flex-start' },
+      ]}>
       <View style={styles.head}>
         <Text variant="badge">{title}</Text>
-        <Text variant="caption" weight="600" tone="secondary">
-          {offer.status === 'pending' && offer.expiresLabel ? offer.expiresLabel : STATUS_LABEL[offer.status]}
+        <Text variant="caption" weight={accepted ? '700' : '600'} tone={accepted ? 'primary' : 'secondary'}>
+          {label}
         </Text>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 10 }}>
+        {offer.kind === 'counter' && (
+          <Text variant="subhead" weight="400" tone="tertiary" numeric strike>
+            {formatPrice(offer.compareCents)}
+          </Text>
+        )}
         <Text variant="title2" numeric strike={offer.status === 'declined' || offer.status === 'withdrawn' || offer.status === 'expired'}>
           {formatPrice(offer.amountCents)}
         </Text>
-        <Text variant="footnote" tone="secondary" numeric>
-          {offer.kind === 'counter' ? `was ${formatPrice(offer.compareCents)}` : `asking ${formatPrice(offer.compareCents)}`}
-        </Text>
+        {offer.kind === 'offer' && (
+          <Text variant="footnote" tone="secondary" numeric>
+            asking {formatPrice(offer.compareCents)}
+          </Text>
+        )}
       </View>
       {offer.message && (
         <Text variant="footnote" tone="secondary">
@@ -95,6 +91,45 @@ export function OfferCard({
         </View>
       )}
       {offer.status === 'pending' && offer.fromMe && onWithdraw && <Button label="Withdraw offer" variant="link" size="sm" onPress={onWithdraw} />}
+    </View>
+  );
+}
+
+/** The design's black "OFFER ACCEPTED" card, with next steps. */
+export function AcceptedBanner({ amountCents, onMeetup, onShipping }: { amountCents: number; onMeetup?: () => void; onShipping?: () => void }) {
+  const { colors } = useTheme();
+  return (
+    <View accessibilityRole="summary" style={[styles.accepted, { backgroundColor: colors.interactive }]}>
+      <View style={[styles.check, { backgroundColor: colors.onInteractive }]}>
+        <Icon name="check" size={18} color={colors.interactive} weight="bold" />
+      </View>
+      <Text variant="badge" style={{ color: colors.onInteractive }}>
+        OFFER ACCEPTED
+      </Text>
+      <Text variant="priceLarge" style={{ fontSize: 34, color: colors.onInteractive }} numeric>
+        {formatPrice(amountCents)}
+      </Text>
+      <Text variant="footnote" align="center" style={{ color: colors.onInteractive, opacity: 0.8 }}>
+        This isn’t a purchase yet. Agree on payment and pickup or shipping below.
+      </Text>
+      {(onMeetup || onShipping) && (
+        <View style={{ flexDirection: 'row', gap: 8, marginTop: 6 }}>
+          {onMeetup && (
+            <Pressable accessibilityRole="button" onPress={onMeetup} style={[styles.bannerBtn, { backgroundColor: colors.onInteractive }]}>
+              <Text variant="footnote" weight="700" style={{ color: colors.interactive }}>
+                Suggest meet-up
+              </Text>
+            </Pressable>
+          )}
+          {onShipping && (
+            <Pressable accessibilityRole="button" onPress={onShipping} style={[styles.bannerBtn, { borderWidth: 1, borderColor: colors.onInteractive }]}>
+              <Text variant="footnote" weight="700" style={{ color: colors.onInteractive }}>
+                Shipping details
+              </Text>
+            </Pressable>
+          )}
+        </View>
+      )}
     </View>
   );
 }
@@ -147,6 +182,7 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', justifyContent: 'space-between' },
   accepted: { borderRadius: 22, padding: 16, alignItems: 'center', gap: 6 },
   check: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
+  bannerBtn: { height: 34, paddingHorizontal: 12, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   bubble: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18 },
   system: { alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12 },
 });

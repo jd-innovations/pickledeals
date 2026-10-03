@@ -1,4 +1,4 @@
-import type { Database } from '@pickledeals/shared';
+import type { Database, OfferStatus } from '@pickledeals/shared';
 
 import { requireSupabase } from '@/lib/supabase';
 
@@ -117,6 +117,10 @@ export type Thread = {
   archived: boolean;
   otherLastReadMessageId: number;
   otherLastReadAt: string | null;
+  /** The thread's latest offer (Phase 9). */
+  offer: { id: string; status: OfferStatus; amountCents: number; awaitingMe: boolean; mine: boolean } | null;
+  acceptsOffers: boolean;
+  variantId: string | null;
 };
 
 type ThreadRow = Database['public']['Functions']['my_conversations']['Returns'][number];
@@ -142,6 +146,11 @@ const toThread = (r: ThreadRow): Thread => ({
   archived: r.archived,
   otherLastReadMessageId: r.other_last_read_message_id ?? 0,
   otherLastReadAt: r.other_last_read_at,
+  offer: r.offer_id
+    ? { id: r.offer_id, status: r.offer_status as OfferStatus, amountCents: r.offer_amount_cents, awaitingMe: !!r.offer_awaiting_me, mine: !!r.offer_mine }
+    : null,
+  acceptsOffers: r.accepts_offers,
+  variantId: r.variant_id,
 });
 
 export async function fetchInbox(): Promise<Thread[]> {
@@ -220,4 +229,113 @@ export function chatErrorText(e: unknown): string {
   const err = e as { message?: string; code?: string };
   if (err?.code === '42501' || err?.code === '54000' || err?.code === '22023') return err.message ?? 'Couldn’t send.';
   return 'Couldn’t send. Check your connection.';
+}
+
+// --- Offers (Phase 9) ----------------------------------------------------------------------------
+
+export type Offer = {
+  id: string;
+  conversationId: string;
+  listingId: string;
+  buyerId: string | null;
+  sellerId: string | null;
+  proposedBy: string | null;
+  parentOfferId: string | null;
+  amountCents: number;
+  message: string | null;
+  status: OfferStatus;
+  expiresAt: string;
+  createdAt: string;
+};
+
+export async function fetchThreadOffers(conversationId: string): Promise<Offer[]> {
+  const { data, error } = await requireSupabase()
+    .from('marketplace_offers')
+    .select('id, conversation_id, listing_id, buyer_id, seller_id, proposed_by, parent_offer_id, amount_cents, message, status, expires_at, created_at')
+    .eq('conversation_id', conversationId)
+    .order('created_at');
+  if (error) throw error;
+  return data.map((o) => ({
+    id: o.id,
+    conversationId: o.conversation_id,
+    listingId: o.listing_id,
+    buyerId: o.buyer_id,
+    sellerId: o.seller_id,
+    proposedBy: o.proposed_by,
+    parentOfferId: o.parent_offer_id,
+    amountCents: o.amount_cents,
+    message: o.message,
+    status: o.status as OfferStatus,
+    expiresAt: o.expires_at,
+    createdAt: o.created_at,
+  }));
+}
+
+export async function makeOffer(listingId: string, amountCents: number, message?: string): Promise<{ offerId: string; conversationId: string; status: OfferStatus }> {
+  const { data, error } = await requireSupabase().rpc('make_offer', { listing: listingId, amount_cents: amountCents, message: message || undefined });
+  if (error) throw error;
+  const r = data as { offer_id: string; conversation_id: string; status: OfferStatus };
+  return { offerId: r.offer_id, conversationId: r.conversation_id, status: r.status };
+}
+
+export async function counterOffer(offerId: string, amountCents: number, message?: string) {
+  const { error } = await requireSupabase().rpc('counter_offer', { offer: offerId, amount_cents: amountCents, message: message || undefined });
+  if (error) throw error;
+}
+
+export async function respondToOffer(offerId: string, action: 'accept' | 'decline' | 'withdraw') {
+  const client = requireSupabase();
+  const { error } =
+    action === 'accept'
+      ? await client.rpc('accept_offer', { offer: offerId })
+      : action === 'decline'
+        ? await client.rpc('decline_offer', { offer: offerId })
+        : await client.rpc('withdraw_offer', { offer: offerId });
+  if (error) throw error;
+}
+
+export type MyOffer = {
+  id: string;
+  conversationId: string;
+  listingId: string;
+  listingTitle: string;
+  listingImage: string | null;
+  productSlug: string | null;
+  categorySlug: string;
+  role: 'buyer' | 'seller';
+  otherName: string;
+  amountCents: number;
+  status: OfferStatus;
+  awaitingMe: boolean;
+  mine: boolean;
+  expiresAt: string;
+  createdAt: string;
+};
+
+export async function fetchMyOffers(): Promise<MyOffer[]> {
+  const { data, error } = await requireSupabase().rpc('my_offers');
+  if (error) throw error;
+  return data.map((o) => ({
+    id: o.id,
+    conversationId: o.conversation_id,
+    listingId: o.listing_id,
+    listingTitle: o.listing_title,
+    listingImage: o.listing_image,
+    productSlug: o.product_slug,
+    categorySlug: o.category_slug,
+    role: o.role as MyOffer['role'],
+    otherName: o.other_name,
+    amountCents: o.amount_cents,
+    status: o.status as OfferStatus,
+    awaitingMe: o.awaiting_me,
+    mine: o.mine,
+    expiresAt: o.expires_at,
+    createdAt: o.created_at,
+  }));
+}
+
+export async function fetchListingActivity(): Promise<Map<string, { chats: number; openOffers: number }>> {
+  const { data, error } = await requireSupabase().rpc('my_listing_activity');
+  if (error) throw error;
+  return new Map(data.map((r) => [r.listing_id, { chats: r.chats, openOffers: r.open_offers }]));
 }

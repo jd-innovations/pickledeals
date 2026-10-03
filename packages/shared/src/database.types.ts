@@ -42,6 +42,31 @@ isOneToOne: true
       referencedColumns: ["id"]
     }
                   ]
+                },"agreements": {
+                  Row: {
+                    "amount_cents": number,"buyer_id": string | null,"created_at": string,"id": string,"listing_id": string,"offer_id": string,"seller_id": string | null
+                  }
+                  Insert: {
+                    "amount_cents": number,"buyer_id"?: string | null,"created_at"?: string,"id"?: string,"listing_id": string,"offer_id": string,"seller_id"?: string | null
+                  }
+                  Update: {
+                    "amount_cents"?: number,"buyer_id"?: string | null,"created_at"?: string,"id"?: string,"listing_id"?: string,"offer_id"?: string,"seller_id"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "agreements_listing_id_fkey"
+      columns: ["listing_id"]
+isOneToOne: false
+      referencedRelation: "listings"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "agreements_offer_id_fkey"
+      columns: ["offer_id"]
+isOneToOne: true
+      referencedRelation: "marketplace_offers"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"brand_follows": {
                   Row: {
                     "brand_id": string,"created_at": string,"user_id": string
@@ -417,6 +442,37 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"marketplace_offers": {
+                  Row: {
+                    "amount_cents": number,"auto_declined": boolean,"buyer_id": string | null,"conversation_id": string,"created_at": string,"expires_at": string,"id": string,"listing_id": string,"message": string | null,"parent_offer_id": string | null,"proposed_by": string | null,"reminded_at": string | null,"responded_at": string | null,"seller_id": string | null,"status": Database["public"]['Enums']["marketplace_offer_status"]
+                  }
+                  Insert: {
+                    "amount_cents": number,"auto_declined"?: boolean,"buyer_id"?: string | null,"conversation_id": string,"created_at"?: string,"expires_at"?: string,"id"?: string,"listing_id": string,"message"?: string | null,"parent_offer_id"?: string | null,"proposed_by"?: string | null,"reminded_at"?: string | null,"responded_at"?: string | null,"seller_id"?: string | null,"status"?: Database["public"]['Enums']["marketplace_offer_status"]
+                  }
+                  Update: {
+                    "amount_cents"?: number,"auto_declined"?: boolean,"buyer_id"?: string | null,"conversation_id"?: string,"created_at"?: string,"expires_at"?: string,"id"?: string,"listing_id"?: string,"message"?: string | null,"parent_offer_id"?: string | null,"proposed_by"?: string | null,"reminded_at"?: string | null,"responded_at"?: string | null,"seller_id"?: string | null,"status"?: Database["public"]['Enums']["marketplace_offer_status"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "marketplace_offers_conversation_id_fkey"
+      columns: ["conversation_id"]
+isOneToOne: false
+      referencedRelation: "conversations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "marketplace_offers_listing_id_fkey"
+      columns: ["listing_id"]
+isOneToOne: false
+      referencedRelation: "listings"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "marketplace_offers_parent_offer_id_fkey"
+      columns: ["parent_offer_id"]
+isOneToOne: false
+      referencedRelation: "marketplace_offers"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"messages": {
                   Row: {
                     "body": string | null,"client_id": string | null,"conversation_id": string,"created_at": string,"id": number,"image_path": string | null,"kind": Database["public"]['Enums']["message_kind"],"meta": NonNullable<Json>,"offer_id": string | null,"sender_id": string | null
@@ -433,6 +489,12 @@ isOneToOne: false
       columns: ["conversation_id"]
 isOneToOne: false
       referencedRelation: "conversations"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "messages_offer_fk"
+      columns: ["offer_id"]
+isOneToOne: false
+      referencedRelation: "marketplace_offers"
       referencedColumns: ["id"]
     }
                   ]
@@ -1243,7 +1305,10 @@ isOneToOne: false
                 }
           }
           Functions: {
-            "apply_raw_offer":
+            "accept_offer":
+{ Args: { "offer": string }; Returns: string
+                           },
+"apply_raw_offer":
 { Args: { "raw_id": string,"vid": string }; Returns: Json
                            },
 "block_user":
@@ -1260,6 +1325,9 @@ isOneToOne: false
               "body": string,"id": string,"route": string,"title": string,"user_id": string
             }[]
                            },
+"counter_offer":
+{ Args: { "amount_cents": number,"message"?: string,"offer": string }; Returns: string
+                           },
 "custom_access_token_hook":
 { Args: { "event": Json }; Returns: Json
                            },
@@ -1269,14 +1337,26 @@ isOneToOne: false
 "deals_home":
 { Args: Record<PropertyKey, never>; Returns: Json
                            },
+"decline_offer":
+{ Args: { "offer": string }; Returns: undefined
+                           },
 "detect_deal":
 { Args: { "vid": string }; Returns: undefined
                            },
 "evaluate_price_alerts":
 { Args: { "vid": string }; Returns: number
                            },
+"expire_offers":
+{ Args: Record<PropertyKey, never>; Returns: number
+                           },
 "file_report":
 { Args: { "details"?: string,"reason": string,"target_id": string,"target_type": string }; Returns: string
+                           },
+"first_name":
+{ Args: { "uid": string }; Returns: string
+                           },
+"fmt_usd":
+{ Args: { "cents": number }; Returns: string
                            },
 "format_usd":
 { Args: { "cents": number }; Returns: string
@@ -1302,6 +1382,9 @@ isOneToOne: false
 "listing_is_public":
 { Args: { "lid": string }; Returns: boolean
                            },
+"make_offer":
+{ Args: { "amount_cents": number,"listing": string,"message"?: string }; Returns: Json
+                           },
 "mark_conversation_read":
 { Args: { "conversation": string,"up_to": number }; Returns: undefined
                            },
@@ -1319,7 +1402,12 @@ isOneToOne: false
                            },
 "my_conversations":
 { Args: { "only_id"?: string }; Returns: {
-              "archived": boolean,"category_slug": string,"id": string,"last_message_at": string,"last_message_id": number,"last_message_mine": boolean,"last_message_preview": string,"listing_id": string,"listing_image": string,"listing_price_cents": number,"listing_status": string,"listing_title": string,"muted": boolean,"other_id": string,"other_last_read_at": string,"other_last_read_message_id": number,"other_name": string,"product_slug": string,"role": string,"unread": number
+              "accepts_offers": boolean,"archived": boolean,"category_slug": string,"id": string,"last_message_at": string,"last_message_id": number,"last_message_mine": boolean,"last_message_preview": string,"listing_id": string,"listing_image": string,"listing_price_cents": number,"listing_status": string,"listing_title": string,"muted": boolean,"offer_amount_cents": number,"offer_awaiting_me": boolean,"offer_id": string,"offer_mine": boolean,"offer_status": string,"other_id": string,"other_last_read_at": string,"other_last_read_message_id": number,"other_name": string,"product_slug": string,"role": string,"unread": number,"variant_id": string
+            }[]
+                           },
+"my_listing_activity":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "chats": number,"listing_id": string,"open_offers": number
             }[]
                            },
 "my_listing_save_counts":
@@ -1327,8 +1415,43 @@ isOneToOne: false
               "listing_id": string,"saves": number
             }[]
                            },
+"my_offers":
+{ Args: Record<PropertyKey, never>; Returns: {
+              "amount_cents": number,"awaiting_me": boolean,"category_slug": string,"conversation_id": string,"created_at": string,"expires_at": string,"id": string,"listing_id": string,"listing_image": string,"listing_title": string,"mine": boolean,"other_name": string,"product_slug": string,"role": string,"status": string
+            }[]
+                           },
 "notify":
 { Args: { "body": string,"dedupe": string,"extra"?: Json,"kind": string,"route": string,"title": string,"uid": string }; Returns: undefined
+                           },
+"offer_event":
+{ Args: { "action": string,"actor": string,"body": string,"extra"?: Json,"o": Database["public"]['Tables']["marketplace_offers"]['Row'] }; Returns: undefined
+                           },
+"offer_for_action":
+{ Args: { "as_role": string,"offer": string }; Returns: {
+              "amount_cents": number,
+"auto_declined": boolean,
+"buyer_id": string | null,
+"conversation_id": string,
+"created_at": string,
+"expires_at": string,
+"id": string,
+"listing_id": string,
+"message": string | null,
+"parent_offer_id": string | null,
+"proposed_by": string | null,
+"reminded_at": string | null,
+"responded_at": string | null,
+"seller_id": string | null,
+"status": Database["public"]['Enums']["marketplace_offer_status"]
+            }
+                          SetofOptions: {
+        from: "*"
+        to: "marketplace_offers"
+        isOneToOne: true
+        isSetofReturn: false
+      } },
+"offer_notify":
+{ Args: { "body": string,"o": Database["public"]['Tables']["marketplace_offers"]['Row'],"recipient": string,"title": string }; Returns: undefined
                            },
 "price_history":
 { Args: { "days"?: number,"retailer_slug"?: string,"variant": string }; Returns: {
@@ -1429,10 +1552,13 @@ isOneToOne: false
                            },
 "variant_low_on":
 { Args: { "d": string,"vid": string }; Returns: number
+                           },
+"withdraw_offer":
+{ Args: { "offer": string }; Returns: undefined
                            }
           }
           Enums: {
-            "alert_status": "active"|"paused","app_role": "admin"|"editor","catalog_review_decision": "pending"|"linked"|"promoted"|"dismissed","collection_kind": "editorial"|"sponsored","deal_kind": "price_drop"|"sale"|"promo"|"editorial","deal_origin": "auto"|"curated","deal_quality": "above_typical"|"typical"|"good"|"excellent"|"all_time_low","deal_status": "active"|"expired"|"removed","discount_type": "percent"|"amount"|"free_ship","display_name_source": "generated"|"provided","identifier_kind": "gtin"|"upc"|"ean"|"asin"|"mpn"|"retailer_sku","image_source": "brand_supplied"|"manufacturer_site"|"retailer_feed"|"affiliate_feed"|"owned","image_status": "active"|"pending_review"|"removed","ingestion_kind": "manual"|"csv"|"feed"|"api","listing_condition": "new_sealed"|"like_new"|"excellent"|"good"|"fair","listing_status": "draft"|"active"|"pending"|"sold"|"removed","match_status": "matched"|"unmatched"|"rejected","message_kind": "text"|"image"|"offer_event"|"status_event"|"location_share","offer_status": "active"|"inactive","placement_kind": "sponsored_deal"|"sponsored_product"|"sponsored_collection","price_display": "show"|"check_price","price_source": "manual"|"feed"|"api","product_status": "draft"|"active"|"discontinued","promo_status": "active"|"removed","push_status": "pending"|"sending"|"sent"|"skipped"|"failed","report_status": "open"|"actioned"|"dismissed","retailer_kind": "marketplace"|"retailer"|"manufacturer"
+            "alert_status": "active"|"paused","app_role": "admin"|"editor","catalog_review_decision": "pending"|"linked"|"promoted"|"dismissed","collection_kind": "editorial"|"sponsored","deal_kind": "price_drop"|"sale"|"promo"|"editorial","deal_origin": "auto"|"curated","deal_quality": "above_typical"|"typical"|"good"|"excellent"|"all_time_low","deal_status": "active"|"expired"|"removed","discount_type": "percent"|"amount"|"free_ship","display_name_source": "generated"|"provided","identifier_kind": "gtin"|"upc"|"ean"|"asin"|"mpn"|"retailer_sku","image_source": "brand_supplied"|"manufacturer_site"|"retailer_feed"|"affiliate_feed"|"owned","image_status": "active"|"pending_review"|"removed","ingestion_kind": "manual"|"csv"|"feed"|"api","listing_condition": "new_sealed"|"like_new"|"excellent"|"good"|"fair","listing_status": "draft"|"active"|"pending"|"sold"|"removed","marketplace_offer_status": "pending"|"accepted"|"declined"|"countered"|"withdrawn"|"expired","match_status": "matched"|"unmatched"|"rejected","message_kind": "text"|"image"|"offer_event"|"status_event"|"location_share","offer_status": "active"|"inactive","placement_kind": "sponsored_deal"|"sponsored_product"|"sponsored_collection","price_display": "show"|"check_price","price_source": "manual"|"feed"|"api","product_status": "draft"|"active"|"discontinued","promo_status": "active"|"removed","push_status": "pending"|"sending"|"sent"|"skipped"|"failed","report_status": "open"|"actioned"|"dismissed","retailer_kind": "marketplace"|"retailer"|"manufacturer"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -1552,7 +1678,7 @@ export const Constants = {
           }
         },"public": {
           Enums: {
-            "alert_status": ["active", "paused"],"app_role": ["admin", "editor"],"catalog_review_decision": ["pending", "linked", "promoted", "dismissed"],"collection_kind": ["editorial", "sponsored"],"deal_kind": ["price_drop", "sale", "promo", "editorial"],"deal_origin": ["auto", "curated"],"deal_quality": ["above_typical", "typical", "good", "excellent", "all_time_low"],"deal_status": ["active", "expired", "removed"],"discount_type": ["percent", "amount", "free_ship"],"display_name_source": ["generated", "provided"],"identifier_kind": ["gtin", "upc", "ean", "asin", "mpn", "retailer_sku"],"image_source": ["brand_supplied", "manufacturer_site", "retailer_feed", "affiliate_feed", "owned"],"image_status": ["active", "pending_review", "removed"],"ingestion_kind": ["manual", "csv", "feed", "api"],"listing_condition": ["new_sealed", "like_new", "excellent", "good", "fair"],"listing_status": ["draft", "active", "pending", "sold", "removed"],"match_status": ["matched", "unmatched", "rejected"],"message_kind": ["text", "image", "offer_event", "status_event", "location_share"],"offer_status": ["active", "inactive"],"placement_kind": ["sponsored_deal", "sponsored_product", "sponsored_collection"],"price_display": ["show", "check_price"],"price_source": ["manual", "feed", "api"],"product_status": ["draft", "active", "discontinued"],"promo_status": ["active", "removed"],"push_status": ["pending", "sending", "sent", "skipped", "failed"],"report_status": ["open", "actioned", "dismissed"],"retailer_kind": ["marketplace", "retailer", "manufacturer"]
+            "alert_status": ["active", "paused"],"app_role": ["admin", "editor"],"catalog_review_decision": ["pending", "linked", "promoted", "dismissed"],"collection_kind": ["editorial", "sponsored"],"deal_kind": ["price_drop", "sale", "promo", "editorial"],"deal_origin": ["auto", "curated"],"deal_quality": ["above_typical", "typical", "good", "excellent", "all_time_low"],"deal_status": ["active", "expired", "removed"],"discount_type": ["percent", "amount", "free_ship"],"display_name_source": ["generated", "provided"],"identifier_kind": ["gtin", "upc", "ean", "asin", "mpn", "retailer_sku"],"image_source": ["brand_supplied", "manufacturer_site", "retailer_feed", "affiliate_feed", "owned"],"image_status": ["active", "pending_review", "removed"],"ingestion_kind": ["manual", "csv", "feed", "api"],"listing_condition": ["new_sealed", "like_new", "excellent", "good", "fair"],"listing_status": ["draft", "active", "pending", "sold", "removed"],"marketplace_offer_status": ["pending", "accepted", "declined", "countered", "withdrawn", "expired"],"match_status": ["matched", "unmatched", "rejected"],"message_kind": ["text", "image", "offer_event", "status_event", "location_share"],"offer_status": ["active", "inactive"],"placement_kind": ["sponsored_deal", "sponsored_product", "sponsored_collection"],"price_display": ["show", "check_price"],"price_source": ["manual", "feed", "api"],"product_status": ["draft", "active", "discontinued"],"promo_status": ["active", "removed"],"push_status": ["pending", "sending", "sent", "skipped", "failed"],"report_status": ["open", "actioned", "dismissed"],"retailer_kind": ["marketplace", "retailer", "manufacturer"]
           }
         }
 } as const

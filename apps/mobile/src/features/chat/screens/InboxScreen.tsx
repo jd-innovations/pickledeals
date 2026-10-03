@@ -11,7 +11,7 @@ import type { Thread } from '../api';
 import { ThreadRow } from '../components';
 import { useChatMutations, useInbox } from '../hooks';
 
-type Filter = 'all' | 'buying' | 'selling' | 'archived';
+type Filter = 'all' | 'buying' | 'selling' | 'offers' | 'archived';
 
 /** Messages (design: Inbox; reached from Profile per D5). Swipe a row to mute or archive. */
 export default function InboxScreen() {
@@ -23,8 +23,11 @@ export default function InboxScreen() {
 
   const all = inbox.data ?? [];
   const threads = all.filter((t) =>
-    filter === 'archived' ? t.archived : !t.archived && (filter === 'all' || (filter === 'buying' ? t.role === 'buyer' : t.role === 'seller')),
+    filter === 'archived'
+      ? t.archived
+      : !t.archived && (filter === 'all' || (filter === 'offers' ? t.offer?.status === 'pending' : filter === 'buying' ? t.role === 'buyer' : t.role === 'seller')),
   );
+  const openOffers = all.filter((t) => !t.archived && t.offer?.status === 'pending').length;
   const archivedCount = all.filter((t) => t.archived).length;
 
   const open = (t: Thread) => router.push({ pathname: '/conversation/[id]', params: { id: t.id } });
@@ -53,6 +56,7 @@ export default function InboxScreen() {
             <Chip label="All" selected={filter === 'all'} onPress={() => setFilter('all')} />
             <Chip label="Buying" selected={filter === 'buying'} onPress={() => setFilter('buying')} />
             <Chip label="Selling" selected={filter === 'selling'} onPress={() => setFilter('selling')} />
+            <Chip label="Open offers" count={openOffers} selected={filter === 'offers'} onPress={() => setFilter('offers')} />
             {archivedCount > 0 && <Chip label="Archived" count={archivedCount} selected={filter === 'archived'} onPress={() => setFilter('archived')} />}
           </ChipRow>
         </View>
@@ -68,7 +72,7 @@ export default function InboxScreen() {
         ) : (
           <EmptyState
             icon="message"
-            title={filter === 'archived' ? 'Nothing archived' : 'No messages yet'}
+            title={filter === 'archived' ? 'Nothing archived' : filter === 'offers' ? 'No open offers' : 'No messages yet'}
             message={filter === 'archived' ? 'Archived conversations come back when there’s a new message.' : 'Message a seller from any listing. Conversations about your listings show up here too.'}
           />
         )

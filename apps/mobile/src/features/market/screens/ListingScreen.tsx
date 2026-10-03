@@ -71,7 +71,7 @@ export default function ListingScreen() {
         Alert.alert('Can’t message right now', (e as Error).message);
       }
     });
-  const offer = () => requireAuth('make_offer', () => Alert.alert('Make an offer', 'Offers open in the next update. Message the seller in the meantime.'));
+  const offer = () => requireAuth('make_offer', () => router.push({ pathname: '/make-offer', params: { listing: id } }));
   const report = () => requireAuth('report', () => router.push({ pathname: '/report', params: { type: 'listing', id, name: fullTitle, user: l?.sellerId } }));
 
   return (

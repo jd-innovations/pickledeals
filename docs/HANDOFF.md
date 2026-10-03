@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (after Phase 8)
+# PickleDeals — session handoff (after Phase 9)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -28,8 +28,8 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - Add mobile packages with `npx expo install`, and check the SDK 57 docs before using an Expo/RN API.
 
 ## Status
-- Phases 0–8 are done and pushed. The last commit is "Phase 8: chat …".
-- **Next: Phase 9, structured offers** (offer RPCs and state machine, offer cards in chat, Make offer and Counter sheets, expiry cron, agreements, status events). The `offer_event` message kind and `messages.offer_id` already exist; add the `marketplace_offers` FK there. Check the §13 Phase 9 scope and its exit criterion first, then propose the plan to the user.
+- Phases 0–9 are done and pushed. The last commit is "Phase 9: structured offers …".
+- **Next: Phase 10, notifications complete** (all event types, the preference screen, quiet hours and digests, daily caps, deep links, badge counts). Check the §13 Phase 10 scope and its exit criterion first, then propose the plan to the user. The Profile → Notifications row is still a placeholder.
 - D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. The one exception is a meet-up spot, which is an exact point but lives only in a private `location_share` message.
 
 ## Local environment
@@ -81,6 +81,21 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
     - the Profile tab badge counts unread threads
     - Activity excludes `new_message`
   - Admin: the Reports page (`#/reports`).
+- **Offers (Phase 9, §8):**
+  - `marketplace_offers` (enum `marketplace_offer_status`, because `offer_status` is the retail enum) and `agreements`. Both are read-only to buyer and seller; every write goes through an RPC.
+  - RPCs:
+    - `make_offer` returns `{offer_id, conversation_id, status}`. Offers below the seller's floor are declined at once and hidden from the seller.
+    - `counter_offer`, `accept_offer`, `decline_offer`, `withdraw_offer`, all built on `offer_for_action`
+    - `expire_offers` on pg_cron every 5 minutes, with a reminder 6 h before expiry
+    - Listings going sold or removed close their open offers (trigger).
+  - Each transition writes an `offer_event` line (`meta.action`, `actor_id`, `amount_cents`, `previous_cents`) and an `offer` notification, which appears in Activity.
+  - `my_conversations` now includes the latest offer per thread. Plus `my_offers()` and `my_listing_activity()`.
+  - App:
+    - root sheets `make-offer` and `counter-offer`
+    - `OfferEventItem` renders the cards, with `AcceptedBanner` for accepted offers
+    - `offerFlow.afterAccept` offers to mark the listing Pending
+    - Profile → Offers is `profile/offers`
+    - the inbox has an "Open offers" filter and tags
 - **Map (Phase 7, D4):**
   - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
   - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).
@@ -115,7 +130,6 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - a decision on a staging Supabase project (costs money; the user prefers local)
   - Vault secrets for production push dispatch
 - **Placeholders to wire up later:**
-  - Make offer on the listing detail, the inbox "Open offers" filter, and offer/chat counts on My listings (Phase 9)
   - the Notifications settings row (Phase 10)
 - **Chat follow-ups:**
   - Push suppression while the recipient is viewing the thread (presence) is not built; muting does suppress.

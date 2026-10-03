@@ -5,6 +5,7 @@ import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 
 import { ProductImage } from '@/commerce';
 import { useTheme } from '@/design/theme';
+import { useListingActivity } from '@/features/chat/hooks';
 import { Button, EmptyState, IconButton, SegmentedControl, Skeleton, Text } from '@/ui';
 
 import type { MyListing } from '../api';
@@ -13,7 +14,7 @@ import { listingImage, listingTitle, useMyListings } from '../hooks';
 
 type Tab = 'active' | 'pending' | 'sold';
 
-/** My listings (design). Offers and chats counts join in when messaging lands. */
+/** My listings (design): saves, chats and open offers per listing. */
 export default function MyListingsScreen() {
   const { data, isPending, isError, refetch } = useMyListings();
   const [tab, setTab] = useState<Tab>('active');
@@ -52,6 +53,7 @@ export default function MyListingsScreen() {
 function Row({ l }: { l: MyListing }) {
   const { colors } = useTheme();
   const { openListing, openManage } = useMarketNav();
+  const activity = useListingActivity().data?.get(l.id);
   const title = listingTitle(l);
   const primary =
     l.status === 'active'
@@ -93,6 +95,8 @@ function Row({ l }: { l: MyListing }) {
           {l.saves}
         </Text>{' '}
         {l.saves === 1 ? 'save' : 'saves'}
+        {activity?.chats ? ` · ${activity.chats} ${activity.chats === 1 ? 'chat' : 'chats'}` : ''}
+        {activity?.openOffers ? ` · ${activity.openOffers} open ${activity.openOffers === 1 ? 'offer' : 'offers'}` : ''}
         {l.acceptsOffers ? ` · offers on${l.hideBelowCents ? `, hidden below ${formatPrice(l.hideBelowCents)}` : ''}` : ' · offers off'}
       </Text>
       <View style={{ flexDirection: 'row', gap: 8 }}>

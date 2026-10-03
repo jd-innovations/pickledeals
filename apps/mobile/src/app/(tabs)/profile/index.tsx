@@ -6,7 +6,7 @@ import { useTheme } from '@/design/theme';
 import { authErrorMessage, signOut } from '@/features/auth/api';
 import { useAlerts, useSavedIds } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
-import { useUnreadThreads } from '@/features/chat/hooks';
+import { useMyOffers, useUnreadThreads } from '@/features/chat/hooks';
 import { useHomeArea, useMyListings } from '@/features/market/hooks';
 import { Button, Group, ListRow, Text } from '@/ui';
 
@@ -27,6 +27,7 @@ export default function ProfileScreen() {
   const myListings = useMyListings();
   const home = useHomeArea();
   const unreadThreads = useUnreadThreads();
+  const offersWaiting = (useMyOffers().data ?? []).filter((o) => o.awaitingMe).length;
 
   const onSignOut = async () => {
     setSigningOut(true);
@@ -84,7 +85,7 @@ export default function ProfileScreen() {
           <Group label="Buying & selling">
             <ListRow title="My listings" value={myListings.data ? String(myListings.data.filter((l) => l.status !== 'sold').length) : undefined} onPress={() => router.push('/profile/listings')} />
             <ListRow title="Location" value={home.data?.label ?? 'Not set'} onPress={() => router.push('/profile/location')} />
-            <ListRow title="Offers" value="Phase 9" />
+            <ListRow title="Offers" value={offersWaiting ? `${offersWaiting} to answer` : undefined} onPress={() => router.push('/profile/offers')} />
             <ListRow title="Messages" value={unreadThreads ? `${unreadThreads} unread` : undefined} onPress={() => router.push('/profile/messages')} last />
           </Group>
         </>

@@ -11,7 +11,13 @@ import { requireSupabase } from '@/lib/supabase';
 import {
   blockUser,
   chatErrorText,
+  counterOffer,
   fetchBlocked,
+  fetchListingActivity,
+  fetchMyOffers,
+  fetchThreadOffers,
+  makeOffer,
+  respondToOffer,
   fetchInbox,
   fetchMessages,
   fetchMessagesAfter,
@@ -35,6 +41,9 @@ export const chatKeys = {
   messages: (uid: string, id: string) => ['chat', uid, 'messages', id] as const,
   unread: (uid: string) => ['chat', uid, 'unread'] as const,
   blocked: (uid: string) => ['chat', uid, 'blocked'] as const,
+  offers: (uid: string, id: string) => ['chat', uid, 'offers', id] as const,
+  myOffers: (uid: string) => ['chat', uid, 'my-offers'] as const,
+  activity: (uid: string) => ['chat', uid, 'listing-activity'] as const,
 };
 
 type MessagesData = { items: ChatMessage[]; hasMore: boolean };
@@ -206,8 +215,11 @@ export function useConversationChannel(id: string) {
         .on('broadcast', { event: 'message' }, ({ payload }) => {
           const m = toMessage(payload as Parameters<typeof toMessage>[0]);
           appendMessages(qc, uid, id, [m]);
-          // Status lines change the listing strip ("Pending", "Sold").
-          if (m.kind === 'status_event') qc.invalidateQueries({ queryKey: chatKeys.thread(uid, id) });
+          // Status and offer lines change the listing strip and the offer cards.
+          if (m.kind === 'status_event' || m.kind === 'offer_event') {
+            qc.invalidateQueries({ queryKey: chatKeys.thread(uid, id) });
+            qc.invalidateQueries({ queryKey: chatKeys.offers(uid, id) });
+          }
           if (m.senderId && m.senderId !== uid) {
             clearTimeout(typingTimer);
             setTyping(false);
@@ -307,5 +319,34 @@ export function useChatMutations() {
     setState: useMutation({ mutationFn: ({ id, ...s }: { id: string; muted?: boolean; archived?: boolean }) => setThreadState(id, s), onSuccess: refresh }),
     block: useMutation({ mutationFn: blockUser, onSuccess: refresh }),
     unblock: useMutation({ mutationFn: unblockUser, onSuccess: refresh }),
+  };
+}
+
+// --- Offers (Phase 9) ----------------------------------------------------------------------------
+
+export function useThreadOffers(id: string) {
+  const uid = useUid();
+  return useQuery({ queryKey: chatKeys.offers(uid, id), queryFn: () => fetchThreadOffers(id), enabled: !!uid && !!id, staleTime: 30_000 });
+}
+
+export function useMyOffers() {
+  const uid = useUid();
+  return useQuery({ queryKey: chatKeys.myOffers(uid), queryFn: fetchMyOffers, enabled: !!uid, staleTime: 30_000 });
+}
+
+export function useListingActivity() {
+  const uid = useUid();
+  return useQuery({ queryKey: chatKeys.activity(uid), queryFn: fetchListingActivity, enabled: !!uid, staleTime: 30_000 });
+}
+
+/** Offer transitions. Every chat-shaped query refreshes afterwards (offers, thread, inbox, lists). */
+export function useOfferActions() {
+  const uid = useUid();
+  const qc = useQueryClient();
+  const refresh = () => Promise.all([qc.invalidateQueries({ queryKey: chatKeys.root(uid) }), qc.invalidateQueries({ queryKey: ['me'] })]);
+  return {
+    make: useMutation({ mutationFn: (v: { listingId: string; amountCents: number; message?: string }) => makeOffer(v.listingId, v.amountCents, v.message), onSuccess: refresh }),
+    counter: useMutation({ mutationFn: (v: { offerId: string; amountCents: number; message?: string }) => counterOffer(v.offerId, v.amountCents, v.message), onSuccess: refresh }),
+    respond: useMutation({ mutationFn: (v: { offerId: string; action: 'accept' | 'decline' | 'withdraw' }) => respondToOffer(v.offerId, v.action), onSuccess: refresh }),
   };
 }

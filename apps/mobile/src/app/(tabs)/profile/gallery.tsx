@@ -8,6 +8,7 @@ import {
   DealQualityMeter,
   ListingCard,
   MessageBubble,
+  AcceptedBanner,
   OfferCard,
   PriceBlock,
   PromoCodeRow,
@@ -103,6 +104,7 @@ export default function GalleryScreen() {
           <OfferCard offer={{ status: 'countered', kind: 'offer', fromMe: true, amountCents: 12500, compareCents: 15000 }} />
         </View>
         <OfferCard offer={{ status: 'accepted', kind: 'counter', fromMe: true, amountCents: 13500, compareCents: 14000 }} />
+        <AcceptedBanner amountCents={13500} onMeetup={() => {}} onShipping={() => {}} />
         <SystemMessage text="Marcus marked this listing Pending" />
       </Section>
 

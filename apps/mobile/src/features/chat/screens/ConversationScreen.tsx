@@ -1,7 +1,7 @@
 import { formatChatSeparator, formatReadReceipt } from '@pickledeals/shared';
 import { router, useIsFocused, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/design/theme';
@@ -10,9 +10,10 @@ import { pickPhotos } from '@/features/market/device';
 import { chooseAction, confirm } from '@/lib/dialog';
 import { EmptyState, ErrorState, Icon, IconButton, Text } from '@/ui';
 
-import type { ChatMessage } from '../api';
-import { Avatar, DateSeparator, ListingStrip, MessageItem, TypingBubble } from '../components';
-import { useChatMutations, useConversationChannel, useMarkRead, useMessages, useSendMessage, useThread } from '../hooks';
+import { chatErrorText, type ChatMessage, type Offer } from '../api';
+import { Avatar, DateSeparator, ListingStrip, MessageItem, OfferEventItem, TypingBubble } from '../components';
+import { useChatMutations, useConversationChannel, useMarkRead, useMessages, useOfferActions, useSendMessage, useThread, useThreadOffers } from '../hooks';
+import { afterAccept } from './offerFlow';
 
 type Row = { key: string; m?: ChatMessage; separator?: string; receipt?: string };
 
@@ -30,6 +31,8 @@ export default function ConversationScreen() {
   const { send, sendPhoto, retry } = useSendMessage(id);
   const { typing, sendTyping } = useConversationChannel(id);
   const { setState, block } = useChatMutations();
+  const offers = useThreadOffers(id);
+  const { respond } = useOfferActions();
   const [text, setText] = useState('');
 
   const t = thread.data;
@@ -38,7 +41,28 @@ export default function ConversationScreen() {
   useMarkRead(id, latestIncoming, focused);
 
   // Newest first for the inverted list; separators when the day changes or after an hour's gap.
-  const lastMine = [...items].reverse().find((m) => m.senderId === uid && m.kind !== 'status_event');
+  const lastMine = [...items].reverse().find((m) => m.senderId === uid && m.kind !== 'status_event' && m.kind !== 'offer_event');
+  const offerById = new Map((offers.data ?? []).map((o) => [o.id, o]));
+  const openOffer = (offers.data ?? []).find((o) => o.status === 'pending');
+  const canOffer = !!t && t.role === 'buyer' && t.acceptsOffers && t.listingStatus === 'active' && !openOffer && !!t.otherId;
+
+  const offerAction = async (o: Offer, action: 'accept' | 'decline' | 'withdraw') => {
+    if (action !== 'accept') {
+      const verb = action === 'decline' ? 'Decline' : 'Withdraw';
+      if (!(await confirm(`${verb} this offer?`, action === 'decline' ? 'You can keep chatting, and they can make a new offer.' : 'You can make a new offer later.', verb, true))) return;
+    }
+    respond.mutate(
+      { offerId: o.id, action },
+      {
+        onSuccess: () => action === 'accept' && t?.role === 'seller' && afterAccept(t.listingId),
+        onError: (e) => Alert.alert('Couldn’t update the offer', chatErrorText(e)),
+      },
+    );
+  };
+  const openCounter = (o: Offer) => router.push({ pathname: '/counter-offer', params: { offer: o.id, conversation: id } });
+  const openMeetup = () => router.push({ pathname: '/meetup', params: { conversation: id, listing: t?.listingId ?? '' } });
+  const prefillShipping = () =>
+    setText(t?.role === 'buyer' ? 'Could you ship it? My ZIP code is ' : 'Happy to ship it. What’s your ZIP code so I can work out postage?');
   const rows: Row[] = [];
   items.forEach((m, i) => {
     const prev = items[i - 1];
@@ -67,7 +91,8 @@ export default function ConversationScreen() {
     chooseAction('Share', [
       { text: 'Photo library', onPress: () => pickPhotos('library', 1).then(([p]) => p && sendPhoto(p)) },
       { text: 'Take photo', onPress: () => pickPhotos('camera', 1).then(([p]) => p && sendPhoto(p)) },
-      { text: 'Suggest meet-up spot', onPress: () => router.push({ pathname: '/meetup', params: { conversation: id, listing: t?.listingId ?? '' } }) },
+      { text: 'Suggest meet-up spot', onPress: openMeetup },
+      ...(canOffer ? [{ text: 'Make an offer', onPress: () => router.push({ pathname: '/make-offer', params: { listing: t!.listingId, from: 'chat' } }) }] : []),
     ]);
 
   const options = () => {
@@ -141,7 +166,24 @@ export default function ConversationScreen() {
             ) : null
           }
           renderItem={({ item: r }) =>
-            r.separator ? <DateSeparator label={r.separator} /> : <MessageItem m={r.m!} mine={r.m!.senderId === uid} receipt={r.receipt} onRetry={() => r.m!.clientId && retry(r.m!.clientId)} />
+            r.separator ? (
+              <DateSeparator label={r.separator} />
+            ) : r.m!.kind === 'offer_event' ? (
+              <OfferEventItem
+                m={r.m!}
+                offer={r.m!.offerId ? offerById.get(r.m!.offerId) : undefined}
+                thread={t ?? undefined}
+                uid={uid}
+                onAccept={(o) => offerAction(o, 'accept')}
+                onCounter={openCounter}
+                onDecline={(o) => offerAction(o, 'decline')}
+                onWithdraw={(o) => offerAction(o, 'withdraw')}
+                onMeetup={openMeetup}
+                onShipping={prefillShipping}
+              />
+            ) : (
+              <MessageItem m={r.m!} mine={r.m!.senderId === uid} receipt={r.receipt} onRetry={() => r.m!.clientId && retry(r.m!.clientId)} />
+            )
           }
         />
       )}
@@ -154,7 +196,7 @@ export default function ConversationScreen() {
         <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8, opacity: t?.otherId ? 1 : 0.4 }} pointerEvents={t?.otherId ? 'auto' : 'none'}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Add photo or meet-up spot"
+            accessibilityLabel={canOffer ? 'Add photo, meet-up spot or offer' : 'Add photo or meet-up spot'}
             onPress={addAttachment}
             style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.chip, alignItems: 'center', justifyContent: 'center', marginBottom: 1 }}>
             <Icon name="plus" size={18} color={colors.textPrimary} weight="semibold" />

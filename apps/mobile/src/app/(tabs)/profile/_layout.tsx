@@ -13,6 +13,7 @@ export default function ProfileStack() {
       <Stack.Screen name="brands" options={{ title: 'Followed brands' }} />
       <Stack.Screen name="listings" options={{ title: 'My listings' }} />
       <Stack.Screen name="messages" options={{ title: 'Messages' }} />
+      <Stack.Screen name="offers" options={{ title: 'Offers' }} />
       <Stack.Screen name="location" options={sheetOptions([0.6, 0.9])} />
       <Stack.Screen name="listing/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="seller/[id]" options={{ title: '', headerLargeTitle: false }} />

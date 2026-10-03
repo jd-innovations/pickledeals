@@ -28,3 +28,15 @@ npm run catalog:seed -- --check   # CI: fail if seed.sql is stale
 Continuation rows of a product only need `product_slug` and the variant columns. `attributes` and
 `specs` are `key=value;key=value`; `aliases` are pipe-separated. Money is dollars in the CSV and
 integer cents in the database.
+
+## Push dispatch (Vault secrets)
+
+`public.trigger_dispatch()` runs every minute via pg_cron and POSTs `dispatch-notifications` when
+notifications are pending. It reads two Vault secrets; without them it does nothing:
+
+```sql
+select vault.create_secret('https://<project-ref>.supabase.co', 'project_url');
+select vault.create_secret('<service role key>', 'dispatch_key');
+```
+
+The local seed sets them to the local gateway and the CLI's public demo service key.

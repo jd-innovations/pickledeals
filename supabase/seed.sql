@@ -91,6 +91,13 @@ select 'sponsored_deal', d.id, 'CRBN', 1
   from public.deals d join public.product_variants v on v.id = d.variant_id join public.products p on p.id = v.product_id
  where d.status = 'active' and p.slug = 'crbn-3x-power-series' and v.label = '14mm';
 
+-- Local push dispatch: pg_cron → pg_net → the local API gateway (inside the Docker network).
+-- Staging/production set these with their own URL and a service key (see supabase/seed/README.md).
+select vault.create_secret('http://supabase_kong_pickledeals:8000', 'project_url');
+select vault.create_secret(
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU',
+  'dispatch_key');
+
 -- DEV ADMIN (local only): admin@pickledeals.test signs in with an email code from Mailpit
 -- (http://127.0.0.1:54324). Never created outside a local db reset.
 do $admin$

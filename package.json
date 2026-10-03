@@ -19,7 +19,9 @@
     "db:test": "supabase test db",
     "catalog:seed": "vite-node supabase/seed/build-seed.ts",
     "db:stop": "supabase stop",
-    "mock:integrations": "node scripts/mock-integrations.mjs"
+    "mock:integrations": "node scripts/mock-integrations.mjs",
+    "device:lan": "node scripts/use-backend.mjs lan",
+    "device:local": "node scripts/use-backend.mjs local"
   },
   "engines": {
     "node": ">=20.19.4"

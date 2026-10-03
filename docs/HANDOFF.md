@@ -175,9 +175,12 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
     - the bounds RPC takes ~190 ms locally with 2,000 listings in view (500 returned)
     - supercluster takes ~2 ms to index 500 pins and ~0.2 ms per pan (Node)
     - Markers use `tracksViewChanges={false}`, except the selected one.
+- **Device testing (set up, waiting on the user's first build):** see `docs/DEVICE_SETUP.md`.
+  - Apple Team `ZSH27U747N`, bundle `app.pickledeals` (`app.json` → `ios.appleTeamId`). `expo-dev-client` is installed.
+  - Option a: the phone uses local Supabase over Wi-Fi. `npm run device:lan` / `device:local` switch `EXPO_PUBLIC_SUPABASE_URL`. Development builds relax ATS for this (`app.config.ts`, `APP_ENV=development` only).
+  - The user runs `eas login` / `eas init` (projectId → `app.json` extra.eas.projectId and owner), `eas device:create`, `eas build --profile development --platform ios` and the Windows Firewall rule (the Wi-Fi is a Public network).
 - **Need the user:**
-  - Apple key and Team ID (Sign in with Apple token revocation)
-  - Expo/EAS project setup and a dev build
+  - Sign in with Apple key (.p8 and Key ID) for token revocation
   - a decision on a staging Supabase project (costs money; the user prefers local)
   - Vault secrets for production push dispatch
 - **Chat follow-ups:**

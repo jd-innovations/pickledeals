@@ -455,8 +455,9 @@ begin
    where o.variant_id = vid and p.price_display = 'show' and p.active and p.price_cents is not null
      and p.observed_at < current_date;
 
-  -- Honest labels: no quality without a price, and "all-time low" only with two weeks of history.
-  if best.delivered_cents is null or typical is null then
+  -- Honest labels: no quality without a price or a week of history, and "all-time low" only with
+  -- two weeks of history.
+  if best.delivered_cents is null or typical is null or coalesce(hist_days, 0) < 7 then
     quality := null;
   elsif hist_days >= 14 and prior_low is not null and list_best < prior_low then
     quality := 'all_time_low';

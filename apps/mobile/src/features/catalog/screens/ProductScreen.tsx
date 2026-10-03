@@ -174,7 +174,7 @@ export default function ProductScreen() {
               </View>
             )}
 
-            {best && (history.data?.length ?? 0) > 1 && stats && (
+            {best && stats && stats.historyDays >= 7 && (history.data?.length ?? 0) > 1 && (
               <View style={{ gap: 10 }}>
                 <SectionHeader title="Price history" actionLabel="90 days" onAction={openHistory} />
                 <Pressable accessibilityRole="button" accessibilityLabel="Open price history" onPress={openHistory} style={{ marginHorizontal: 16, padding: 14, borderRadius: radius.card, backgroundColor: colors.surface, gap: 12 }}>

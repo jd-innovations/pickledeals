@@ -1,5 +1,5 @@
 begin;
-select plan(47);
+select plan(48);
 
 insert into auth.users (id, email) values
   ('dddddddd-0000-0000-0000-000000000001', 'user3@example.test'),
@@ -83,6 +83,8 @@ select is((select promo_code from public.variant_offer_ranking where variant_id 
 select is((select best_delivered_cents from public.variant_price_stats where variant_id = (select vid from t)), 17000,
   'stats pick the best delivered price');
 select is((select offer_count from public.variant_price_stats where variant_id = (select vid from t)), 5, 'stats count every listed offer');
+select is((select deal_quality from public.variant_price_stats where variant_id = (select vid from t)), null,
+  'no deal-quality label until there is a week of history');
 
 -- Price points on change only
 select is((select count(*)::int from public.price_points p join public.retailer_offers o on o.id = p.offer_id

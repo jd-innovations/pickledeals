@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (after Phase 10)
+# PickleDeals — session handoff (after Phase 11)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -28,8 +28,8 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - Add mobile packages with `npx expo install`, and check the SDK 57 docs before using an Expo/RN API.
 
 ## Status
-- Phases 0–10 are done and pushed. The last commit is "Phase 10: notifications complete …".
-- **Next: Phase 11, admin and deal operations** (matching review queue, promo verification, collections, placements, moderation queue, listing takedown, basic metrics; exit: operations can run without SQL). Much of the admin already exists from Phases 2–8, so audit what is missing against the scope first, then propose the plan to the user.
+- Phases 0–11 are done and pushed. The last commit is "Phase 11: admin and deal operations …".
+- **Next: Phase 12, affiliate and API integrations** (Amazon product API, one affiliate network feed, a price-monitoring scheduler, automatic identifier learning; exit: automated prices stay fresh within the required windows). It needs external accounts and credentials from the user, so start by listing what's needed and proposing the plan.
 - D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. The one exception is a meet-up spot, which is an exact point but lives only in a private `location_share` message.
 
 ## Local environment
@@ -129,6 +129,16 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
     - `useClusters` (supercluster; same-cell clusters open a carousel instead of zooming)
     - `useMapViewport` ("Search this area")
   - Route: `market/map` (full screen, no header). The Grid/Map toggle pushes it, and "List" goes back.
+- **Admin operations (Phase 11):**
+  - Admin (`apps/admin`, :5174) pages: Dashboard (`#/dashboard`, default), Products, Brands, Categories, CSV import, Offers, Review queue, Promo codes, Retailers, Live deals, Collections, Sponsored placements, Reports, Listings, Users, Custom listings, Prohibited terms. Shared helpers live in `src/lib/ops.tsx` (`useNotice`, `ActivityList`, `describeAction`).
+  - Audit log: `staff_actions`. RPCs log explicitly (`log_staff_action`); direct staff edits to promos, promo targets, collections, collection items, placements and prohibited terms log via the `log_staff_change` trigger, as do raw-offer match status and custom-listing decisions. Read it with `staff_activity(for_type, for_id, max_rows)`.
+  - Listing status changes only through RPCs, staff included (`update(status)` is revoked). `staff_set_listing_status(listing, 'remove' | 'restore', reason)` uses the internal `takedown_listing` / `restore_listing`: a thread status line plus a `system` notification to the seller. `listings.removed_by_staff`, `removed_at` and `removed_reason` are maintained by `listings_track_removal`; the owner can read the reason, and the app shows "Removed by PickleDeals". `resolve_report(..., remove_listing)` uses the same path.
+  - Suspensions (admins only): `user_suspensions`, `staff_suspend_user(target, reason, hide_listings)` / `staff_unsuspend_user(target, restore_listings)`. The `guard_suspended` triggers block the suspended user's own listing inserts and live-status updates, new conversations, client messages, new offers and accepting offers. Marking sold or removed still works. Staff can't be suspended.
+  - Search: `staff_listings(q, with_status, by_seller, …)` and `staff_users(q, only_suspended, …)`. Emails are returned and searchable for admins only.
+  - D3 promote: `promote_listing_review(review, brand, name)` creates a draft product with a default variant; the `products_link_promoted_listings` trigger links the listing when the product goes active.
+  - `reopen_raw_offer`; `promo_codes.verified_by` (set by trigger on every verification).
+  - Metrics: `staff_queue_counts()` (all staff) and `staff_metrics(days)` (admins; UTC days, clicks by retailer/placement/product, per-placement clicks approximated as clicks on the promoted variant's offers while the placement ran).
+  - Only `sponsored_deal` placements are offered, because the app renders only those.
 - **Database:**
   - Every table gets RLS in the migration that creates it, plus pgTAP tests in `supabase/tests`.
   - Definer functions use `set search_path = ''`.
@@ -137,6 +147,10 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - **React Compiler lint:** no `setState` in effects (adjust state during render instead), and use Reanimated `.get()`/`.set()`.
 
 ## Open items
+- **Admin follow-ups:**
+  - Sponsored clicks aren't attributed exactly: the app opens a deal's detail from the trending row, so `outbound_clicks.placement` never says "sponsored". Exact attribution needs the placement passed through navigation.
+  - A pending listing hidden by a suspension comes back as active when the suspension is lifted.
+  - Removed listings don't appear in My listings; the seller reaches them from the notification.
 - **Not yet verified on a real iPhone:**
   - camera and photo library
   - reverse geocoding and city/ZIP search

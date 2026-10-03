@@ -46,3 +46,11 @@ tr.link:hover td { background: var(--surface); }
 .notice { padding: 10px 12px; border-radius: 10px; background: var(--surface); font-size: 13px; }
 .notice.error { border: 1px solid var(--text-primary); }
 .thumb { width: 72px; height: 72px; object-fit: contain; background: var(--image-tile); border-radius: 12px; }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border-radius: 16px; padding: 14px 16px; display: grid; gap: 2px; text-decoration: none; font-size: 13px; }
+.tile.alert { outline: 1.5px solid var(--text-primary); }
+.tile-n { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; }
+.bars { display: flex; align-items: flex-end; gap: 2px; height: 120px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.bars span { flex: 1; background: var(--interactive); border-radius: 4px 4px 0 0; min-width: 2px; }
+.tabs { display: flex; gap: 6px; margin: 12px 0; flex-wrap: wrap; }

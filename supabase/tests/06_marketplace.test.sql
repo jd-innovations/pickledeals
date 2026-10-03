@@ -57,7 +57,7 @@ select lives_ok($$select public.publish_listing(pg_temp.listing('aaaa0000-0000-0
   'custom (non-catalog) items can be listed (D3)');
 select throws_ok($$update public.listings set price_cents = 1 where id = 'aaaa0000-0000-0000-0000-000000000001'$$, '42501', null,
   'listings are edited through update_listing, not directly');
-select is_empty($$update public.listings set status = 'sold' where id = 'aaaa0000-0000-0000-0000-000000000001' returning 1$$,
+select throws_ok($$update public.listings set status = 'sold' where id = 'aaaa0000-0000-0000-0000-000000000001'$$, '42501', null,
   'sellers cannot change status directly');
 select lives_ok($$select public.update_listing('aaaa0000-0000-0000-0000-000000000001', '{"price_cents": 14000}')$$, 'sellers edit through the RPC');
 select lives_ok($$insert into storage.objects (bucket_id, name) values ('listing-images', '12121212-0000-0000-0000-000000000001/x/own.jpg')$$,

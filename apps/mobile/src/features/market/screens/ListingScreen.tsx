@@ -103,10 +103,21 @@ export default function ListingScreen() {
         {l && (
           <View style={{ paddingHorizontal: 16, paddingTop: 20, gap: 24 }}>
             {l.status !== 'active' && (
-              <View style={{ padding: 12, borderRadius: radius.card, backgroundColor: colors.interactive }}>
+              <View style={{ padding: 12, borderRadius: radius.card, backgroundColor: colors.interactive, gap: 4 }}>
                 <Text variant="subhead" weight="700" style={{ color: colors.onInteractive }}>
-                  {l.status === 'pending' ? 'Pending — the seller is finishing a sale' : l.status === 'sold' ? 'Sold' : 'No longer available'}
+                  {own && l.staffRemoval
+                    ? 'Removed by PickleDeals'
+                    : l.status === 'pending'
+                      ? 'Pending — the seller is finishing a sale'
+                      : l.status === 'sold'
+                        ? 'Sold'
+                        : 'No longer available'}
                 </Text>
+                {own && l.staffRemoval && (
+                  <Text variant="footnote" style={{ color: colors.onInteractive }}>
+                    {l.staffRemoval.reason ? `${l.staffRemoval.reason}. ` : ''}Buyers can’t see it. Contact PickleDeals support if you think this is a mistake.
+                  </Text>
+                )}
               </View>
             )}
 
@@ -218,7 +229,7 @@ export default function ListingScreen() {
         </View>
       </View>
 
-      {l && (
+      {l && !(own && l.status === 'removed') && (
         <View style={[styles.bottom, { paddingBottom: Math.max(insets.bottom, 12), backgroundColor: colors.glass, borderTopColor: colors.border }]}>
           {own ? (
             <Button label="Manage listing" style={{ flex: 1 }} onPress={() => openManage(l.id)} />

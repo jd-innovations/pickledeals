@@ -33,7 +33,7 @@ const REASON: Record<string, string> = {
  * Reports (App Store Guideline 1.2). Every open report on the same target closes together.
  * Conversation reports show the last 50 messages; chats are otherwise private to participants.
  */
-export function ReportsPage() {
+export function ReportsPage({ role }: { role: 'admin' | 'editor' }) {
   const [rows, setRows] = useState<Row[]>([]);
   const [closed, setClosed] = useState(false);
   const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);
@@ -79,14 +79,14 @@ export function ReportsPage() {
       {cards.length === 0 && <p className="muted">No open reports.</p>}
       <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
         {cards.map((r) => (
-          <ReportCard key={r.id} r={r} onResolve={resolve} />
+          <ReportCard key={r.id} r={r} role={role} onResolve={resolve} />
         ))}
       </div>
     </>
   );
 }
 
-function ReportCard({ r, onResolve }: { r: Row; onResolve: (r: Row, d: 'actioned' | 'dismissed', note: string, remove?: boolean) => void }) {
+function ReportCard({ r, role, onResolve }: { r: Row; role: 'admin' | 'editor'; onResolve: (r: Row, d: 'actioned' | 'dismissed', note: string, remove?: boolean) => void }) {
   const [note, setNote] = useState('');
   const open = r.status === 'open';
   return (
@@ -102,6 +102,12 @@ function ReportCard({ r, onResolve }: { r: Row; onResolve: (r: Row, d: 'actioned
         Reported by {r.reporter_name ?? 'a deleted account'} · {formatAgo(r.created_at)}
         {r.target_owner_name ? ` · ${r.target_type === 'conversation' ? 'other party' : 'owner'}: ${r.target_owner_name}` : ''}
         {r.listing_status ? ` · listing ${r.listing_status}` : ''}
+        {r.target_owner && (
+          <>
+            {' · '}
+            <a href={`#/users/${r.target_owner}`}>{role === 'admin' ? 'Review or suspend this user' : 'Review this user'}</a>
+          </>
+        )}
       </div>
       {r.details && <div>“{r.details}”</div>}
       {r.transcript && r.transcript.length > 0 && (

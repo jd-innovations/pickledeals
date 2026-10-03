@@ -4,22 +4,28 @@ import { useSession } from './lib/session';
 import { supabase } from './lib/supabase';
 import { BrandsPage } from './pages/Brands';
 import { CollectionsPage } from './pages/Collections';
+import { DashboardPage } from './pages/Dashboard';
 import { DealsPage } from './pages/Deals';
 import { CategoriesPage } from './pages/Categories';
 import { ImportPage } from './pages/Import';
 import { ListingReviewPage } from './pages/ListingReview';
+import { ListingsPage } from './pages/Listings';
 import { OffersPage } from './pages/Offers';
+import { PlacementsPage } from './pages/Placements';
 import { ProductEditPage } from './pages/ProductEdit';
 import { ProductsPage } from './pages/Products';
 import { PromosPage } from './pages/Promos';
 import { ReportsPage } from './pages/Reports';
 import { RetailersPage } from './pages/Retailers';
 import { ReviewPage } from './pages/Review';
+import { TermsPage } from './pages/Terms';
+import { UsersPage } from './pages/Users';
 
 /**
  * Internal admin (D7): catalog CRUD, images with provenance (D8), CSV import (Phase 2); offers via
  * the ingestion pipeline, review queue, promo codes and retailers (Phase 3); deals and collections
- * (Phase 4); the custom-listing catalog queue (Phase 6); reports (Phase 8).
+ * (Phase 4); the custom-listing catalog queue (Phase 6); reports (Phase 8); dashboard, listing
+ * takedowns, user suspensions, placements and prohibited terms (Phase 11). Every staff write is logged.
  * Staff only — the UI checks the app_role claim, and RLS enforces it on every write.
  */
 export default function App() {
@@ -31,7 +37,7 @@ export default function App() {
 }
 
 function useHashRoute() {
-  const read = () => window.location.hash.replace(/^#\/?/, '') || 'products';
+  const read = () => window.location.hash.replace(/^#\/?/, '') || 'dashboard';
   const [route, setRoute] = useState(read);
   useEffect(() => {
     const on = () => setRoute(read());
@@ -56,6 +62,10 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
     <div className="shell">
       <nav className="nav">
         <strong>PickleDeals Admin</strong>
+        {link('dashboard', 'Dashboard')}
+        <span className="muted" style={{ padding: '14px 10px 4px', fontSize: 12 }}>
+          Catalog
+        </span>
         {link('products', 'Products')}
         {link('brands', 'Brands')}
         {link('categories', 'Categories')}
@@ -71,12 +81,16 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
           Discovery
         </span>
         {link('deals', 'Live deals')}
-        {link('collections', 'Collections & sponsored')}
+        {link('collections', 'Collections')}
+        {link('placements', 'Sponsored placements')}
         <span className="muted" style={{ padding: '14px 10px 4px', fontSize: 12 }}>
           Marketplace
         </span>
-        {link('custom-listings', 'Custom listings')}
         {link('reports', 'Reports')}
+        {link('listings', 'Listings')}
+        {link('users', 'Users')}
+        {link('custom-listings', 'Custom listings')}
+        {link('terms', 'Prohibited terms')}
         <span className="spacer" />
         <span className="muted" style={{ padding: '0 10px', fontSize: 12 }}>
           Signed in as {role}
@@ -86,6 +100,7 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
         </a>
       </nav>
       <main className="main">
+        {section === 'dashboard' && <DashboardPage role={role} />}
         {section === 'products' && (id ? <ProductEditPage slug={id === 'new' ? null : decodeURIComponent(id)} /> : <ProductsPage />)}
         {section === 'brands' && <BrandsPage />}
         {section === 'categories' && <CategoriesPage />}
@@ -97,7 +112,11 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
         {section === 'deals' && <DealsPage />}
         {section === 'collections' && <CollectionsPage />}
         {section === 'custom-listings' && <ListingReviewPage />}
-        {section === 'reports' && <ReportsPage />}
+        {section === 'reports' && <ReportsPage role={role} />}
+        {section === 'listings' && <ListingsPage seller={id ? decodeURIComponent(id) : null} />}
+        {section === 'users' && <UsersPage role={role} focus={id ? decodeURIComponent(id) : null} />}
+        {section === 'placements' && <PlacementsPage role={role} />}
+        {section === 'terms' && <TermsPage />}
       </main>
     </div>
   );

@@ -8,6 +8,9 @@ type Retailer = { id: string; slug: string; name: string };
 type Category = { id: string; name: string };
 type Promo = {
   id: string;
+  retailer_id: string;
+  terms: string | null;
+  verified_by: string | null;
   code: string;
   title: string;
   discount_type: 'percent' | 'amount' | 'free_ship';
@@ -19,10 +22,16 @@ type Promo = {
   is_exclusive: boolean;
   status: 'active' | 'removed';
   retailer: { name: string } | null;
-  targets: { product: { name: string } | null; category: { name: string } | null; variant: { label: string } | null }[];
+  targets: { category_id: string | null; product: { name: string; slug: string } | null; category: { name: string } | null; variant: { label: string } | null }[];
 };
 
 const STALE_DAYS = 14;
+
+/** Active and not ended, and either hidden for want of a check or going stale within 3 days. */
+function needsVerification(p: Promo): boolean {
+  if (p.status !== 'active' || (p.ends_at && new Date(p.ends_at).getTime() <= Date.now())) return false;
+  return !p.verified_at || Date.now() - new Date(p.verified_at).getTime() > (STALE_DAYS - 3) * 86_400_000;
+}
 
 /** Mirrors promo_is_live(): active, in its dates, verified within 14 days (§9). */
 function liveState(p: Promo): { live: boolean; reason: string } {
@@ -47,16 +56,26 @@ export function PromosPage() {
   const [retailers, setRetailers] = useState<Retailer[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<Promo | null>(null);
+  const [filter, setFilter] = useState<'all' | 'verify' | 'live' | 'hidden'>('all');
+  const [names, setNames] = useState<Map<string, string>>(new Map());
   const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase
       .from('promo_codes')
-      .select('id, code, title, discount_type, discount_value, min_purchase_cents, starts_at, ends_at, verified_at, is_exclusive, status, retailer:retailers(name), targets:promo_code_targets(product:products(name), category:categories(name), variant:product_variants(label))')
+      .select(
+        'id, retailer_id, terms, verified_by, code, title, discount_type, discount_value, min_purchase_cents, starts_at, ends_at, verified_at, is_exclusive, status, retailer:retailers(name), targets:promo_code_targets(category_id, product:products(name, slug), category:categories(name), variant:product_variants(label))',
+      )
       .order('created_at', { ascending: false })
       .returns<Promo[]>();
     if (error) setMessage({ error: true, text: error.message });
     setRows(data ?? []);
+    const ids = [...new Set((data ?? []).map((p) => p.verified_by).filter((x): x is string => !!x))];
+    if (ids.length) {
+      const { data: people } = await supabase.from('profiles').select('id, display_name').in('id', ids);
+      setNames(new Map((people ?? []).map((p) => [p.id, p.display_name])));
+    }
   }, []);
   useEffect(() => {
     load();
@@ -78,15 +97,35 @@ export function PromosPage() {
           New code
         </button>
       </div>
-      <p className="muted">Only live codes change prices in the app. “Verify” means you checked the code works at the retailer today.</p>
+      <p className="muted">Only live codes change prices in the app. “Verify” means you checked the code works at the retailer today; codes hide 14 days after their last check.</p>
+      <div className="tabs">
+        {(
+          [
+            ['all', 'All'],
+            ['verify', `Needs verification (${rows.filter(needsVerification).length})`],
+            ['live', 'Live'],
+            ['hidden', 'Hidden'],
+          ] as const
+        ).map(([k, label]) => (
+          <button key={k} className={`btn ${filter === k ? 'primary' : ''}`} onClick={() => setFilter(k)}>
+            {label}
+          </button>
+        ))}
+      </div>
       {message && <div className={`notice ${message.error ? 'error' : ''}`}>{message.text}</div>}
-      {creating && (
+      {(creating || editing) && (
         <PromoForm
+          key={editing?.id ?? 'new'}
+          promo={editing}
           retailers={retailers}
           categories={categories}
-          onCancel={() => setCreating(false)}
+          onCancel={() => {
+            setCreating(false);
+            setEditing(null);
+          }}
           onDone={(text) => {
             setCreating(false);
+            setEditing(null);
             setMessage({ error: false, text });
             load();
           }}
@@ -105,7 +144,10 @@ export function PromosPage() {
           </tr>
         </thead>
         <tbody>
-          {rows.map((p) => {
+          {rows
+            .filter((p) => (filter === 'verify' ? needsVerification(p) : filter === 'live' ? liveState(p).live : filter === 'hidden' ? !liveState(p).live : true))
+            .sort((a, b) => (filter === 'verify' ? new Date(a.verified_at ?? 0).getTime() - new Date(b.verified_at ?? 0).getTime() : 0))
+            .map((p) => {
             const state = liveState(p);
             const target = p.targets.map((t) => t.product?.name ?? t.category?.name ?? t.variant?.label).filter(Boolean).join(', ') || 'Sitewide';
             return (
@@ -128,6 +170,7 @@ export function PromosPage() {
                   <span className={`pill ${state.live ? 'dark' : ''}`}>{state.live ? 'live' : 'hidden'}</span>
                   <div className="muted" style={{ fontSize: 12 }}>
                     {state.reason}
+                    {p.verified_by && names.get(p.verified_by) ? ` by ${names.get(p.verified_by)}` : ''}
                   </div>
                 </td>
                 <td>
@@ -137,6 +180,9 @@ export function PromosPage() {
                         Verify now
                       </button>
                     )}
+                    <button className="btn" onClick={() => setEditing(p)}>
+                      Edit
+                    </button>
                     <button className="btn danger" onClick={() => update(p, { status: p.status === 'active' ? 'removed' : 'active' }, `${p.status === 'active' ? 'Removed' : 'Restored'} ${p.code}.`)}>
                       {p.status === 'active' ? 'Remove' : 'Restore'}
                     </button>
@@ -151,11 +197,43 @@ export function PromosPage() {
   );
 }
 
-function PromoForm({ retailers, categories, onDone, onCancel }: { retailers: Retailer[]; categories: Category[]; onDone: (m: string) => void; onCancel: () => void }) {
-  const [f, setF] = useState({ retailer: '', code: '', title: '', type: 'percent' as Promo['discount_type'], value: '', min: '', ends: '', exclusive: false, verified: true, terms: '' });
-  const [targetKind, setTargetKind] = useState<'all' | 'product' | 'category'>('all');
-  const [product, setProduct] = useState<PickedVariant | null>(null);
-  const [category, setCategory] = useState('');
+const centsToInput = (c: number) => (c / 100).toFixed(2).replace(/\.00$/, '');
+
+function PromoForm({
+  promo,
+  retailers,
+  categories,
+  onDone,
+  onCancel,
+}: {
+  promo: Promo | null;
+  retailers: Retailer[];
+  categories: Category[];
+  onDone: (m: string) => void;
+  onCancel: () => void;
+}) {
+  const target = promo?.targets[0];
+  const [f, setF] = useState(
+    promo
+      ? {
+          retailer: promo.retailer_id,
+          code: promo.code,
+          title: promo.title,
+          type: promo.discount_type,
+          value: promo.discount_type === 'percent' ? String(promo.discount_value) : promo.discount_type === 'amount' ? centsToInput(promo.discount_value) : '',
+          min: promo.min_purchase_cents ? centsToInput(promo.min_purchase_cents) : '',
+          ends: promo.ends_at ? promo.ends_at.slice(0, 10) : '',
+          exclusive: promo.is_exclusive,
+          verified: false,
+          terms: promo.terms ?? '',
+        }
+      : { retailer: '', code: '', title: '', type: 'percent' as Promo['discount_type'], value: '', min: '', ends: '', exclusive: false, verified: true, terms: '' },
+  );
+  const [targetKind, setTargetKind] = useState<'all' | 'product' | 'category'>(target?.product ? 'product' : target?.category_id ? 'category' : 'all');
+  const [product, setProduct] = useState<PickedVariant | null>(
+    target?.product ? { variantId: '', label: '', productSlug: target.product.slug, productName: target.product.name, brand: '' } : null,
+  );
+  const [category, setCategory] = useState(target?.category_id ?? '');
   const [error, setError] = useState<string | null>(null);
 
   const save = async (e: FormEvent) => {
@@ -169,39 +247,50 @@ function PromoForm({ retailers, categories, onDone, onCancel }: { retailers: Ret
     if (targetKind === 'product' && !product) return setError('Choose the product this code applies to.');
     if (targetKind === 'category' && !category) return setError('Choose the category this code applies to.');
 
-    const { data: user } = await supabase.auth.getUser();
-    const { data: promo, error: insertError } = await supabase
-      .from('promo_codes')
-      .insert({
-        retailer_id: f.retailer,
-        code: f.code.toUpperCase(),
-        title: f.title.trim(),
-        discount_type: f.type,
-        discount_value: value,
-        min_purchase_cents: min,
-        ends_at: f.ends ? new Date(`${f.ends}T23:59:59`).toISOString() : null,
-        verified_at: f.verified ? new Date().toISOString() : null,
-        is_exclusive: f.exclusive,
-        terms: f.terms.trim() || null,
-        created_by: user.user?.id ?? null,
-      })
-      .select('id')
-      .single();
-    if (insertError) return setError(insertError.message);
+    const fields = {
+      retailer_id: f.retailer,
+      code: f.code.toUpperCase(),
+      title: f.title.trim(),
+      discount_type: f.type,
+      discount_value: value,
+      min_purchase_cents: min,
+      ends_at: f.ends ? new Date(`${f.ends}T23:59:59`).toISOString() : null,
+      is_exclusive: f.exclusive,
+      terms: f.terms.trim() || null,
+      // Editing never un-verifies; ticking the box re-verifies.
+      ...(f.verified || !promo ? { verified_at: f.verified ? new Date().toISOString() : null } : {}),
+    };
+    let promoId: string;
+    if (promo) {
+      const { error: updateError } = await supabase.from('promo_codes').update(fields).eq('id', promo.id);
+      if (updateError) return setError(updateError.message);
+      const { error: clearError } = await supabase.from('promo_code_targets').delete().eq('promo_id', promo.id);
+      if (clearError) return setError(clearError.message);
+      promoId = promo.id;
+    } else {
+      const { data: user } = await supabase.auth.getUser();
+      const { data: created, error: insertError } = await supabase
+        .from('promo_codes')
+        .insert({ ...fields, created_by: user.user?.id ?? null })
+        .select('id')
+        .single();
+      if (insertError) return setError(insertError.message);
+      promoId = created.id;
+    }
 
     if (targetKind !== 'all') {
-      const target: { promo_id: string; category_id?: string; product_id?: string } = { promo_id: promo.id };
+      const target: { promo_id: string; category_id?: string; product_id?: string } = { promo_id: promoId };
       if (targetKind === 'category') target.category_id = category;
       else target.product_id = (await supabase.from('products').select('id').eq('slug', product!.productSlug).single()).data!.id;
       const { error: targetError } = await supabase.from('promo_code_targets').insert(target);
       if (targetError) return setError(`Code saved, but its target failed: ${targetError.message}`);
     }
-    onDone(`Added ${f.code.toUpperCase()}${f.verified ? ' (live)' : ' (hidden until verified)'}.`);
+    onDone(promo ? `Saved ${f.code.toUpperCase()}.` : `Added ${f.code.toUpperCase()}${f.verified ? ' (live)' : ' (hidden until verified)'}.`);
   };
 
   return (
     <form className="card" style={{ marginTop: 12 }} onSubmit={save}>
-      <strong>New promo code</strong>
+      <strong>{promo ? `Edit ${promo.code}` : 'New promo code'}</strong>
       <div className="grid3">
         <label className="field">
           Retailer
@@ -276,7 +365,7 @@ function PromoForm({ retailers, categories, onDone, onCancel }: { retailers: Ret
       </label>
       <div className="row">
         <label className="row">
-          <input type="checkbox" checked={f.verified} onChange={(e) => setF({ ...f, verified: e.target.checked })} /> I checked this code works today
+          <input type="checkbox" checked={f.verified} onChange={(e) => setF({ ...f, verified: e.target.checked })} /> I checked this code works today{promo?.verified_at ? ` (last checked ${formatAgo(promo.verified_at)})` : ''}
         </label>
         <label className="row">
           <input type="checkbox" checked={f.exclusive} onChange={(e) => setF({ ...f, exclusive: e.target.checked })} /> PickleDeals exclusive

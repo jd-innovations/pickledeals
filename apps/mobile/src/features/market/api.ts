@@ -218,6 +218,8 @@ export type ListingDetail = {
   id: string;
   sellerId: string;
   status: ListingStatus;
+  /** Set when PickleDeals staff took the listing down; only the seller can read removed listings. */
+  staffRemoval: { reason: string | null } | null;
   condition: ListingCondition;
   priceCents: number;
   acceptsOffers: boolean;
@@ -246,7 +248,7 @@ export async function fetchListing(id: string): Promise<ListingDetail> {
   const { data: l, error } = await client
     .from('listings')
     .select(
-      'id, seller_id, status, condition, price_cents, accepts_offers, description, pickup, ships, published_at, custom_title, custom_brand_text, variant_id, ' +
+      'id, seller_id, status, removed_reason, removed_by_staff, condition, price_cents, accepts_offers, description, pickup, ships, published_at, custom_title, custom_brand_text, variant_id, ' +
         'product:products(id, slug, name, specs, msrp_cents, brand:brands(name), category:categories(slug)), variant:product_variants(id, label, msrp_cents), category:categories(slug, name), ' +
         'images:listing_images(storage_path, width, height, sort), location:listing_locations(area_label, geohash6)',
     )
@@ -257,6 +259,8 @@ export async function fetchListing(id: string): Promise<ListingDetail> {
     id: string;
     seller_id: string;
     status: ListingStatus;
+    removed_reason: string | null;
+    removed_by_staff: boolean;
     condition: ListingCondition;
     price_cents: number;
     accepts_offers: boolean;
@@ -287,6 +291,7 @@ export async function fetchListing(id: string): Promise<ListingDetail> {
     id: row.id,
     sellerId: row.seller_id,
     status: row.status,
+    staffRemoval: row.status === 'removed' && row.removed_by_staff ? { reason: row.removed_reason } : null,
     condition: row.condition,
     priceCents: row.price_cents,
     acceptsOffers: row.accepts_offers,

@@ -8,7 +8,8 @@ import { useTheme } from '@/design/theme';
 import { useAuth } from '@/features/auth/authStore';
 import { productImage } from '@/features/catalog/hooks';
 import { useDealFilterStore, EMPTY_FILTERS } from '@/features/deals/hooks';
-import { Button, EmptyState, IconButton, SegmentedControl, Skeleton, Text } from '@/ui';
+import { DEFAULT_MARKET_FILTERS, useMarketFilters, useMarketSearch } from '@/features/market/hooks';
+import { Button, EmptyState, Icon, IconButton, SegmentedControl, Skeleton, Text, type IconName } from '@/ui';
 
 import type { AppNotification, PriceAlert, SavedSearch } from '../api';
 import { useAlertPrices, useAlerts, useMeMutations, useNotifications, useSavedSearches } from '../hooks';
@@ -70,6 +71,18 @@ export default function AlertsScreen() {
   );
 }
 
+/** One icon per notification category (Phase 10). */
+const TYPE_ICON: Record<string, IconName> = {
+  price_drop: 'arrowDown',
+  target_price: 'bell',
+  brand_deal: 'tag',
+  saved_search: 'search',
+  weekly_digest: 'tag',
+  offer: 'tag',
+  nearby_listing: 'pin',
+  listing_update: 'clock',
+};
+
 function Activity({ items }: { items: AppNotification[] | undefined }) {
   const { colors } = useTheme();
   const { markRead } = useMeMutations();
@@ -104,6 +117,9 @@ function Activity({ items }: { items: AppNotification[] | undefined }) {
               },
             ]}
           />
+          <View style={[styles.typeIcon, { backgroundColor: colors.surface }]}>
+            <Icon name={TYPE_ICON[n.type] ?? 'bell'} size={16} color={colors.textPrimary} />
+          </View>
           <View style={{ flex: 1, gap: 2 }}>
             <Text variant="subhead" weight={n.readAt ? '600' : '700'}>
               {n.title}
@@ -253,9 +269,15 @@ function Searches() {
   const { updateSearch, deleteSearch } = useMeMutations();
   if (!data) return <Skeleton height={56} round={14} />;
   if (data.length === 0) {
-    return <EmptyState icon="search" title="No saved searches" message="On any category, tap Save search to hear about new matching deals." />;
+    return <EmptyState icon="search" title="No saved searches" message="On any category or in the marketplace, tap Save search to hear about new matches." />;
   }
   const open = (s: SavedSearch) => {
+    if (s.scope === 'market') {
+      useMarketFilters.getState().set({ ...DEFAULT_MARKET_FILTERS, category: s.categorySlug, maxCents: s.maxCents ?? undefined });
+      useMarketSearch.getState().setText(s.query ?? '');
+      router.push('/market');
+      return;
+    }
     if (!s.categorySlug) return;
     useDealFilterStore.getState().set(`category:${s.categorySlug}`, {
       ...EMPTY_FILTERS,
@@ -283,7 +305,8 @@ function Searches() {
               {s.label}
             </Text>
             <Text variant="caption" weight="400" tone="secondary">
-              {s.notify ? 'Notifying on new deals' : 'Notifications off'} · saved {formatAgo(s.createdAt)}
+              {s.notify ? (s.scope === 'market' ? 'Notifying on new listings near you' : 'Notifying on new deals') : 'Notifications off'} · saved{' '}
+              {formatAgo(s.createdAt)}
             </Text>
           </Pressable>
           <Switch
@@ -302,6 +325,7 @@ function Searches() {
 const styles = StyleSheet.create({
   note: { flexDirection: 'row', gap: 10, paddingVertical: 12 },
   dot: { width: 8, height: 8, borderRadius: 4, marginTop: 6 },
+  typeIcon: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   card: { padding: 14, borderRadius: radius.card, gap: 10 },
   track: { height: 5, borderRadius: 3, overflow: 'hidden' },
   search: {

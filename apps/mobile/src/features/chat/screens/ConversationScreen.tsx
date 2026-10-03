@@ -12,7 +12,7 @@ import { EmptyState, ErrorState, Icon, IconButton, Text } from '@/ui';
 
 import { chatErrorText, type ChatMessage, type Offer } from '../api';
 import { Avatar, DateSeparator, ListingStrip, MessageItem, OfferEventItem, TypingBubble } from '../components';
-import { useChatMutations, useConversationChannel, useMarkRead, useMessages, useOfferActions, useSendMessage, useThread, useThreadOffers } from '../hooks';
+import { useChatMutations, useConversationChannel, useMarkRead, useMessages, useOfferActions, useSendMessage, useThread, useThreadOffers, useViewingHeartbeat } from '../hooks';
 import { afterAccept } from './offerFlow';
 
 type Row = { key: string; m?: ChatMessage; separator?: string; receipt?: string };
@@ -39,6 +39,7 @@ export default function ConversationScreen() {
   const items = messages.data?.items ?? [];
   const latestIncoming = [...items].reverse().find((m) => !m.status && m.senderId && m.senderId !== uid)?.id ?? null;
   useMarkRead(id, latestIncoming, focused);
+  useViewingHeartbeat(id, focused);
 
   // Newest first for the inverted list; separators when the day changes or after an hour's gap.
   const lastMine = [...items].reverse().find((m) => m.senderId === uid && m.kind !== 'status_event' && m.kind !== 'offer_event');

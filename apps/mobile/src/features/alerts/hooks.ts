@@ -1,5 +1,6 @@
 import type { AuthIntent } from '@pickledeals/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { Alert } from 'react-native';
 
 import { useAuth } from '@/features/auth/authStore';
@@ -23,6 +24,11 @@ import {
   upsertAlert,
   type SavedIds,
   type SaveKind,
+  fetchNotificationSettings,
+  setNotificationCategory,
+  setNotificationSettings,
+  type NotificationCategory,
+  type NotificationSettings,
 } from './api';
 
 export const meKeys = {
@@ -137,4 +143,57 @@ export function useMeMutations() {
     deleteSearch: useMutation({ mutationFn: deleteSavedSearch, onSuccess: refresh }),
     markRead: useMutation({ mutationFn: (ids?: string[]) => markRead(ids), onSuccess: refresh }),
   };
+}
+
+// --- Notification settings (Phase 10) ----------------------------------------------------------
+
+export function useNotificationSettings() {
+  const uid = useAuth((s) => s.user?.id ?? '');
+  return useQuery({ queryKey: ['me', uid, 'notification-settings'], queryFn: fetchNotificationSettings, enabled: !!uid });
+}
+
+/** Optimistic: toggles flip immediately and roll back on error. */
+export function useNotificationSettingsMutations() {
+  const qc = useQueryClient();
+  const uid = useAuth((s) => s.user?.id ?? '');
+  const key = ['me', uid, 'notification-settings'];
+  const optimistic = (patch: (s: NotificationSettings) => NotificationSettings) => async () => {
+    await qc.cancelQueries({ queryKey: key });
+    const prev = qc.getQueryData<NotificationSettings>(key);
+    if (prev) qc.setQueryData(key, patch(prev));
+    return { prev };
+  };
+  const rollback = (_e: unknown, _v: unknown, ctx?: { prev?: NotificationSettings }) => ctx?.prev && qc.setQueryData(key, ctx.prev);
+  const settle = () => qc.invalidateQueries({ queryKey: key });
+  return {
+    setCategory: useMutation({
+      mutationFn: ({ category, enabled }: { category: NotificationCategory; enabled: boolean }) => setNotificationCategory(category, enabled),
+      onMutate: (v) => optimistic((s) => ({ ...s, categories: { ...s.categories, [v.category]: v.enabled } }))(),
+      onError: rollback,
+      onSettled: settle,
+    }),
+    setDelivery: useMutation({
+      mutationFn: setNotificationSettings,
+      onMutate: (v) =>
+        optimistic((s) => ({
+          ...s,
+          quietEnabled: v.quietEnabled ?? s.quietEnabled,
+          quietStart: v.quietStart ?? s.quietStart,
+          quietEnd: v.quietEnd ?? s.quietEnd,
+          dailyDealCap: v.dailyDealCap === undefined ? s.dailyDealCap : v.dailyDealCap,
+        }))(),
+      onError: rollback,
+      onSettled: settle,
+    }),
+  };
+}
+
+/** Quiet hours and the weekly digest use local time: keep the account's zone in step with the device. */
+export function useTimeZoneSync() {
+  const uid = useAuth((s) => s.user?.id);
+  useEffect(() => {
+    if (!uid) return;
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz) setNotificationSettings({ tz }).catch(() => {});
+  }, [uid]);
 }

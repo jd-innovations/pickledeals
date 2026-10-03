@@ -92,7 +92,7 @@ export default function ProfileScreen() {
       )}
 
       <Group label="Settings">
-        <ListRow title="Notifications" value="Phase 10" />
+        {user && <ListRow title="Notifications" onPress={() => router.push('/profile/notifications')} />}
         <ListRow title="Appearance" value={APPEARANCE_LABEL[preference]} onPress={() => router.push('/profile/appearance')} last={!user} />
         {user && <ListRow title="Account" onPress={() => router.push('/profile/account')} last />}
       </Group>

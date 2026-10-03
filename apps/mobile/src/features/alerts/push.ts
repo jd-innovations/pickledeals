@@ -6,8 +6,10 @@ import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
 import { useAuth } from '@/features/auth/authStore';
+import { useUnreadThreads } from '@/features/chat/hooks';
 
-import { registerPushToken } from './api';
+import { markRead, registerPushToken } from './api';
+import { useUnreadCount } from './hooks';
 
 /**
  * Push foundation (Phase 5). Permission is asked in context — after the first price alert — never
@@ -43,7 +45,11 @@ export async function ensurePushRegistered({ ask }: { ask: boolean }): Promise<P
   }
 }
 
-/** Root-layout hook: re-registers on sign-in (no prompt) and routes notification taps. */
+/**
+ * Root-layout hook: re-registers on sign-in (no prompt), routes notification taps (cold start and
+ * background, marking the notification read) and keeps the app icon badge in step with unread
+ * Activity plus unread chat threads — the same count the server sends with each push.
+ */
 export function usePush() {
   const userId = useAuth((s) => s.user?.id);
 
@@ -53,7 +59,14 @@ export function usePush() {
 
   const last = Notifications.useLastNotificationResponse();
   useEffect(() => {
-    const route = last?.notification.request.content.data?.route;
+    const data = last?.notification.request.content.data;
+    if (typeof data?.notificationId === 'string') markRead([data.notificationId]).catch(() => {});
+    const route = data?.route;
     if (typeof route === 'string' && route.startsWith('/')) router.push(route as Href);
   }, [last]);
+
+  const badge = useUnreadCount() + useUnreadThreads();
+  useEffect(() => {
+    Notifications.setBadgeCountAsync(userId ? badge : 0).catch(() => {});
+  }, [badge, userId]);
 }

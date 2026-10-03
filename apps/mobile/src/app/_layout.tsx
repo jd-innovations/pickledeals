@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import { useStackOptions } from '@/design/navigation';
 import { ThemeProvider, useTheme } from '@/design/theme';
+import { useTimeZoneSync } from '@/features/alerts/hooks';
 import { usePush } from '@/features/alerts/push';
 import { startAuthListener } from '@/features/auth/authStore';
 import { useInboxChannel } from '@/features/chat/hooks';
@@ -14,6 +15,7 @@ import { queryClient } from '@/lib/queryClient';
 function RootNavigator() {
   const { colors, scheme } = useTheme();
   usePush();
+  useTimeZoneSync();
   useInboxChannel();
   const stack = useStackOptions();
   const base = scheme === 'dark' ? DarkTheme : DefaultTheme;

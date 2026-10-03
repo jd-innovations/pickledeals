@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 
 import { useAuth } from '@/features/auth/authStore';
+import { setViewing } from '@/features/alerts/api';
 import { uploadChatPhoto, type PickedPhoto } from '@/features/market/device';
 import { requireSupabase } from '@/lib/supabase';
 
@@ -349,4 +350,29 @@ export function useOfferActions() {
     counter: useMutation({ mutationFn: (v: { offerId: string; amountCents: number; message?: string }) => counterOffer(v.offerId, v.amountCents, v.message), onSuccess: refresh }),
     respond: useMutation({ mutationFn: (v: { offerId: string; action: 'accept' | 'decline' | 'withdraw' }) => respondToOffer(v.offerId, v.action), onSuccess: refresh }),
   };
+}
+
+/**
+ * While the thread is on screen (and the app is in front), tell the server every 30 s so it skips
+ * message pushes for it; clear it on leave (§11 "viewing presence").
+ */
+export function useViewingHeartbeat(id: string, focused: boolean) {
+  const uid = useUid();
+  useEffect(() => {
+    if (!uid || !id || !focused) return;
+    let active = AppState.currentState === 'active';
+    const beat = () => active && setViewing(id, true).catch(() => {});
+    beat();
+    const timer = setInterval(beat, 30_000);
+    const sub = AppState.addEventListener('change', (s) => {
+      active = s === 'active';
+      if (active) beat();
+      else setViewing(id, false).catch(() => {});
+    });
+    return () => {
+      clearInterval(timer);
+      sub.remove();
+      setViewing(id, false).catch(() => {});
+    };
+  }, [uid, id, focused]);
 }

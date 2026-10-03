@@ -69,22 +69,22 @@ select is(pg_temp.notes('ffffffff-0000-0000-0000-000000000001'), 0, 'nothing whi
 update public.retailer_offers set price_cents = 14900 where url = 'https://baseline-sports.example/cfs14-alert';
 select is((select count(*)::int from public.notifications where user_id = 'ffffffff-0000-0000-0000-000000000001' and type = 'brand_deal'), 1,
   'following a brand notifies when it gets a new deal');
-select is((select count(*)::int from public.notifications where user_id = 'ffffffff-0000-0000-0000-000000000001' and type = 'price_alert'), 1,
+select is((select count(*)::int from public.notifications where user_id = 'ffffffff-0000-0000-0000-000000000001' and type = 'target_price'), 1,
   'dropping below target fires the alert');
-select is((select title from public.notifications where type = 'price_alert' and user_id = 'ffffffff-0000-0000-0000-000000000001'),
+select is((select title from public.notifications where type = 'target_price' and user_id = 'ffffffff-0000-0000-0000-000000000001'),
   'JOOLA Perseus CFS is $149', 'the alert names the product and price');
 
 update public.retailer_offers set in_stock = false where url = 'https://baseline-sports.example/cfs14-alert';
-select is((select count(*)::int from public.notifications where type = 'price_alert' and user_id = 'ffffffff-0000-0000-0000-000000000001'), 1,
+select is((select count(*)::int from public.notifications where type = 'target_price' and user_id = 'ffffffff-0000-0000-0000-000000000001'), 1,
   'a refresh at the same price does not repeat');
 
 update public.retailer_offers set price_cents = 13900 where url = 'https://baseline-sports.example/cfs14-alert';
-select is((select count(*)::int from public.notifications where type = 'price_alert' and user_id = 'ffffffff-0000-0000-0000-000000000001'), 2,
+select is((select count(*)::int from public.notifications where type = 'target_price' and user_id = 'ffffffff-0000-0000-0000-000000000001'), 2,
   'a further drop notifies again');
 
 update public.price_alerts set status = 'paused' where user_id = 'ffffffff-0000-0000-0000-000000000001';
 update public.retailer_offers set price_cents = 12900 where url = 'https://baseline-sports.example/cfs14-alert';
-select is((select count(*)::int from public.notifications where type = 'price_alert' and user_id = 'ffffffff-0000-0000-0000-000000000001'), 2,
+select is((select count(*)::int from public.notifications where type = 'target_price' and user_id = 'ffffffff-0000-0000-0000-000000000001'), 2,
   'paused alerts stay quiet');
 
 update public.price_alerts set status = 'active', target_cents = 13000 where user_id = 'ffffffff-0000-0000-0000-000000000001';
@@ -94,13 +94,15 @@ select is((select last_notified_cents from public.price_alerts where user_id = '
 -- Read state + queue -------------------------------------------------------------------------------
 
 select pg_temp.act_as('ffffffff-0000-0000-0000-000000000001');
-select is(public.mark_notifications_read(), 3, 'mark-all-read marks the user’s own notifications');
+-- 4 = brand deal + two target-price alerts + the saved-product price drop while the alert was paused (Phase 10).
+select is(public.mark_notifications_read(), 4, 'mark-all-read marks the user’s own notifications');
 reset role;
 select is((select count(*)::int from public.notifications where read_at is not null and user_id = 'ffffffff-0000-0000-0000-000000000002'), 0,
   'and nobody else’s');
 
-select ok((select count(*) from public.claim_pending_notifications()) >= 3, 'dispatch claims pending notifications');
-select is((select count(*)::int from public.claim_pending_notifications()), 0, 'a second run cannot claim the same notifications');
+-- Claimed at midday New York time, so quiet hours (Phase 10) don't apply.
+select ok((select count(*) from public.claim_pending_notifications(500, '2026-10-07 16:00+00')) >= 3, 'dispatch claims pending notifications');
+select is((select count(*)::int from public.claim_pending_notifications(500, '2026-10-07 16:00+00')), 0, 'a second run cannot claim the same notifications');
 
 select * from finish();
 rollback;

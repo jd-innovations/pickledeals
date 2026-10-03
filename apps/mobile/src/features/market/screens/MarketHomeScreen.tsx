@@ -6,7 +6,10 @@ import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import { useTheme } from '@/design/theme';
 import { ChipRow, EmptyState, Icon, IconButton, SearchField, SectionHeader, SegmentedControl, Text } from '@/ui';
 
-import { ListingGrid, ListingGridSkeleton, ListingRail, MarketLoadError, MarketQuickChips, radiusLabel } from '../components';
+import { useMeMutations } from '@/features/alerts/hooks';
+import { useAuth } from '@/features/auth/authStore';
+
+import { filterSummary, ListingGrid, ListingGridSkeleton, ListingRail, MarketLoadError, MarketQuickChips, radiusLabel } from '../components';
 import { DEFAULT_MARKET_FILTERS, filtersToQuery, useHomeArea, useMarket, useMarketFilters, useMarketSearch, useViewer } from '../hooks';
 
 /** Marketplace home (design: "Pre-owned marketplace"). Browsing is open to guests. */
@@ -19,6 +22,18 @@ export default function MarketHomeScreen() {
   const search = useDeferredValue(text.trim());
   const feed = useMarket({ ...filtersToQuery(f), text: search || undefined, limit: 60 });
   const [pulling, setPulling] = useState(false);
+  const requireAuth = useAuth((x) => x.requireAuth);
+  const { createSearch } = useMeMutations();
+  const [savedSearch, setSavedSearch] = useState<string | null>(null);
+  const searchKey = JSON.stringify([f, search]);
+  // Saved-search alerts for new nearby listings (§11 "Nearby listing match").
+  const saveSearch = () =>
+    requireAuth('save_search', () =>
+      createSearch.mutate(
+        { scope: 'market', label: filterSummary(f, search).slice(0, 80), query: search || undefined, categorySlug: f.category ?? undefined, maxCents: f.maxCents },
+        { onSuccess: () => setSavedSearch(searchKey) },
+      ),
+    );
 
   const items = feed.data?.items ?? [];
   const hasOrigin = feed.data?.hasOrigin ?? false;
@@ -71,6 +86,15 @@ export default function MarketHomeScreen() {
         </View>
         <ChipRow>
           <IconButton icon="sliders" label={filtered ? 'Filters (on)' : 'Filters'} size={36} tone={filtered ? 'solid' : 'surface'} onPress={() => router.push('/market/filters')} />
+          {(filtered || !!search) && (
+            <IconButton
+              icon="bell"
+              label={savedSearch === searchKey ? 'Search saved' : 'Save this search'}
+              size={36}
+              tone={savedSearch === searchKey ? 'solid' : 'surface'}
+              onPress={saveSearch}
+            />
+          )}
           <MarketQuickChips />
         </ChipRow>
       </View>

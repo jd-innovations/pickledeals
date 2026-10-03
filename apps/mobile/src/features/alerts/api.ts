@@ -140,18 +140,52 @@ export async function deleteAlert(id: string) {
 
 // --- Saved searches ------------------------------------------------------------------------------
 
-export type SavedSearch = { id: string; label: string; categorySlug: string | null; brandSlug: string | null; maxCents: number | null; notify: boolean; createdAt: string };
+export type SavedSearch = {
+  id: string;
+  scope: 'deals' | 'market';
+  label: string;
+  query: string | null;
+  categorySlug: string | null;
+  brandSlug: string | null;
+  maxCents: number | null;
+  notify: boolean;
+  createdAt: string;
+};
 
 export async function fetchSavedSearches(): Promise<SavedSearch[]> {
-  const { data, error } = await requireSupabase().from('saved_searches').select('id, label, category_slug, brand_slug, max_cents, notify, created_at').order('created_at', { ascending: false });
+  const { data, error } = await requireSupabase()
+    .from('saved_searches')
+    .select('id, scope, label, query, category_slug, brand_slug, max_cents, notify, created_at')
+    .order('created_at', { ascending: false });
   if (error) throw error;
-  return data.map((s) => ({ id: s.id, label: s.label, categorySlug: s.category_slug, brandSlug: s.brand_slug, maxCents: s.max_cents, notify: s.notify, createdAt: s.created_at }));
+  return data.map((s) => ({
+    id: s.id,
+    scope: s.scope as SavedSearch['scope'],
+    label: s.label,
+    query: s.query,
+    categorySlug: s.category_slug,
+    brandSlug: s.brand_slug,
+    maxCents: s.max_cents,
+    notify: s.notify,
+    createdAt: s.created_at,
+  }));
 }
 
-export async function createSavedSearch(userId: string, s: { label: string; categorySlug?: string; brandSlug?: string; maxCents?: number }) {
+export async function createSavedSearch(
+  userId: string,
+  s: { label: string; scope?: 'deals' | 'market'; query?: string; categorySlug?: string; brandSlug?: string; maxCents?: number },
+) {
   const { error } = await requireSupabase()
     .from('saved_searches')
-    .insert({ user_id: userId, label: s.label, category_slug: s.categorySlug ?? null, brand_slug: s.brandSlug ?? null, max_cents: s.maxCents ?? null });
+    .insert({
+      user_id: userId,
+      scope: s.scope ?? 'deals',
+      label: s.label,
+      query: s.query || null,
+      category_slug: s.categorySlug ?? null,
+      brand_slug: s.brandSlug ?? null,
+      max_cents: s.maxCents ?? null,
+    });
   if (error) throw error;
 }
 
@@ -211,4 +245,81 @@ export async function fetchSavedDeals(): Promise<{ live: Deal[]; endedCount: num
   if (feedError) throw feedError;
   const live = data.map((r) => toDeal(r as never));
   return { live, endedCount: ids.length - live.length };
+}
+
+// --- Notification settings (Phase 10) ----------------------------------------------------------
+
+export const NOTIFICATION_CATEGORIES = [
+  'price_drop',
+  'target_price',
+  'brand_deal',
+  'saved_search',
+  'weekly_digest',
+  'offer',
+  'new_message',
+  'nearby_listing',
+  'listing_update',
+] as const;
+export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
+
+export type NotificationSettings = {
+  categories: Record<NotificationCategory, boolean>;
+  quietEnabled: boolean;
+  quietStart: string;
+  quietEnd: string;
+  tz: string;
+  dailyDealCap: number | null;
+  radiusM: number;
+};
+
+export async function fetchNotificationSettings(): Promise<NotificationSettings | null> {
+  const { data, error } = await requireSupabase().rpc('my_notification_settings');
+  if (error) throw error;
+  if (!data) return null;
+  const r = data as {
+    categories: Record<NotificationCategory, { push: boolean; in_app: boolean }>;
+    quiet_enabled: boolean;
+    quiet_start: string;
+    quiet_end: string;
+    tz: string;
+    daily_deal_cap: number | null;
+    radius_m: number;
+  };
+  return {
+    categories: Object.fromEntries(NOTIFICATION_CATEGORIES.map((c) => [c, !!(r.categories[c]?.push || r.categories[c]?.in_app)])) as Record<NotificationCategory, boolean>,
+    quietEnabled: r.quiet_enabled,
+    quietStart: r.quiet_start,
+    quietEnd: r.quiet_end,
+    tz: r.tz,
+    dailyDealCap: r.daily_deal_cap,
+    radiusM: r.radius_m,
+  };
+}
+
+export async function setNotificationCategory(category: NotificationCategory, enabled: boolean) {
+  const { error } = await requireSupabase().rpc('set_notification_preference', { category, enabled });
+  if (error) throw error;
+}
+
+export async function setNotificationSettings(s: { quietEnabled?: boolean; quietStart?: string; quietEnd?: string; tz?: string; dailyDealCap?: number | null }) {
+  const { error } = await requireSupabase().rpc('set_notification_settings', {
+    quiet_enabled: s.quietEnabled,
+    quiet_start: s.quietStart,
+    quiet_end: s.quietEnd,
+    tz: s.tz,
+    daily_deal_cap: s.dailyDealCap ?? undefined,
+    clear_cap: s.dailyDealCap === null,
+  });
+  if (error) throw error;
+}
+
+export async function fetchBadgeCount(): Promise<number> {
+  const { data, error } = await requireSupabase().rpc('my_badge_count');
+  if (error) throw error;
+  return data;
+}
+
+export async function setViewing(conversationId: string, viewing: boolean) {
+  const { error } = await requireSupabase().rpc('set_viewing', { conversation: conversationId, viewing });
+  if (error) throw error;
 }

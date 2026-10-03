@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (after Phase 9)
+# PickleDeals — session handoff (after Phase 10)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -28,8 +28,8 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - Add mobile packages with `npx expo install`, and check the SDK 57 docs before using an Expo/RN API.
 
 ## Status
-- Phases 0–9 are done and pushed. The last commit is "Phase 9: structured offers …".
-- **Next: Phase 10, notifications complete** (all event types, the preference screen, quiet hours and digests, daily caps, deep links, badge counts). Check the §13 Phase 10 scope and its exit criterion first, then propose the plan to the user. The Profile → Notifications row is still a placeholder.
+- Phases 0–10 are done and pushed. The last commit is "Phase 10: notifications complete …".
+- **Next: Phase 11, admin and deal operations** (matching review queue, promo verification, collections, placements, moderation queue, listing takedown, basic metrics; exit: operations can run without SQL). Much of the admin already exists from Phases 2–8, so audit what is missing against the scope first, then propose the plan to the user.
 - D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. The one exception is a meet-up spot, which is an exact point but lives only in a private `location_share` message.
 
 ## Local environment
@@ -96,6 +96,27 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
     - `offerFlow.afterAccept` offers to mark the listing Pending
     - Profile → Offers is `profile/offers`
     - the inbox has an "Open offers" filter and tags
+- **Notifications (Phase 10, §11):**
+  - Types and preference categories:
+    - deals: `price_drop`, `target_price`, `brand_deal`, `saved_search`, `weekly_digest` (opt-in)
+    - pre-owned: `offer`, `new_message`, `nearby_listing`, `listing_update`
+    - always on: `summary`, `system`
+  - Preferences: `notify()` reads `notification_preferences`; when a category is off, nothing is created.
+  - `claim_pending_notifications(max_rows, at)` applies the push rules and returns each push with a `badge`:
+    - quiet hours (`profiles_private.quiet_*`, `tz`): offers and messages are held and released as one "While you were away" summary; other pushes are skipped
+    - daily deal cap (`daily_deal_cap`): limits `price_drop`, `brand_deal`, `saved_search` and `nearby_listing` pushes
+  - Viewing suppression: `set_viewing` heartbeat on `conversation_participants.viewing_until`.
+  - New events:
+    - saved-product price drops (variant stats trigger)
+    - `nearby_listing` from `saved_searches` with `scope = 'market'` (Market home bell button)
+    - `send_weekly_digests` (hourly cron, Sunday 9 AM local)
+  - Dispatch sends `badge` and stores tickets in `push_receipts`; a later run checks receipts and revokes `DeviceNotRegistered` tokens. `EXPO_PUSH_URL` and `EXPO_RECEIPTS_URL` can point at a mock: serve the function with `--env-file`.
+  - App:
+    - Profile → Notifications (`profile/notifications`, NotifPrefs design)
+    - time zone synced on sign-in (`useTimeZoneSync`)
+    - push taps mark the notification read
+    - the app icon badge equals unread Activity plus unread threads
+    - Activity icons per type
 - **Map (Phase 7, D4):**
   - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
   - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).
@@ -118,7 +139,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - camera and photo library
   - reverse geocoding and city/ZIP search
   - native dialogs
-  - push delivery (Expo → APNs)
+  - push delivery (Expo → APNs): the payload, badge and receipts are verified only against a local mock
   - the "list in under 60 seconds" timing. The automated browser run took 77 s, inflated by tool overhead.
   - **the Phase 7 exit criterion**: Apple Maps rendering and a smooth 500-pin map on a mid-range iPhone. So far only measured off-device:
     - the bounds RPC takes ~190 ms locally with 2,000 listings in view (500 returned)
@@ -129,8 +150,6 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Expo/EAS project setup and a dev build
   - a decision on a staging Supabase project (costs money; the user prefers local)
   - Vault secrets for production push dispatch
-- **Placeholders to wire up later:**
-  - the Notifications settings row (Phase 10)
 - **Chat follow-ups:**
   - Push suppression while the recipient is viewing the thread (presence) is not built; muting does suppress.
   - Blocks hide threads and stop messages, but blocked sellers' listings still appear in the marketplace.

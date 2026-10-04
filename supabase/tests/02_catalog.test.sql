@@ -34,7 +34,7 @@ select ok((select bool_and(relrowsecurity) from pg_class where oid in (
   'public.brands'::regclass, 'public.categories'::regclass, 'public.products'::regclass,
   'public.product_aliases'::regclass, 'public.product_variants'::regclass,
   'public.product_identifiers'::regclass, 'public.product_images'::regclass)), 'RLS is on for every catalog table');
-select is((select count(*)::int from public.products where status = 'active'), 144, 'seed loads 144 active products');
+select is((select count(*)::int from public.products where status = 'active'), 149, 'seed loads 149 active products');
 select is((select count(*)::int from public.categories), 12, 'seed loads 12 categories');
 select is((select count(*)::int from public.products p
             where not exists (select 1 from public.product_variants v where v.product_id = p.id and v.is_default)), 0,
@@ -75,7 +75,7 @@ select ok((select search_text like '%zzspecialalias%' from public.products where
 -- Anonymous reads ---------------------------------------------------------------------------------
 
 set local role anon;
-select ok((select count(*) from public.products) >= 144, 'anon reads active products');
+select ok((select count(*) from public.products) >= 149, 'anon reads active products');
 select is((select count(*)::int from public.products where slug = 'joola-secret-prototype'), 0, 'anon cannot see draft products');
 select is((select count(*)::int from public.brands where slug = 'hidden-brand'), 0, 'anon cannot see inactive brands');
 select is((select count(*)::int from public.product_variants where product_id = 'cccccccc-0000-0000-0000-000000000001'), 0,

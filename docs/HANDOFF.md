@@ -157,6 +157,11 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - **React Compiler lint:** no `setState` in effects (adjust state during render instead), and use Reanimated `.get()`/`.set()`.
 
 ## Open items
+- **Amazon Associates compliance (researched Oct 4, 2026). Read this before adding any Amazon tag:**
+  - Program Policies: "Unless otherwise agreed by Amazon, your Site must not have price tracking and/or price alerting functionality." A "Site" includes apps. PickleDeals has price history, price alerts and price-drop pushes, so participating at all (even tagged "Check price" links) needs Amazon's written agreement. Until then, leave the Amazon affiliate program unset; `go` then sends untagged Amazon links, which is compliant because we aren't participating.
+  - Mobile apps: must be live in an app store and registered in Associates Central, use the app's own tracking ID, not emulate Amazon's app, and not render Amazon pages in WebViews. Amazon links should open in Safari or the Amazon app, not `expo-web-browser`.
+  - Creators API access: at least 10 qualifying sales in the trailing 30 days, per marketplace (rolling; access pauses below it). Credentials are under Associates Central → Tools → Creators API.
+  - If granted: price "comparison" displays must show both Amazon's lowest new and lowest used price. Add the "As an Amazon Associate I earn from qualifying purchases" statement and the "CERTAIN CONTENT THAT APPEARS IN THIS APPLICATION COMES FROM AMAZON…" disclaimer. ASINs may be stored indefinitely; images can't be cached.
 - **Integrations need the user:**
   - Amazon Creators API credentials (Associates Central). New accounts start at 1 request/second and 8,640/day, and API access depends on qualifying sales. Verify the resource names in `AMAZON_RESOURCES` and the `externalIds` casing against a live response.
   - An AvantLink account approved for Selkirk (or another network/merchant). Get the datafeed download URL and check its column names against the source config (editable in admin → Integrations → Settings). Add the AvantLink click URL (`mi`/`pw`) on Retailers.

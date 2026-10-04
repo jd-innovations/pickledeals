@@ -44,7 +44,8 @@ export default function ProductScreen() {
   const stats = offersQuery.data?.stats.find((s) => s.variantId === variant?.id);
   const best = offers.find((o) => o.rank === 1) ?? null;
   const checkPriceOnly = !best ? offers.find((o) => o.priceDisplay === 'check_price') : undefined;
-  const others = offers.filter((o) => o !== best).slice(0, 3);
+  // The hero card already shows the best offer (or the check-price retailer when nothing is priced).
+  const others = offers.filter((o) => o !== best && o !== checkPriceOnly).slice(0, 3);
   const history = usePriceHistory(best ? variant?.id : undefined, 90);
   const showVariants = (p?.variants.length ?? 0) > 1;
   const specs = Object.entries(p?.specs ?? {});

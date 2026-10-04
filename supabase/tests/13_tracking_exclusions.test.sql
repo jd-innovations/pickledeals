@@ -1,5 +1,5 @@
 begin;
-select plan(14);
+select plan(16);
 
 insert into auth.users (id, email) values ('18181818-0000-0000-0000-000000000001', 'tracker@example.test');
 
@@ -53,6 +53,12 @@ select matches((select body from public.notifications where user_id = '18181818-
 select is((select r.slug::text from public.variant_price_stats s join public.retailer_offers o on o.id = s.best_offer_id
              join public.retailers r on r.id = o.retailer_id where s.variant_id = (select vid from v)), 'courtside-pro-shop',
   'the tracked best price moves with tracked retailers');
+
+-- Catalog import binds ASINs to Amazon (regression: "already belongs to another variant").
+select is((public.import_catalog('{"brands":[{"slug":"asin-test-brand","name":"ASIN Test"}],"products":[{"slug":"asin-test-grip","brand_slug":"asin-test-brand","category_slug":"grips","name":"ASIN test grip","variants":[{"label":"Standard","identifiers":[{"kind":"asin","value":"B0TESTASIN"}]}]}]}'::jsonb, false)
+  -> 'errors'), '[]'::jsonb, 'the catalog import accepts ASINs');
+select is((select r.slug::text from public.product_identifiers i join public.retailers r on r.id = i.retailer_id where i.value = 'B0TESTASIN'), 'amazon',
+  'and binds them to Amazon');
 
 select * from finish();
 rollback;

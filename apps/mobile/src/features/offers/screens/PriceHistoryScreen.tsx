@@ -8,7 +8,7 @@ import { useTheme } from '@/design/theme';
 import { useProduct } from '@/features/catalog/hooks';
 import { Chip, ChipRow, SectionHeader, SegmentedControl, Skeleton, Text } from '@/ui';
 
-import { qualityDetail } from '../format';
+import { qualityDetail, UNTRACKED_NOTE } from '../format';
 import { usePriceHistory, useProductOffers, useRecentChanges } from '../hooks';
 
 const RANGES = [
@@ -43,7 +43,9 @@ export default function PriceHistoryScreen() {
   const stats = offerData?.stats.find((s) => s.variantId === variant?.id);
   const pricedRetailers = [
     ...new Map(
-      (offerData?.offers ?? []).filter((o) => o.variantId === variant?.id && o.priceDisplay === 'show').map((o) => [o.retailer.slug, o.retailer.name] as const),
+      (offerData?.offers ?? [])
+        .filter((o) => o.variantId === variant?.id && o.priceDisplay === 'show' && !o.trackingExcluded)
+        .map((o) => [o.retailer.slug, o.retailer.name] as const),
     ),
   ];
 
@@ -90,6 +92,9 @@ export default function PriceHistoryScreen() {
             Not enough price history yet for this range.
           </Text>
         )}
+        <Text variant="caption" weight="400" tone="tertiary" style={{ paddingTop: 8 }}>
+          {UNTRACKED_NOTE}
+        </Text>
       </View>
 
       {pricedRetailers.length > 1 && (

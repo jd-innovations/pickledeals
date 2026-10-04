@@ -21,7 +21,7 @@ import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { PreOwnedSection } from '@/features/market/PreOwned';
 import type { RankedOffer } from '@/features/offers/api';
-import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, deltaLabel, isApiPrice, offerBreakdown, priceAsOf, qualityDetail, shippingLabel } from '@/features/offers/format';
+import { AFFILIATE_DISCLOSURE, UNTRACKED_NOTE, apiPriceDisclaimer, deltaLabel, isApiPrice, offerBreakdown, priceAsOf, qualityDetail, shippingLabel } from '@/features/offers/format';
 import { openDeal, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
 import { Button, Chip, ChipRow, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
 
@@ -134,7 +134,7 @@ export default function ProductScreen() {
                       .filter(Boolean)
                       .join(' · ')}
                   </Text>
-                  {stats?.quality && (
+                  {stats?.quality && stats.bestOfferId === best.offerId && (
                     <View style={{ padding: 12, borderRadius: radius.card, backgroundColor: colors.surfaceElevated }}>
                       <DealQualityMeter quality={stats.quality} detail={qualityDetail(stats)} />
                     </View>
@@ -205,7 +205,7 @@ export default function ProductScreen() {
                   <PriceChart points={history.data!} typicalCents={stats.typicalCents} height={100} />
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     {[
-                      ['Now', best.deliveredCents],
+                      ['Now', stats.bestDeliveredCents],
                       ['Typical', stats.typicalCents],
                       ['90-day low', stats.low90dCents],
                       ['All-time low', stats.lowAllTimeCents],
@@ -220,6 +220,11 @@ export default function ProductScreen() {
                       </View>
                     ))}
                   </View>
+                  {offers.some((o) => o.trackingExcluded) && (
+                    <Text variant="caption" weight="400" tone="tertiary">
+                      {UNTRACKED_NOTE}
+                    </Text>
+                  )}
                 </Pressable>
               </View>
             )}

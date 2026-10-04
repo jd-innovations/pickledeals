@@ -132,7 +132,7 @@ export default function PriceAlertSheet() {
             New offers
           </Text>
           <Text variant="caption" weight="400" tone="secondary">
-            Any retailer, including verified codes and shipping.
+            Every retailer except Amazon, including verified codes and shipping.
           </Text>
         </View>
         <Icon name="check" size={16} color={colors.textPrimary} />

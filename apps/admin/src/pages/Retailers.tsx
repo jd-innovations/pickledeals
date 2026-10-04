@@ -10,11 +10,12 @@ type Retailer = {
   kind: 'marketplace' | 'retailer' | 'manufacturer';
   domain: string;
   price_display_default: 'show' | 'check_price';
+  tracking_excluded: boolean;
   is_active: boolean;
 };
 type Affiliate = { retailer_id: string; network: string; tag_template: string | null; link_template: string | null; is_active: boolean };
 
-const EMPTY: Retailer = { id: '', slug: '', name: '', kind: 'retailer', domain: '', price_display_default: 'show', is_active: true };
+const EMPTY: Retailer = { id: '', slug: '', name: '', kind: 'retailer', domain: '', price_display_default: 'show', tracking_excluded: false, is_active: true };
 
 /**
  * Retailers. "Check price" retailers (D1) never show a number in the app; only an approved API
@@ -28,7 +29,7 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
   const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);
 
   const load = useCallback(async () => {
-    const { data, error } = await supabase.from('retailers').select('id, slug, name, kind, domain, price_display_default, is_active').order('name');
+    const { data, error } = await supabase.from('retailers').select('id, slug, name, kind, domain, price_display_default, tracking_excluded, is_active').order('name');
     if (error) setMessage({ error: true, text: error.message });
     setRows(data ?? []);
     if (role === 'admin') {
@@ -45,7 +46,7 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
     const slug = isNew ? r.slug || slugify(r.name) : r.slug;
     const domain = r.domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
     if (!r.name.trim() || !SLUG_PATTERN.test(slug) || !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain)) return setMessage({ error: true, text: 'Name, slug and a domain like joola.com are required.' });
-    const values = { name: r.name.trim(), kind: r.kind, domain, price_display_default: r.price_display_default, is_active: r.is_active };
+    const values = { name: r.name.trim(), kind: r.kind, domain, price_display_default: r.price_display_default, tracking_excluded: r.tracking_excluded, is_active: r.is_active };
     const { error } = isNew ? await supabase.from('retailers').insert({ ...values, slug }) : await supabase.from('retailers').update(values).eq('id', r.id);
     setMessage(error ? { error: true, text: error.message } : { error: false, text: `Saved ${values.name}.` });
     if (!error) setEditing(null);
@@ -100,6 +101,7 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
                 <td>{r.domain}</td>
                 <td>
                   <span className={`pill ${r.price_display_default === 'show' ? 'dark' : ''}`}>{r.price_display_default === 'show' ? 'show' : 'check price'}</span>
+                  {r.tracking_excluded && <div className="muted" style={{ fontSize: 12 }}>not price-tracked</div>}
                 </td>
                 {role === 'admin' && (
                   <td>
@@ -170,6 +172,15 @@ function RetailerForm({ retailer, onSave, onCancel }: { retailer: Retailer; onSa
             <option value="show">Show prices</option>
             <option value="check_price">Check price (no number, D1)</option>
           </select>
+        </label>
+        <label className="row" style={{ alignSelf: 'end' }} title="Amazon’s Associates policies restrict price tracking; amazon.* domains are always excluded.">
+          <input
+            type="checkbox"
+            checked={r.tracking_excluded || /(^|\.)amazon\.[a-z.]+$/.test(r.domain.trim().toLowerCase())}
+            disabled={/(^|\.)amazon\.[a-z.]+$/.test(r.domain.trim().toLowerCase())}
+            onChange={(e) => setR({ ...r, tracking_excluded: e.target.checked })}
+          />{' '}
+          Leave out of price history, deal quality and alerts
         </label>
         <label className="row" style={{ alignSelf: 'end' }}>
           <input type="checkbox" checked={r.is_active} onChange={(e) => setR({ ...r, is_active: e.target.checked })} /> Visible in the app

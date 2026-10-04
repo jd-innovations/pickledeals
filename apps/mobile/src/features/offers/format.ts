@@ -50,4 +50,7 @@ export function apiPriceDisclaimer(offers: RankedOffer[]): string | null {
   return `Product prices and availability are accurate as of the date/time indicated and are subject to change. Any price and availability information displayed on ${site} at the time of purchase will apply to the purchase of this product.`;
 }
 
+/** Amazon's Associates policies restrict price tracking, so history, deal quality and alerts leave it out. */
+export const UNTRACKED_NOTE = 'Price history and alerts don’t include Amazon.';
+
 export const AFFILIATE_DISCLOSURE = 'Affiliate links — PickleDeals may earn a commission. Offers are ranked by what you pay, never by commission.';

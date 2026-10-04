@@ -1079,13 +1079,13 @@ isOneToOne: false
                   ]
                 },"retailers": {
                   Row: {
-                    "created_at": string,"domain": string,"id": string,"is_active": boolean,"kind": Database["public"]['Enums']["retailer_kind"],"logo_path": string | null,"name": string,"price_display_default": Database["public"]['Enums']["price_display"],"slug": string,"updated_at": string
+                    "created_at": string,"domain": string,"id": string,"is_active": boolean,"kind": Database["public"]['Enums']["retailer_kind"],"logo_path": string | null,"name": string,"price_display_default": Database["public"]['Enums']["price_display"],"slug": string,"tracking_excluded": boolean,"updated_at": string
                   }
                   Insert: {
-                    "created_at"?: string,"domain": string,"id"?: string,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["retailer_kind"],"logo_path"?: string | null,"name": string,"price_display_default"?: Database["public"]['Enums']["price_display"],"slug": string,"updated_at"?: string
+                    "created_at"?: string,"domain": string,"id"?: string,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["retailer_kind"],"logo_path"?: string | null,"name": string,"price_display_default"?: Database["public"]['Enums']["price_display"],"slug": string,"tracking_excluded"?: boolean,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"domain"?: string,"id"?: string,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["retailer_kind"],"logo_path"?: string | null,"name"?: string,"price_display_default"?: Database["public"]['Enums']["price_display"],"slug"?: string,"updated_at"?: string
+                    "created_at"?: string,"domain"?: string,"id"?: string,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["retailer_kind"],"logo_path"?: string | null,"name"?: string,"price_display_default"?: Database["public"]['Enums']["price_display"],"slug"?: string,"tracking_excluded"?: boolean,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -1331,7 +1331,7 @@ isOneToOne: false
                   ]
                 },"variant_offer_ranking": {
                   Row: {
-                    "available_sizes": (string)[] | null,"delivered_cents": number | null,"in_stock": boolean | null,"last_checked_at": string | null,"offer_id": string | null,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"] | null,"price_source": Database["public"]['Enums']["price_source"] | null,"product_id": string | null,"promo_code": string | null,"promo_discount_cents": number | null,"promo_id": string | null,"rank": number | null,"retailer_id": string | null,"retailer_kind": Database["public"]['Enums']["retailer_kind"] | null,"retailer_name": string | null,"retailer_slug": string | null,"shipping_cents": number | null,"variant_id": string | null
+                    "available_sizes": (string)[] | null,"delivered_cents": number | null,"in_stock": boolean | null,"last_checked_at": string | null,"offer_id": string | null,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"] | null,"price_source": Database["public"]['Enums']["price_source"] | null,"product_id": string | null,"promo_code": string | null,"promo_discount_cents": number | null,"promo_id": string | null,"rank": number | null,"retailer_id": string | null,"retailer_kind": Database["public"]['Enums']["retailer_kind"] | null,"retailer_name": string | null,"retailer_slug": string | null,"shipping_cents": number | null,"tracking_excluded": boolean | null,"variant_id": string | null
                   }
                   Relationships: [
                     {

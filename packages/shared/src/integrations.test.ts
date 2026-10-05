@@ -322,3 +322,21 @@ describe('discountLinkUrl', () => {
     expect(discountLinkUrl(product, 'X1', '//evil.example/{code}?r={path}')).toBe(product);
   });
 });
+
+describe('shopifyRecords, pre-orders', () => {
+  it('treats pre-order / backorder variants as out of stock', () => {
+    const products = fromStorefront([
+      {
+        id: 'gid://shopify/Product/1',
+        handle: 'engage-x2',
+        title: 'Engage X2 Elongated Pickleball Paddle',
+        vendor: 'EngagePickleball',
+        tags: ['Shopify Collective'],
+        variants: { nodes: [{ id: 'gid://shopify/ProductVariant/9', price: { amount: '199.99', currencyCode: 'USD' }, availableForSale: true, currentlyNotInStock: true }] },
+      },
+    ]);
+    const { records, skipped } = shopifyRecords(products, { retailerSlug: 'r', storeUrl: 'https://example.com' });
+    expect(records).toEqual([]);
+    expect(skipped).toEqual([{ ref: 'variant-9', reason: 'out of stock' }]);
+  });
+});

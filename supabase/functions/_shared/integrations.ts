@@ -275,7 +275,7 @@ export const SHOPIFY_PRODUCTS_QUERY = `query Products($cursor: String) {
       id handle title vendor productType tags
       variants(first: 100) {
         nodes {
-          id title sku barcode availableForSale requiresShipping
+          id title sku barcode availableForSale currentlyNotInStock requiresShipping
           price { amount currencyCode }
           selectedOptions { name value }
         }
@@ -290,6 +290,8 @@ type GqlVariant = {
   sku?: string | null;
   barcode?: string | null;
   availableForSale?: boolean;
+  /** Purchasable but not in stock: pre-order / backorder ("continue selling when out of stock"). */
+  currentlyNotInStock?: boolean;
   requiresShipping?: boolean;
   price?: { amount?: string; currencyCode?: string };
   selectedOptions?: { name: string; value: string }[];
@@ -319,7 +321,8 @@ export function fromStorefront(nodes: GqlProduct[]): ShopifyProduct[] {
       priceCents: !v.price?.currencyCode || v.price.currencyCode === 'USD' ? toCents(v.price?.amount ?? null) : null,
       sku: v.sku || null,
       barcode: v.barcode || null,
-      available: typeof v.availableForSale === 'boolean' ? v.availableForSale : null,
+      // Pre-orders and backorders have nothing on hand, so they count as out of stock (not listed).
+      available: typeof v.availableForSale === 'boolean' ? v.availableForSale && v.currentlyNotInStock !== true : null,
       requiresShipping: v.requiresShipping !== false,
       options: v.selectedOptions ?? [],
     })),

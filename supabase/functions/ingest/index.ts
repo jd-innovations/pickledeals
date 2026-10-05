@@ -35,7 +35,13 @@ import {
 } from '../_shared/integrations.ts';
 
 type Source = { slug: string; name: string; kind: 'feed' | 'api'; retailer_slug: string | null; config: Record<string, unknown> };
-type Fetched = { records: OfferRecord[]; complete: boolean; notes: string[] };
+type Fetched = {
+  records: OfferRecord[];
+  complete: boolean;
+  notes: string[];
+  /** External refs the source reports as not purchasable (sold out, pre-order): their offers are hidden. */
+  unavailable?: string[];
+};
 
 function serviceKey(): string {
   const keys = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}') as Record<string, string>;
@@ -213,7 +219,8 @@ async function fetchShopify(source: Source): Promise<Fetched> {
   if (skipped.length) notes.push(`Skipped ${skipped.length}: ${[...new Set(skipped.map((s) => s.reason))].slice(0, 4).join('; ')}.`);
   if (!complete) notes.push('Stopped at the page limit; offers not seen this run are kept.');
   const truncated = !complete || skipped.some((s) => s.reason === 'over max_records');
-  return { records, complete: source.config.complete === true && !truncated, notes };
+  const unavailable = skipped.filter((s) => s.reason === 'out of stock').map((s) => s.ref);
+  return { records, complete: source.config.complete === true && !truncated, notes, unavailable };
 }
 
 // --- Runner ----------------------------------------------------------------------------------------------
@@ -240,8 +247,23 @@ async function runSource(db: SupabaseClient, source: Source) {
     if (r.error_count) notes.push(`${r.error_count} row error(s), e.g. ${r.errors?.[0]?.message ?? ''}`);
     // A run where every row failed is a failure (and backs off); partial errors are reported.
     const ok = !(fetched.records.length > 0 && r.error_count === fetched.records.length);
+    // Items the store says can't be bought right now are hidden even when the full-feed rule holds back
+    // (that rule guards against truncated feeds; these were seen and are known to be unavailable).
+    let soldOut = 0;
+    if (ok && fetched.unavailable?.length) {
+      const { data: src } = await db.from('ingestion_sources').select('id').eq('slug', source.slug).single();
+      const { data: hidden } = await db
+        .from('retailer_offers')
+        .update({ status: 'inactive' })
+        .eq('source_id', src?.id ?? '')
+        .eq('status', 'active')
+        .in('external_ref', fetched.unavailable)
+        .select('id');
+      soldOut = hidden?.length ?? 0;
+      if (soldOut) notes.push(`Hid ${soldOut} offer(s) that are sold out or pre-order only.`);
+    }
     const { data: finish } = await db.rpc('finish_ingestion_run', { source_slug: source.slug, run: runId, ok, message: notes.join(' ') || undefined, complete: fetched.complete && ok });
-    return { source: source.slug, ok, records: fetched.records.length, matched: r.matched, unmatched: r.unmatched, errors: r.error_count ?? 0, ...(finish as object) };
+    return { source: source.slug, ok, records: fetched.records.length, matched: r.matched, unmatched: r.unmatched, errors: r.error_count ?? 0, sold_out_hidden: soldOut, ...(finish as object) };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     await db.rpc('finish_ingestion_run', { source_slug: source.slug, run: runId, ok: false, message: message.slice(0, 500) });

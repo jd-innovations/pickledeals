@@ -175,7 +175,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - camera and photo library
   - reverse geocoding and city/ZIP search
   - native dialogs
-  - push delivery (Expo → APNs): the payload, badge and receipts are verified only against a local mock
+  - push delivery (Expo → APNs) **verified on device Oct 4, 2026** (message push, tap opens the thread, badge). Still open: quiet hours on device and receipt handling with real tickets
   - the "list in under 60 seconds" timing. The automated browser run took 77 s, inflated by tool overhead.
   - **the Phase 7 exit criterion**: Apple Maps rendering and a smooth 500-pin map on a mid-range iPhone. So far only measured off-device:
     - the bounds RPC takes ~190 ms locally with 2,000 listings in view (500 returned)

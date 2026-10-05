@@ -83,6 +83,8 @@ Notes:
 - `npx supabase db reset` signs everyone out; sign in again on the phone.
 - If the PC's IP changes (new network, router restart), run `npm run device:lan` again and restart Metro.
 - Two-account tests (chat, offers): phone as one seller, the web preview on the PC as the other.
+- No message push? Check Profile → Notifications → Messages is on. Messages also push once per unread
+  run, and not while the chat is open (or for 45 seconds after leaving it).
 - "Port 8081 is being used by another process": another Metro or web preview is running. Stop it and
   answer **n**. Don't switch to 8082, because the firewall rule only opens 8081. While Metro runs,
   the web preview is also at http://localhost:8081 on the PC.
@@ -97,8 +99,9 @@ Notes:
 - [ ] Camera and photo library in the sell flow; photos upload and show on the listing
 - [ ] Location permission, approximate area, reverse geocoding, city/ZIP search
 - [ ] Native dialogs (Alert, action sheets) in Manage listing, chat, offers
-- [ ] Push: permission prompt, token registered, a message from the web account arrives as a push,
-      tapping it opens the thread, app icon badge matches unread counts, quiet hours hold pushes
+- [x] Push (verified Oct 4, 2026): permission prompt from the first price alert, token registered, a
+      message from the web account arrives as a push, tapping it opens the thread, app icon badge shows
+- [ ] Push: quiet hours hold pushes; badge clears after reading
 - [ ] Map: Apple Maps renders (`mutedStandard`), 500 pins pan smoothly, clusters open, Search this area
 - [ ] Sell flow: list an item in under 60 seconds
 - [ ] Inbox swipe actions, composer and keyboard behaviour

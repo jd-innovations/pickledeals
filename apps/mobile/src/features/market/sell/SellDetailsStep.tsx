@@ -1,11 +1,11 @@
 import { radius, snapToCell } from '@pickledeals/shared';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, Switch, TextInput, View } from 'react-native';
+import { Alert, Platform, StyleSheet, TextInput, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { AreaMap } from '@/features/map';
-import { Button, Icon, Text, TextField } from '@/ui';
+import { Button, Icon, Text, TextField, Toggle } from '@/ui';
 
 import { geocodeArea, getDeviceArea, type DeviceArea } from '../device';
 import { useSellDraft, useViewer } from '../hooks';
@@ -167,7 +167,7 @@ export default function SellDetailsStep() {
                 {r.detail}
               </Text>
             </View>
-            <Switch accessibilityLabel={r.label} value={r.value} onValueChange={r.set} trackColor={{ true: colors.interactive, false: colors.border }} />
+            <Toggle accessibilityLabel={r.label} value={r.value} onValueChange={r.set} />
           </View>
         ))}
       </View>

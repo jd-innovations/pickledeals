@@ -2,13 +2,13 @@ import { formatPrice, radius } from '@pickledeals/shared';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ProductImage } from '@/commerce';
 import { useTheme } from '@/design/theme';
 import { productImage, useProduct } from '@/features/catalog/hooks';
 import { usePriceHistory, useProductOffers } from '@/features/offers/hooks';
-import { Button, Chip, Icon, Skeleton, Text } from '@/ui';
+import { Button, Chip, Icon, Skeleton, Text, Toggle } from '@/ui';
 
 import { useAlerts, useMeMutations } from '../hooks';
 import { ensurePushRegistered } from '../push';
@@ -146,7 +146,7 @@ export default function PriceAlertSheet() {
             Near your saved area, or ones that ship.
           </Text>
         </View>
-        <Switch accessibilityLabel="Pre-owned listings" value={includeUsed} onValueChange={setIncludeUsed} trackColor={{ true: colors.interactive, false: colors.border }} />
+        <Toggle accessibilityLabel="Pre-owned listings" value={includeUsed} onValueChange={setIncludeUsed} />
       </View>
 
       <Button label={existing ? 'Update alert' : 'Create alert'} fullWidth loading={saveAlert.isPending} onPress={save} />

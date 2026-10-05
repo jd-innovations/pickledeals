@@ -1,7 +1,7 @@
 import { formatAgo, formatPrice, radius } from '@pickledeals/shared';
 import { router, Stack, type Href } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ProductImage } from '@/commerce';
 import { useTheme } from '@/design/theme';
@@ -9,7 +9,7 @@ import { useAuth } from '@/features/auth/authStore';
 import { productImage } from '@/features/catalog/hooks';
 import { useDealFilterStore, EMPTY_FILTERS } from '@/features/deals/hooks';
 import { DEFAULT_MARKET_FILTERS, useMarketFilters, useMarketSearch } from '@/features/market/hooks';
-import { Button, EmptyState, Icon, IconButton, SegmentedControl, Skeleton, Text, type IconName } from '@/ui';
+import { Button, EmptyState, Icon, IconButton, SegmentedControl, Skeleton, Text, Toggle, type IconName } from '@/ui';
 
 import type { AppNotification, PriceAlert, SavedSearch } from '../api';
 import { useAlertPrices, useAlerts, useMeMutations, useNotifications, useSavedSearches } from '../hooks';
@@ -309,11 +309,10 @@ function Searches() {
               {formatAgo(s.createdAt)}
             </Text>
           </Pressable>
-          <Switch
+          <Toggle
             accessibilityLabel={`Notify for ${s.label}`}
             value={s.notify}
             onValueChange={(v) => updateSearch.mutate({ id: s.id, notify: v })}
-            trackColor={{ true: colors.interactive, false: colors.border }}
           />
           <IconButton icon="close" label={`Delete ${s.label}`} size={30} onPress={() => deleteSearch.mutate(s.id)} />
         </View>

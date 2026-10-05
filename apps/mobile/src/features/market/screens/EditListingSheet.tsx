@@ -1,10 +1,10 @@
 import { dollarsToCents, radius } from '@pickledeals/shared';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Switch, TextInput, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
-import { Button, Skeleton, Text } from '@/ui';
+import { Button, Skeleton, Text, Toggle } from '@/ui';
 
 import type { MyListing } from '../api';
 import { listingTitle, useListingMutations, useMyListings } from '../hooks';
@@ -66,7 +66,7 @@ function EditForm({ l }: { l: MyListing }) {
           {detail}
         </Text>
       </View>
-      <Switch accessibilityLabel={label} value={value} onValueChange={set} trackColor={{ true: colors.interactive, false: colors.border }} />
+      <Toggle accessibilityLabel={label} value={value} onValueChange={set} />
     </View>
   );
 

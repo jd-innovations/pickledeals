@@ -2,10 +2,10 @@ import { formatPrice, radius } from '@pickledeals/shared';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, Switch, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
-import { Text } from '@/ui';
+import { Text, Toggle } from '@/ui';
 
 import { conditionLabel } from '../components';
 import { usePriceGuide, useSellDraft } from '../hooks';
@@ -184,11 +184,10 @@ export default function SellPriceStep() {
               Buyers can send structured offers
             </Text>
           </View>
-          <Switch
+          <Toggle
             accessibilityLabel="Accept offers"
             value={draft.acceptsOffers}
             onValueChange={(v) => update({ acceptsOffers: v })}
-            trackColor={{ true: colors.interactive, false: colors.border }}
           />
         </View>
         {draft.acceptsOffers && (

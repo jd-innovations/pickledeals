@@ -1,11 +1,11 @@
 import { dollarsToCents, radius } from '@pickledeals/shared';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Switch, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { useBrands, useCategory } from '@/features/catalog/hooks';
-import { Button, Chip, Text } from '@/ui';
+import { Button, Chip, Text, Toggle } from '@/ui';
 
 import type { Deal } from '../api';
 import { EMPTY_FILTERS, useDealFilters, useDealFilterStore, useDeals, type DealFilters } from '../hooks';
@@ -135,11 +135,10 @@ export default function FilterSheet() {
               Hide offers the retailer lists as out of stock.
             </Text>
           </View>
-          <Switch
+          <Toggle
             accessibilityLabel="In stock only"
             value={draft.inStockOnly}
             onValueChange={(v) => setDraft({ ...draft, inStockOnly: v })}
-            trackColor={{ true: colors.interactive, false: colors.border }}
           />
         </View>
       </ScrollView>

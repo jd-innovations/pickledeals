@@ -1,11 +1,11 @@
 import { dollarsToCents, LISTING_CONDITIONS, radius } from '@pickledeals/shared';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Switch, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { useBrands } from '@/features/catalog/hooks';
-import { Button, Chip, SegmentedControl, Text } from '@/ui';
+import { Button, Chip, SegmentedControl, Text, Toggle } from '@/ui';
 
 import type { MarketSort } from '../api';
 import { RADIUS_OPTIONS } from '../components';
@@ -140,22 +140,20 @@ export default function MarketFiltersSheet() {
             <Text variant="subhead" weight="600">
               Local pickup only
             </Text>
-            <Switch
+            <Toggle
               accessibilityLabel="Local pickup only"
               value={draft.pickupOnly}
               onValueChange={(v) => setDraft({ ...draft, pickupOnly: v })}
-              trackColor={{ true: colors.interactive, false: colors.border }}
             />
           </View>
           <View style={styles.toggle}>
             <Text variant="subhead" weight="600">
               Include items that ship
             </Text>
-            <Switch
+            <Toggle
               accessibilityLabel="Include items that ship"
               value={draft.includeShipping}
               onValueChange={(v) => setDraft({ ...draft, includeShipping: v })}
-              trackColor={{ true: colors.interactive, false: colors.border }}
             />
           </View>
         </View>

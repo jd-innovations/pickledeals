@@ -1,11 +1,11 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Platform, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Alert, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { useAuth } from '@/features/auth/authStore';
-import { Button, ListRow, Group, SegmentedControl, Text, TextField } from '@/ui';
+import { Button, Group, ListRow, SegmentedControl, Text, TextField, Toggle } from '@/ui';
 
 import { setHomeArea } from '../api';
 import { RADIUS_OPTIONS } from '../components';
@@ -138,7 +138,7 @@ export default function LocationSheet() {
               Used next time and for pre-owned price alerts nearby.
             </Text>
           </View>
-          <Switch accessibilityLabel="Remember this area" value={remember} onValueChange={setRemember} trackColor={{ true: colors.interactive, false: colors.border }} />
+          <Toggle accessibilityLabel="Remember this area" value={remember} onValueChange={setRemember} />
         </View>
       )}
     </ScrollView>

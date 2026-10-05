@@ -1,9 +1,9 @@
-import { Pressable, ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { radiusLabel } from '@/features/market/components';
 import { chooseAction } from '@/lib/dialog';
-import { ErrorState, Icon, Skeleton, Text } from '@/ui';
+import { ErrorState, Icon, Skeleton, Text, Toggle } from '@/ui';
 
 import type { NotificationCategory } from '../api';
 import { useNotificationSettings, useNotificationSettingsMutations } from '../hooks';
@@ -85,11 +85,10 @@ export default function NotificationSettingsScreen() {
                       {r.detail}
                     </Text>
                   </View>
-                  <Switch
+                  <Toggle
                     accessibilityLabel={r.title}
                     value={s.categories[r.key]}
                     onValueChange={(enabled) => setCategory.mutate({ category: r.key, enabled })}
-                    trackColor={{ true: colors.interactive, false: colors.border }}
                   />
                 </View>
               ))}

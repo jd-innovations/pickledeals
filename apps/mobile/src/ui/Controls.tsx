@@ -1,7 +1,7 @@
 import { minTouchTarget, radius } from '@pickledeals/shared';
 import * as Haptics from 'expo-haptics';
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Switch, TextInput, View, type TextInputProps, type ViewStyle } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { Icon, type IconName } from './Icon';
@@ -229,3 +229,32 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 16 },
   rowInner: { flex: 1, minHeight: 50, flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 16 },
 });
+
+/**
+ * iOS switch in the monochrome palette (design: track --int when on, --border when off). Dark mode's
+ * "on" track is near-white, so the knob turns dark there; the design's white knob would vanish.
+ */
+export function Toggle({
+  value,
+  onValueChange,
+  accessibilityLabel,
+  disabled,
+}: {
+  value: boolean;
+  onValueChange: (value: boolean) => void;
+  accessibilityLabel: string;
+  disabled?: boolean;
+}) {
+  const { colors, scheme } = useTheme();
+  return (
+    <Switch
+      accessibilityLabel={accessibilityLabel}
+      value={value}
+      onValueChange={onValueChange}
+      disabled={disabled}
+      trackColor={{ true: colors.interactive, false: colors.border }}
+      ios_backgroundColor={colors.border}
+      thumbColor={scheme === 'dark' && value ? colors.onInteractive : undefined}
+    />
+  );
+}

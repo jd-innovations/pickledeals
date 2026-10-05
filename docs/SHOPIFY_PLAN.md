@@ -46,6 +46,10 @@ Status: **Part B built (Oct 5, 2026); waiting for the user's Part A (Shopify tok
   Disclosure now reads "PickleDeals’ owner also owns this store; it’s listed first when prices tie".
 - **Sold-out items aren't imported**: the adapter skips items with nothing in stock; with the
   full-catalog setting, an offer that sells out is hidden on the next run and returns when restocked.
+- **Pre-orders are hidden too** (user, Oct 5): variants Shopify sells with nothing on hand
+  ("continue selling when out of stock", Storefront `currentlyNotInStock`) count as out of stock. Their
+  offers are hidden on each run and return once stock arrives. Example: the Engage X2's description still
+  carries Engage's stale "5/1 shipping update" (supplier content synced by Collective; ask Engage to fix it).
 
 ## Store check via the Shopify connector (Oct 5, 2026, read-only)
 - **No Headless channel is installed yet.** Channels: Online Store, Point of Sale, Shop, Google & YouTube,

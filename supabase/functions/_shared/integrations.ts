@@ -406,6 +406,7 @@ const slugPart = (s: string) =>
  *   and cosmetic options (colour, graphic, design) collapse too: the app lists one offer per store.
  * - The price is the variant price. compare_at_price is never used: a store's own "was" price isn't a
  *   reference PickleDeals can vouch for (deals come from tracked price history and catalog MSRP).
+ * - Items with nothing in stock are skipped: only items a shopper can buy are listed.
  * - Items tagged with the Collective tag carry ships_from = vendor (the supplier ships them).
  * - Links are built on the store's public origin, so they pass the retailer-domain check.
  */
@@ -481,6 +482,12 @@ export function shopifyRecords(
         continue;
       }
       const stockKnown = priced.some((v) => v.available != null);
+      // Nothing to sell: not imported. With a full-catalog source, an offer that sells out is hidden on
+      // the next run (it disappears from the feed) and comes back when restocked.
+      if (stockKnown && !priced.some((v) => v.available === true)) {
+        skipped.push({ ref, reason: 'out of stock' });
+        continue;
+      }
       const inStock = priced.filter((v) => v.available !== false);
       const price = Math.min(...(inStock.length ? inStock : priced).map((v) => v.priceCents!));
       const label = collapsed ? key : v0.title !== DEFAULT_TITLE ? v0.title : '';
@@ -510,6 +517,22 @@ export function shopifyRecords(
     }
   }
   return { records, skipped };
+}
+
+// --- Discount links (go function) ---------------------------------------------------------------------
+
+/**
+ * Shopify discount link: the code is applied at checkout and the shopper lands on the product page.
+ * The template is a path on the retailer's own origin ('/discount/{code}?redirect={path}'); {path} is
+ * the product page's path and query, so the result can never leave the product's host.
+ */
+export function discountLinkUrl(productUrl: URL, code: string, template: string | null): URL {
+  const clean = code.trim();
+  if (!template || !/^[A-Za-z0-9_-]{1,64}$/.test(clean) || !template.startsWith('/')) return productUrl;
+  const path = `${productUrl.pathname}${productUrl.search}`;
+  const filled = template.replace('{code}', encodeURIComponent(clean)).replace('{path}', encodeURIComponent(path));
+  const url = new URL(filled, productUrl.origin);
+  return url.origin === productUrl.origin ? url : productUrl;
 }
 
 // --- Affiliate links (go function) ---------------------------------------------------------------

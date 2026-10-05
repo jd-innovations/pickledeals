@@ -28,6 +28,10 @@ export function ownershipDisclosure(offers: (RankedOffer | null | undefined)[]):
   return seen.size ? [...seen].map(([name, note]) => `${name}: ${note}.`).join(' ') : null;
 }
 
+/** Button copy for an offer with a code: applied by the store at checkout, or copied for the shopper to paste. */
+export const codeDealLabel = (o: RankedOffer) =>
+  o.promo ? (o.codeAutoApplied ? `Get deal · ${o.promo.code} applied` : `Copy ${o.promo.code} & get deal`) : null;
+
 export function stockLabel(o: RankedOffer): string {
   return o.inStock ? 'In stock' : 'Out of stock';
 }

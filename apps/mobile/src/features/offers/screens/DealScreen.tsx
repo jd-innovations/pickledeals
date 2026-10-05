@@ -142,7 +142,7 @@ export default function DealScreen() {
 
             <View style={{ paddingHorizontal: 16 }}>
               <Text variant="caption" weight="400" tone="tertiary">
-                Opens {o.retailer.name}.{o.promo ? ' The code is copied for you.' : ''} PickleDeals doesn’t handle checkout.{' '}
+                Opens {o.retailer.name}.{o.promo ? (o.codeAutoApplied ? ' The code is applied at checkout, and copied in case you need it.' : ' The code is copied for you.') : ''} PickleDeals doesn’t handle checkout.{' '}
                 {AFFILIATE_DISCLOSURE.replace('Affiliate links — ', '')}
                 {ownershipDisclosure([o]) ? ` ${ownershipDisclosure([o])}` : ''}
                 {apiPriceDisclaimer([o]) ? ` ${apiPriceDisclaimer([o])}` : ''}
@@ -156,7 +156,7 @@ export default function DealScreen() {
         <StickyDealBar
           title={checkPrice ? `Check price at ${o.retailer.name}` : formatPrice(o.deliveredCents!)}
           subtitle={checkPrice ? undefined : [o.retailer.name, shippingLabel(o)].join(' · ')}
-          actionLabel={o.promo ? 'Copy code & get deal' : checkPrice ? 'Open' : 'Get deal'}
+          actionLabel={o.promo ? (o.codeAutoApplied ? 'Get deal, code applied' : 'Copy code & get deal') : checkPrice ? 'Open' : 'Get deal'}
           onAction={getDeal}
         />
       )}

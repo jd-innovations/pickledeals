@@ -1,5 +1,5 @@
 begin;
-select plan(22);
+select plan(26);
 
 create function pg_temp.act_as(uid uuid, app_role text default null) returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'app_role', app_role)::text, true);
@@ -22,7 +22,7 @@ select is(public.brand_for_vendor('Unknown Paddle Co'), null, 'unknown vendors m
 
 -- The pilot store ------------------------------------------------------------------------------------
 
-select is((select ownership_note from public.retailers where slug = 'pickleball-grip-doctor'), 'PickleDeals’ owner also owns this store',
+select is((select ownership_note from public.retailers where slug = 'pickleball-grip-doctor'), 'PickleDeals’ owner also owns this store; it’s listed first when prices tie',
   'Pickleball Grip Doctor carries the ownership disclosure');
 select ok(not (select is_active from public.ingestion_sources where slug = 'shopify-gripdoctor'), 'its Shopify source ships turned off');
 
@@ -66,7 +66,7 @@ select is_empty($$select 1 from public.variant_offer_ranking where product_id = 
 
 update public.products set status = 'active' where slug = 'engage-x2-elongated';
 select results_eq($$select ships_from, ownership_note from public.variant_offer_ranking where product_id = (select (r ->> 'product_id')::uuid from made)$$,
-  $$values ('Engage'::text, 'PickleDeals’ owner also owns this store'::text)$$,
+  $$values ('Engage'::text, 'PickleDeals’ owner also owns this store; it’s listed first when prices tie'::text)$$,
   'once published, the app gets "Ships from Engage" and the ownership note');
 select is((public.ingest_offers('shopify-gripdoctor', jsonb_build_array((select rec from x2)), false, true) ->> 'matched')::int, 1,
   'the next import matches by itself');
@@ -83,7 +83,7 @@ reset role;
 select is(public.brand_for_vendor('PGD supply'), (select id from public.brands where slug = 'pickleball-grip-doctor'),
   'the store’s vendor name is remembered for that brand');
 
--- Ranking ties are neutral ------------------------------------------------------------------------
+-- Ranking ties ----------------------------------------------------------------------------------------
 
 -- Baseline Sports: same item price and shipping, checked long ago. Grip Doctor's feed was just refreshed.
 select public.ingest_offers('csv', jsonb_build_array(jsonb_build_object(
@@ -91,20 +91,35 @@ select public.ingest_offers('csv', jsonb_build_array(jsonb_build_object(
   'variant_id', (select r ->> 'variant_id' from made), 'price_cents', 19999)), false);
 update public.retailer_offers set last_checked_at = now() - interval '3 days'
  where retailer_id = (select id from public.retailers where slug = 'baseline-sports') and variant_id = (select (r ->> 'variant_id')::uuid from made);
+create function pg_temp.first() returns text language sql as $$
+  select retailer_slug from public.variant_offer_ranking where variant_id = (select (r ->> 'variant_id')::uuid from made) and rank = 1;
+$$;
 
-select is((select retailer_slug from public.variant_offer_ranking where variant_id = (select (r ->> 'variant_id')::uuid from made) and rank = 1),
-  'baseline-sports', 'equal prices: a fresher feed doesn’t win the tie (retailer name decides)');
+select is(pg_temp.first(), 'pickleball-grip-doctor', 'an exact tie goes to Grip Doctor (a disclosed preference)');
+update public.retailer_offers set in_stock = false where external_ref = 'variant-9001';
+select is(pg_temp.first(), 'baseline-sports', 'but never when it’s out of stock');
+update public.retailer_offers set in_stock = true where external_ref = 'variant-9001';
 
+update public.retailers set wins_price_ties = false where slug = 'pickleball-grip-doctor';
+select is(pg_temp.first(), 'baseline-sports', 'without the preference, a fresher feed doesn’t win ties (retailer name decides)');
 update public.retailer_offers set price_cents = 19499, shipping_cents = 500
  where retailer_id = (select id from public.retailers where slug = 'baseline-sports') and variant_id = (select (r ->> 'variant_id')::uuid from made);
-select is((select retailer_slug from public.variant_offer_ranking where variant_id = (select (r ->> 'variant_id')::uuid from made) and rank = 1),
-  'pickleball-grip-doctor', 'equal delivered prices: lower shipping wins');
-
-update public.retailer_offers set price_cents = 19999, shipping_cents = 0, in_stock = false
+select is(pg_temp.first(), 'pickleball-grip-doctor', 'equal delivered prices: lower shipping wins');
+update public.retailers set wins_price_ties = true where slug = 'pickleball-grip-doctor';
+update public.retailer_offers set price_cents = 18999, shipping_cents = 0
  where retailer_id = (select id from public.retailers where slug = 'baseline-sports') and variant_id = (select (r ->> 'variant_id')::uuid from made);
-update public.retailer_offers set in_stock = true where external_ref = 'variant-9001';
-select is((select retailer_slug from public.variant_offer_ranking where variant_id = (select (r ->> 'variant_id')::uuid from made) and rank = 1),
-  'pickleball-grip-doctor', 'equal prices: in stock wins');
+select is(pg_temp.first(), 'baseline-sports', 'a cheaper offer always beats the preference');
+
+select throws_ok($$update public.retailers set wins_price_ties = true where slug = 'baseline-sports'$$, '23514', null,
+  'a tie preference needs an ownership disclosure');
+
+-- A Grip Doctor code: ranked on the price after the code, applied at checkout by the discount link.
+insert into public.promo_codes (retailer_id, code, title, discount_type, discount_value, verified_at)
+values ((select id from public.retailers where slug = 'pickleball-grip-doctor'), 'DINK15', '15% off paddles', 'percent', 15, now());
+select results_eq($$select retailer_slug::text, delivered_cents, code_auto_applied from public.variant_offer_ranking
+                     where variant_id = (select (r ->> 'variant_id')::uuid from made) order by rank$$,
+  $$values ('pickleball-grip-doctor'::text, 17000, true), ('baseline-sports'::text, 18999, false)$$,
+  'Grip Doctor’s code lowers what you pay and is applied automatically');
 
 -- Vendor names are staff data -----------------------------------------------------------------------
 

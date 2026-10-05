@@ -5,6 +5,7 @@ import {
   amazonRecords,
   batches,
   detectDelimiter,
+  discountLinkUrl,
   feedRecords,
   fromPublicJson,
   fromStorefront,
@@ -214,7 +215,7 @@ describe('shopifyRecords', () => {
     expect(r!.upc).toBeUndefined();
   });
 
-  it('keeps one record per variant, linked to that variant', () => {
+  it('keeps one record per variant, linked to that variant, and skips sold-out ones', () => {
     const paddle = {
       ...x2,
       options: [{ name: 'Thickness' }],
@@ -223,12 +224,12 @@ describe('shopifyRecords', () => {
         { id: 2, title: '16mm', price: '199.99', barcode: '4006381333931', option1: '16mm', available: false },
       ],
     };
-    const { records } = shopifyRecords(fromPublicJson([paddle]), cfg);
+    const { records, skipped } = shopifyRecords(fromPublicJson([paddle]), cfg);
     expect(records.map((r) => [r.external_ref, r.title, r.in_stock, r.gtin ?? r.ean])).toEqual([
       ['variant-1', 'Engage X2 Elongated Pickleball Paddle – 14mm', true, '00012345678905'],
-      ['variant-2', 'Engage X2 Elongated Pickleball Paddle – 16mm', false, '4006381333931'],
     ]);
     expect(records[0]!.url).toContain('variant=1');
+    expect(skipped).toEqual([{ ref: 'variant-2', reason: 'out of stock' }]);
   });
 
   it('collapses sizes into one record with available sizes', () => {
@@ -298,5 +299,26 @@ describe('shopifyRecords, cosmetic options', () => {
     const { records } = shopifyRecords(grip, { retailerSlug: 'r', storeUrl: 'https://example.com' });
     expect(records).toHaveLength(1);
     expect(records[0]).toMatchObject({ external_ref: 'product-6', title: 'PGD Trigger', url: 'https://example.com/products/trigger' });
+  });
+});
+
+describe('discountLinkUrl', () => {
+  const product = new URL('https://pickleballgripdoctor.com/products/engage-x2?utm_source=pickledeals&utm_medium=referral');
+  const template = '/discount/{code}?redirect={path}';
+
+  it('applies the code at checkout and lands on the product page', () => {
+    const url = discountLinkUrl(product, 'DINK15', template);
+    expect(url.origin).toBe('https://pickleballgripdoctor.com');
+    expect(url.pathname).toBe('/discount/DINK15');
+    expect(url.searchParams.get('redirect')).toBe('/products/engage-x2?utm_source=pickledeals&utm_medium=referral');
+  });
+
+  it('leaves the link alone without a template or with an odd code', () => {
+    expect(discountLinkUrl(product, 'DINK15', null)).toBe(product);
+    expect(discountLinkUrl(product, 'bad code/../x', template)).toBe(product);
+  });
+
+  it('never leaves the product host', () => {
+    expect(discountLinkUrl(product, 'X1', '//evil.example/{code}?r={path}')).toBe(product);
   });
 });

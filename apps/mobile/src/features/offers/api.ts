@@ -29,6 +29,8 @@ export type RankedOffer = {
   shipsFrom: string | null;
   /** Disclosure for a retailer connected to PickleDeals (e.g. the same owner). */
   ownershipNote: string | null;
+  /** The retailer applies the promo code at checkout itself (Shopify discount link). */
+  codeAutoApplied: boolean;
 };
 
 export type VariantStats = {
@@ -80,10 +82,11 @@ type RankingRow = {
   tracking_excluded: boolean;
   ships_from: string | null;
   ownership_note: string | null;
+  code_auto_applied: boolean;
 };
 
 const RANKING_COLUMNS =
-  'offer_id, variant_id, retailer_slug, retailer_name, retailer_kind, price_display, price_cents, shipping_cents, delivered_cents, promo_id, promo_code, promo_discount_cents, rank, in_stock, available_sizes, last_checked_at, price_source, tracking_excluded, ships_from, ownership_note';
+  'offer_id, variant_id, retailer_slug, retailer_name, retailer_kind, price_display, price_cents, shipping_cents, delivered_cents, promo_id, promo_code, promo_discount_cents, rank, in_stock, available_sizes, last_checked_at, price_source, tracking_excluded, ships_from, ownership_note, code_auto_applied';
 
 const toOffer = (r: RankingRow): RankedOffer => ({
   offerId: r.offer_id,
@@ -102,6 +105,7 @@ const toOffer = (r: RankingRow): RankedOffer => ({
   trackingExcluded: r.tracking_excluded,
   shipsFrom: r.ships_from,
   ownershipNote: r.ownership_note,
+  codeAutoApplied: r.code_auto_applied ?? false,
 });
 
 /** Priced offers in rank order, then check-price offers (D1: listed, never ranked). */

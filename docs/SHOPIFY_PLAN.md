@@ -30,6 +30,23 @@ Status: **Part B built (Oct 5, 2026); waiting for the user's Part A (Shopify tok
   newer generations than the catalog (Agassi Pro **V** vs Pro IV): create new products, don't match.
 - The local review queue now holds these 32 items for trying **Create product…**.
 
+## Decisions (user, Oct 5, 2026) — built
+- **Pickleball Grip Doctor is the seller of record** for its own and its Collective items: its domain,
+  Shopify Payments, order numbers and Collective agreements. PickleDeals never sells; it lists Grip
+  Doctor as a disclosed partner store (not a "PickleDeals Shop").
+- **Deals on Collective items come from Grip Doctor discount codes** (Collective prices are set by the
+  supplier and reverted if edited; Grip Doctor absorbs the discount). Add codes in admin → Promo codes
+  (retailer Pickleball Grip Doctor; optional product/category targets; "PickleDeals exclusive" flag).
+  Promo codes must be re-verified every 14 days to stay live (existing rule for all retailers).
+- **Codes apply automatically**: `retailers.discount_link_template = '/discount/{code}?redirect={path}'`;
+  the go function sends Get deal to the Shopify discount link (verified end to end locally). The app
+  says "Get deal · CODE applied" and still copies the code as a fallback.
+- **Grip Doctor wins exact ties** (`retailers.wins_price_ties`, only allowed with an ownership note).
+  Order: delivered price → in stock → tie preference → shipping → name. A cheaper offer always wins.
+  Disclosure now reads "PickleDeals’ owner also owns this store; it’s listed first when prices tie".
+- **Sold-out items aren't imported**: the adapter skips items with nothing in stock; with the
+  full-catalog setting, an offer that sells out is hidden on the next run and returns when restocked.
+
 ## Store check via the Shopify connector (Oct 5, 2026, read-only)
 - **No Headless channel is installed yet.** Channels: Online Store, Point of Sale, Shop, Google & YouTube,
   Facebook & Instagram, TikTok, Collective: Supplier, Sell on WordPress, Microsoft Copilot, Lovable,
@@ -52,7 +69,7 @@ Status: **Part B built (Oct 5, 2026); waiting for the user's Part A (Shopify tok
    Doctor stock and ship these itself? If they're Collective too, the tag is missing in Shopify.
 3. Several items list vendor "Pickleball Grip Doctor" but are other brands (Scorpeus Pro V is JOOLA,
    Luzz, HEXXO). Fixing the vendor in Shopify makes brand mapping automatic.
-4. The ownership wording "PickleDeals’ owner also owns this store" (lawyer to confirm).
+4. The ownership wording "PickleDeals’ owner also owns this store; it’s listed first when prices tie" (lawyer to confirm).
 5. Your shipping rule (Integrations → Settings), e.g. free over $50, otherwise $6.95.
 
 ## To go live (after Part A)

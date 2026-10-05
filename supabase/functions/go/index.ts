@@ -2,11 +2,12 @@
 //
 // The client never builds retailer or affiliate URLs. This function looks up the active offer, adds
 // the retailer's affiliate tag (secrets stay server-side), logs the click and 302s. Destinations are
-// constrained to the retailer's domain, so it can't be used as an open redirect.
+// constrained to the retailer's domain, so it can't be used as an open redirect. For retailers with a
+// discount link template (Shopify stores), a live code is applied at checkout through that link.
 // Public by design (verify_jwt = false): the in-app browser can't send auth headers.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
-import { affiliateUrl, type AffiliateProgram } from '../_shared/integrations.ts';
+import { affiliateUrl, discountLinkUrl, type AffiliateProgram } from '../_shared/integrations.ts';
 
 // Affiliate networks whose click URLs may wrap a product link (AFFILIATE_LINK_HOSTS overrides).
 const LINK_HOSTS = (Deno.env.get('AFFILIATE_LINK_HOSTS') ?? 'avantlink.com,sjv.io,anrdoezrs.net,jdoqocy.com,kqzyfj.com,tkqlhce.com,dpbolvw.net,awin1.com,linksynergy.com')
@@ -47,11 +48,11 @@ Deno.serve(async (req) => {
 
   const { data: offer } = await db
     .from('retailer_offers')
-    .select('id, url, status, retailer:retailers!inner(id, domain, is_active, affiliate:affiliate_programs(tag_template, link_template, is_active))')
+    .select('id, url, status, retailer:retailers!inner(id, domain, is_active, discount_link_template, affiliate:affiliate_programs(tag_template, link_template, is_active))')
     .eq('id', offerId)
     .maybeSingle();
 
-  type Retailer = { id: string; domain: string; is_active: boolean; affiliate: AffiliateProgram | null };
+  type Retailer = { id: string; domain: string; is_active: boolean; discount_link_template: string | null; affiliate: AffiliateProgram | null };
   const retailer = offer?.retailer as unknown as Retailer | undefined;
   if (!offer || offer.status !== 'active' || !retailer?.is_active) {
     return page(404, 'This offer has ended', 'The retailer no longer lists it at this price. Open PickleDeals to see current offers.');
@@ -68,11 +69,25 @@ Deno.serve(async (req) => {
   // Affiliate tag or network click URL from the retailer's program (never stored on the client or in offer URLs).
   target = affiliateUrl(target, retailer.affiliate, LINK_HOSTS);
 
-  // Only log promo ids that belong to this retailer.
+  // Only log promo ids that belong to this retailer; apply live ones through the retailer's discount link.
   let promo: string | null = null;
   if (promoId) {
-    const { data } = await db.from('promo_codes').select('id').eq('id', promoId).eq('retailer_id', retailer.id).maybeSingle();
+    const { data } = await db
+      .from('promo_codes')
+      .select('id, code, status, verified_at, starts_at, ends_at')
+      .eq('id', promoId)
+      .eq('retailer_id', retailer.id)
+      .maybeSingle();
     promo = data?.id ?? null;
+    const now = Date.now();
+    const live =
+      data &&
+      data.status === 'active' &&
+      data.verified_at &&
+      new Date(data.verified_at).getTime() > now - 14 * 86_400_000 &&
+      (!data.starts_at || new Date(data.starts_at).getTime() <= now) &&
+      (!data.ends_at || new Date(data.ends_at).getTime() > now);
+    if (live && onDomain(target, retailer.domain)) target = discountLinkUrl(target, data.code, retailer.discount_link_template);
   }
 
   if (req.method === 'GET') {

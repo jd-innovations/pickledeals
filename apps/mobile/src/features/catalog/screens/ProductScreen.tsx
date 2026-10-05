@@ -13,6 +13,7 @@ import { PreOwnedSection } from '@/features/market/PreOwned';
 import type { RankedOffer } from '@/features/offers/api';
 import {
   AFFILIATE_DISCLOSURE,
+  codeDealLabel,
   UNTRACKED_NOTE,
   apiPriceDisclaimer,
   deltaLabel,
@@ -165,7 +166,7 @@ export default function ProductScreen() {
                     </View>
                   )}
                   <Button
-                    label={best.promo ? `Copy ${best.promo.code} & get deal` : `Get deal at ${best.retailer.name}`}
+                    label={codeDealLabel(best) ?? `Get deal at ${best.retailer.name}`}
                     icon="external"
                     iconPosition="trailing"
                     fullWidth

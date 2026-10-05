@@ -58,15 +58,19 @@ select is((select content_hash from public.products where id = (select id from p
 
 -- A catalog product with nothing of its own adopts the store's content once a store offer matches it.
 update public.products set status = 'active' where id = (select id from pid);
+-- Two published products of the test's own: one with nothing, one with a curated image.
+insert into public.products (brand_id, category_id, slug, name, status)
+select b.id, c.id, x.slug, x.name, 'active'
+  from public.brands b, public.categories c, (values ('sc-bare', 'SC Bare Paddle'), ('sc-curated', 'SC Curated Paddle')) x(slug, name)
+ where b.slug = 'engage' and c.slug = 'paddles';
+insert into public.product_variants (product_id, label, is_default)
+select id, 'Standard', true from public.products where slug in ('sc-bare', 'sc-curated');
+insert into public.product_images (product_id, storage_path, source, status)
+select id, 'products/sc-curated/curated.jpg', 'owned', 'active' from public.products where slug = 'sc-curated';
 create temp table bare as
-  select p.id, v.id as vid from public.products p join public.product_variants v on v.product_id = p.id and v.is_default
-   where p.status = 'active' and p.description is null and p.content_source_id is null
-     and not exists (select 1 from public.product_images i where i.product_id = p.id and i.status = 'active')
-   limit 1;
+  select p.id, v.id as vid from public.products p join public.product_variants v on v.product_id = p.id where p.slug = 'sc-bare';
 create temp table curated as
-  select p.id, v.id as vid from public.products p join public.product_variants v on v.product_id = p.id and v.is_default
-   where exists (select 1 from public.product_images i where i.product_id = p.id and i.status = 'active') and p.content_source_id is null
-   limit 1;
+  select p.id, v.id as vid from public.products p join public.product_variants v on v.product_id = p.id where p.slug = 'sc-curated';
 select public.ingest_offers('shopify-gripdoctor', jsonb_build_array(
   (select rec from item) || jsonb_build_object('external_ref', 'variant-sc-2', 'content_ref', 'shopify-product-sc-2', 'variant_id', (select vid from bare)),
   (select rec from item) || jsonb_build_object('external_ref', 'variant-sc-3', 'content_ref', 'shopify-product-sc-3', 'variant_id', (select vid from curated))),

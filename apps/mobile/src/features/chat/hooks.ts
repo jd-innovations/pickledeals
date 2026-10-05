@@ -316,10 +316,12 @@ export function useChatMutations() {
   const uid = useUid();
   const qc = useQueryClient();
   const refresh = () => qc.invalidateQueries({ queryKey: chatKeys.root(uid) });
+  // Blocks also hide (or restore) the other person's listings in the marketplace.
+  const refreshWithMarket = () => Promise.all([refresh(), qc.invalidateQueries({ queryKey: ['market'] })]);
   return {
     setState: useMutation({ mutationFn: ({ id, ...s }: { id: string; muted?: boolean; archived?: boolean }) => setThreadState(id, s), onSuccess: refresh }),
-    block: useMutation({ mutationFn: blockUser, onSuccess: refresh }),
-    unblock: useMutation({ mutationFn: unblockUser, onSuccess: refresh }),
+    block: useMutation({ mutationFn: blockUser, onSuccess: refreshWithMarket }),
+    unblock: useMutation({ mutationFn: unblockUser, onSuccess: refreshWithMarket }),
   };
 }
 

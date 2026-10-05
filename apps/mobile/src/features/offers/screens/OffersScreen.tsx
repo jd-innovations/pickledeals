@@ -8,7 +8,7 @@ import { useProduct } from '@/features/catalog/hooks';
 import { EmptyState, SegmentedControl, Skeleton, Text } from '@/ui';
 
 import type { RankedOffer } from '../api';
-import { apiPriceDisclaimer, isApiPrice, offerBreakdown, priceAsOf, stockLabel } from '../format';
+import { apiPriceDisclaimer, isApiPrice, offerBreakdown, priceAsOf, shipsFromLabel, stockLabel } from '../format';
 import { openDeal, useProductOffers } from '../hooks';
 
 type Mode = 'delivered' | 'item';
@@ -63,17 +63,28 @@ export default function OffersScreen() {
                 monogram: retailerMonogram(o.retailer.name),
                 tagline: checkPrice
                   ? 'Price shown at retailer'
-                  : [isBest ? (mode === 'delivered' ? 'Lowest delivered price' : 'Lowest item price') : stockLabel(o), o.retailer.kind === 'manufacturer' ? 'Manufacturer' : null, o.promo ? `code ${o.promo.code}` : null]
+                  : [
+                      isBest ? (mode === 'delivered' ? 'Lowest delivered price' : 'Lowest item price') : stockLabel(o),
+                      o.retailer.kind === 'manufacturer' ? 'Manufacturer' : null,
+                      o.promo ? `code ${o.promo.code}` : null,
+                    ]
                       .filter(Boolean)
                       .join(' · '),
                 priceCents: value,
-                deltaLabel: !checkPrice && bestValue != null && value != null ? (value - bestValue <= 0 ? 'Best' : `+${formatPrice(value - bestValue)}`) : undefined,
-                detail: checkPrice ? `${o.retailer.name} shows the current price on its site` : offerBreakdown(o),
+                deltaLabel:
+                  !checkPrice && bestValue != null && value != null ? (value - bestValue <= 0 ? 'Best' : `+${formatPrice(value - bestValue)}`) : undefined,
+                detail: checkPrice
+                  ? `${o.retailer.name} shows the current price on its site`
+                  : [offerBreakdown(o), shipsFromLabel(o), o.ownershipNote].filter(Boolean).join(' · '),
                 checked: isApiPrice(o) ? priceAsOf(o) : `Checked ${formatAgo(o.checkedAt)}`,
                 best: isBest,
               }}
               actionLabel={checkPrice ? `Check price at ${o.retailer.name}` : isBest ? 'Get deal' : 'View offer'}
-              onAction={() => (isBest || checkPrice ? openDeal(o.offerId, checkPrice ? 'offers_check_price' : 'offers_best', o.promo?.id) : router.push({ pathname: '/deals/offer/[id]', params: { id: o.offerId } }))}
+              onAction={() =>
+                isBest || checkPrice
+                  ? openDeal(o.offerId, checkPrice ? 'offers_check_price' : 'offers_best', o.promo?.id)
+                  : router.push({ pathname: '/deals/offer/[id]', params: { id: o.offerId } })
+              }
             />
           );
         })

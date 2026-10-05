@@ -92,6 +92,31 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"brand_vendor_aliases": {
+                  Row: {
+                    "brand_id": string,"created_at": string,"created_by": string | null,"vendor_key": string
+                  }
+                  Insert: {
+                    "brand_id": string,"created_at"?: string,"created_by"?: string | null,"vendor_key": string
+                  }
+                  Update: {
+                    "brand_id"?: string,"created_at"?: string,"created_by"?: string | null,"vendor_key"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "brand_vendor_aliases_brand_id_fkey"
+      columns: ["brand_id"]
+isOneToOne: false
+      referencedRelation: "brand_summaries"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "brand_vendor_aliases_brand_id_fkey"
+      columns: ["brand_id"]
+isOneToOne: false
+      referencedRelation: "brands"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"brands": {
                   Row: {
                     "created_at": string,"id": string,"is_active": boolean,"logo_path": string | null,"name": string,"slug": string,"updated_at": string,"website_url": string | null
@@ -1048,13 +1073,13 @@ isOneToOne: false
                   ]
                 },"retailer_offers": {
                   Row: {
-                    "available_sizes": (string)[],"created_at": string,"external_ref": string | null,"first_seen_at": string,"id": string,"in_stock": boolean,"last_changed_at": string,"last_checked_at": string,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"],"price_source": Database["public"]['Enums']["price_source"],"retailer_id": string,"shipping_cents": number,"source_id": string | null,"status": Database["public"]['Enums']["offer_status"],"updated_at": string,"url": string,"variant_id": string
+                    "available_sizes": (string)[],"created_at": string,"external_ref": string | null,"first_seen_at": string,"id": string,"in_stock": boolean,"last_changed_at": string,"last_checked_at": string,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"],"price_source": Database["public"]['Enums']["price_source"],"retailer_id": string,"shipping_cents": number,"ships_from": string | null,"source_id": string | null,"status": Database["public"]['Enums']["offer_status"],"updated_at": string,"url": string,"variant_id": string
                   }
                   Insert: {
-                    "available_sizes"?: (string)[],"created_at"?: string,"external_ref"?: string | null,"first_seen_at"?: string,"id"?: string,"in_stock"?: boolean,"last_changed_at"?: string,"last_checked_at"?: string,"price_cents"?: number | null,"price_display": Database["public"]['Enums']["price_display"],"price_source"?: Database["public"]['Enums']["price_source"],"retailer_id": string,"shipping_cents"?: number,"source_id"?: string | null,"status"?: Database["public"]['Enums']["offer_status"],"updated_at"?: string,"url": string,"variant_id": string
+                    "available_sizes"?: (string)[],"created_at"?: string,"external_ref"?: string | null,"first_seen_at"?: string,"id"?: string,"in_stock"?: boolean,"last_changed_at"?: string,"last_checked_at"?: string,"price_cents"?: number | null,"price_display": Database["public"]['Enums']["price_display"],"price_source"?: Database["public"]['Enums']["price_source"],"retailer_id": string,"shipping_cents"?: number,"ships_from"?: string | null,"source_id"?: string | null,"status"?: Database["public"]['Enums']["offer_status"],"updated_at"?: string,"url": string,"variant_id": string
                   }
                   Update: {
-                    "available_sizes"?: (string)[],"created_at"?: string,"external_ref"?: string | null,"first_seen_at"?: string,"id"?: string,"in_stock"?: boolean,"last_changed_at"?: string,"last_checked_at"?: string,"price_cents"?: number | null,"price_display"?: Database["public"]['Enums']["price_display"],"price_source"?: Database["public"]['Enums']["price_source"],"retailer_id"?: string,"shipping_cents"?: number,"source_id"?: string | null,"status"?: Database["public"]['Enums']["offer_status"],"updated_at"?: string,"url"?: string,"variant_id"?: string
+                    "available_sizes"?: (string)[],"created_at"?: string,"external_ref"?: string | null,"first_seen_at"?: string,"id"?: string,"in_stock"?: boolean,"last_changed_at"?: string,"last_checked_at"?: string,"price_cents"?: number | null,"price_display"?: Database["public"]['Enums']["price_display"],"price_source"?: Database["public"]['Enums']["price_source"],"retailer_id"?: string,"shipping_cents"?: number,"ships_from"?: string | null,"source_id"?: string | null,"status"?: Database["public"]['Enums']["offer_status"],"updated_at"?: string,"url"?: string,"variant_id"?: string
                   }
                   Relationships: [
                     {
@@ -1079,13 +1104,13 @@ isOneToOne: false
                   ]
                 },"retailers": {
                   Row: {
-                    "created_at": string,"domain": string,"id": string,"is_active": boolean,"kind": Database["public"]['Enums']["retailer_kind"],"logo_path": string | null,"name": string,"price_display_default": Database["public"]['Enums']["price_display"],"slug": string,"tracking_excluded": boolean,"updated_at": string
+                    "created_at": string,"domain": string,"id": string,"is_active": boolean,"kind": Database["public"]['Enums']["retailer_kind"],"logo_path": string | null,"name": string,"ownership_note": string | null,"price_display_default": Database["public"]['Enums']["price_display"],"slug": string,"tracking_excluded": boolean,"updated_at": string
                   }
                   Insert: {
-                    "created_at"?: string,"domain": string,"id"?: string,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["retailer_kind"],"logo_path"?: string | null,"name": string,"price_display_default"?: Database["public"]['Enums']["price_display"],"slug": string,"tracking_excluded"?: boolean,"updated_at"?: string
+                    "created_at"?: string,"domain": string,"id"?: string,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["retailer_kind"],"logo_path"?: string | null,"name": string,"ownership_note"?: string | null,"price_display_default"?: Database["public"]['Enums']["price_display"],"slug": string,"tracking_excluded"?: boolean,"updated_at"?: string
                   }
                   Update: {
-                    "created_at"?: string,"domain"?: string,"id"?: string,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["retailer_kind"],"logo_path"?: string | null,"name"?: string,"price_display_default"?: Database["public"]['Enums']["price_display"],"slug"?: string,"tracking_excluded"?: boolean,"updated_at"?: string
+                    "created_at"?: string,"domain"?: string,"id"?: string,"is_active"?: boolean,"kind"?: Database["public"]['Enums']["retailer_kind"],"logo_path"?: string | null,"name"?: string,"ownership_note"?: string | null,"price_display_default"?: Database["public"]['Enums']["price_display"],"slug"?: string,"tracking_excluded"?: boolean,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -1331,7 +1356,7 @@ isOneToOne: false
                   ]
                 },"variant_offer_ranking": {
                   Row: {
-                    "available_sizes": (string)[] | null,"delivered_cents": number | null,"in_stock": boolean | null,"last_checked_at": string | null,"offer_id": string | null,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"] | null,"price_source": Database["public"]['Enums']["price_source"] | null,"product_id": string | null,"promo_code": string | null,"promo_discount_cents": number | null,"promo_id": string | null,"rank": number | null,"retailer_id": string | null,"retailer_kind": Database["public"]['Enums']["retailer_kind"] | null,"retailer_name": string | null,"retailer_slug": string | null,"shipping_cents": number | null,"tracking_excluded": boolean | null,"variant_id": string | null
+                    "available_sizes": (string)[] | null,"delivered_cents": number | null,"in_stock": boolean | null,"last_checked_at": string | null,"offer_id": string | null,"ownership_note": string | null,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"] | null,"price_source": Database["public"]['Enums']["price_source"] | null,"product_id": string | null,"promo_code": string | null,"promo_discount_cents": number | null,"promo_id": string | null,"rank": number | null,"retailer_id": string | null,"retailer_kind": Database["public"]['Enums']["retailer_kind"] | null,"retailer_name": string | null,"retailer_slug": string | null,"shipping_cents": number | null,"ships_from": string | null,"tracking_excluded": boolean | null,"variant_id": string | null
                   }
                   Relationships: [
                     {
@@ -1374,6 +1399,9 @@ isOneToOne: false
                            },
 "block_user":
 { Args: { "target": string }; Returns: undefined
+                           },
+"brand_for_vendor":
+{ Args: { "vendor": string }; Returns: string
                            },
 "can_use_topic":
 { Args: { "topic": string }; Returns: boolean
@@ -1657,6 +1685,9 @@ isOneToOne: false
               "action": string,"actor_name": string,"created_at": string,"data": Json,"id": number,"note": string,"target_id": string,"target_type": string
             }[]
                            },
+"staff_create_product_from_raw":
+{ Args: { "brand": string,"category": string,"msrp_cents"?: number,"name": string,"raw_id": string,"variant_label"?: string }; Returns: Json
+                           },
 "staff_integrations":
 { Args: Record<PropertyKey, never>; Returns: {
               "active_offers": number,"config": Json,"consecutive_failures": number,"interval_minutes": number,"is_active": boolean,"kind": string,"last_error": string,"last_run": Json,"last_started_at": string,"last_success_at": string,"max_age_minutes": number,"name": string,"next_run_at": string,"priced_offers": number,"retailer_name": string,"running_since": string,"slug": string,"stale_offers": number
@@ -1728,6 +1759,9 @@ isOneToOne: false
                            },
 "variant_low_on":
 { Args: { "d": string,"vid": string }; Returns: number
+                           },
+"vendor_key":
+{ Args: { "vendor": string }; Returns: string
                            },
 "withdraw_offer":
 { Args: { "offer": string }; Returns: undefined

@@ -17,6 +17,9 @@ export type OfferRecord = {
   mpn?: string;
   asin?: string;
   retailer_sku?: string;
+  available_sizes?: string[];
+  /** Vendor that ships the item for the retailer (Shopify Collective); shown as "Ships from …". */
+  ships_from?: string;
 };
 
 // --- money ---------------------------------------------------------------------------------------
@@ -223,6 +226,290 @@ export function batches<T>(items: T[], size = 10): T[][] {
   const out: T[][] = [];
   for (let i = 0; i < items.length; i += size) out.push(items.slice(i, i + size));
   return out;
+}
+
+// --- Shopify stores ----------------------------------------------------------------------------------
+
+/** One Shopify product, normalized from either the Storefront API or the store's public product JSON. */
+export type ShopifyProduct = {
+  id: string;
+  handle: string;
+  title: string;
+  vendor: string;
+  productType: string;
+  tags: string[];
+  variants: ShopifyVariant[];
+};
+export type ShopifyVariant = {
+  id: string;
+  title: string;
+  priceCents: number | null;
+  sku: string | null;
+  barcode: string | null;
+  /** null when the source doesn't say (the public JSON on some stores). */
+  available: boolean | null;
+  requiresShipping: boolean;
+  options: { name: string; value: string }[];
+};
+
+export type ShopifyConfig = {
+  retailerSlug: string;
+  /** The store's public origin (e.g. https://pickleballgripdoctor.com); offer links are built on it. */
+  storeUrl: string;
+  utmSource?: string;
+  shipping?: { flat_cents?: number | null; free_over_cents?: number | null };
+  collectiveTag?: string;
+  maxRecords?: number;
+};
+
+/** "gid://shopify/ProductVariant/123" or 123 → "123". */
+export function shopifyId(id: unknown): string {
+  return String(id ?? '').split('/').pop() ?? '';
+}
+
+/** Storefront API GraphQL: the products published to the token's storefront (one page). */
+export const SHOPIFY_PRODUCTS_QUERY = `query Products($cursor: String) {
+  products(first: 100, after: $cursor) {
+    pageInfo { hasNextPage endCursor }
+    nodes {
+      id handle title vendor productType tags
+      variants(first: 100) {
+        nodes {
+          id title sku barcode availableForSale requiresShipping
+          price { amount currencyCode }
+          selectedOptions { name value }
+        }
+      }
+    }
+  }
+}`;
+
+type GqlVariant = {
+  id?: string;
+  title?: string;
+  sku?: string | null;
+  barcode?: string | null;
+  availableForSale?: boolean;
+  requiresShipping?: boolean;
+  price?: { amount?: string; currencyCode?: string };
+  selectedOptions?: { name: string; value: string }[];
+};
+export type GqlProduct = {
+  id?: string;
+  handle?: string;
+  title?: string;
+  vendor?: string;
+  productType?: string;
+  tags?: string[];
+  variants?: { nodes?: GqlVariant[] };
+};
+
+export function fromStorefront(nodes: GqlProduct[]): ShopifyProduct[] {
+  return nodes.map((p) => ({
+    id: shopifyId(p.id),
+    handle: p.handle ?? '',
+    title: p.title ?? '',
+    vendor: p.vendor ?? '',
+    productType: p.productType ?? '',
+    tags: p.tags ?? [],
+    variants: (p.variants?.nodes ?? []).map((v) => ({
+      id: shopifyId(v.id),
+      title: v.title ?? '',
+      // USD only (V1 pricing scope); other currencies yield no price and are skipped.
+      priceCents: !v.price?.currencyCode || v.price.currencyCode === 'USD' ? toCents(v.price?.amount ?? null) : null,
+      sku: v.sku || null,
+      barcode: v.barcode || null,
+      available: typeof v.availableForSale === 'boolean' ? v.availableForSale : null,
+      requiresShipping: v.requiresShipping !== false,
+      options: v.selectedOptions ?? [],
+    })),
+  }));
+}
+
+type JsonVariant = {
+  id?: number;
+  title?: string;
+  price?: string;
+  sku?: string | null;
+  barcode?: string | null;
+  available?: boolean;
+  requires_shipping?: boolean;
+  option1?: string | null;
+  option2?: string | null;
+  option3?: string | null;
+};
+export type JsonProduct = {
+  id?: number;
+  handle?: string;
+  title?: string;
+  vendor?: string;
+  product_type?: string;
+  tags?: string[] | string;
+  options?: { name: string }[];
+  variants?: JsonVariant[];
+};
+
+/** The store's public `/products.json` (Online Store channel). Stopgap only: no channel scoping. */
+export function fromPublicJson(products: JsonProduct[]): ShopifyProduct[] {
+  return products.map((p) => {
+    const names = (p.options ?? []).map((o) => o.name);
+    return {
+      id: shopifyId(p.id),
+      handle: p.handle ?? '',
+      title: p.title ?? '',
+      vendor: p.vendor ?? '',
+      productType: p.product_type ?? '',
+      tags: Array.isArray(p.tags)
+        ? p.tags
+        : String(p.tags ?? '')
+            .split(',')
+            .map((t) => t.trim())
+            .filter(Boolean),
+      variants: (p.variants ?? []).map((v) => ({
+        id: shopifyId(v.id),
+        title: v.title ?? '',
+        priceCents: toCents(v.price ?? null),
+        sku: v.sku || null,
+        barcode: v.barcode || null,
+        available: typeof v.available === 'boolean' ? v.available : null,
+        requiresShipping: v.requires_shipping !== false,
+        options: [v.option1, v.option2, v.option3]
+          .map((value, i) => ({ name: names[i] ?? `Option ${i + 1}`, value: value ?? '' }))
+          .filter((o) => o.value !== ''),
+      })),
+    };
+  });
+}
+
+const SIZE_OPTION = /\bsize\b/i;
+/** Options that don't change what the product is: one offer covers every colour or graphic. */
+const COSMETIC_OPTION = /\b(colou?rs?|graphics?|designs?|patterns?|styles?|finish|prints?)\b/i;
+const DEFAULT_TITLE = 'Default Title';
+
+/** Barcode → the identifier kind the catalog uses (UPC-A 12, EAN-13 13, other GTIN lengths 8 and 14). */
+function barcodeIdentifier(raw: string | null): Partial<Pick<OfferRecord, 'upc' | 'ean' | 'gtin'>> {
+  const digits = (raw ?? '').replace(/\s/g, '');
+  if (!/^\d{8}$|^\d{12,14}$/.test(digits)) return {};
+  return digits.length === 12 ? { upc: digits } : digits.length === 13 ? { ean: digits } : { gtin: digits };
+}
+
+const slugPart = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+
+/**
+ * Shopify products → offer records.
+ * - One record per combination of the options that define the product (thickness, shape, weight, …).
+ *   Size options ("Size", "Shoe Size") collapse into available_sizes, the way the catalog models sizes,
+ *   and cosmetic options (colour, graphic, design) collapse too: the app lists one offer per store.
+ * - The price is the variant price. compare_at_price is never used: a store's own "was" price isn't a
+ *   reference PickleDeals can vouch for (deals come from tracked price history and catalog MSRP).
+ * - Items tagged with the Collective tag carry ships_from = vendor (the supplier ships them).
+ * - Links are built on the store's public origin, so they pass the retailer-domain check.
+ */
+export function shopifyRecords(
+  products: ShopifyProduct[],
+  cfg: ShopifyConfig,
+): { records: OfferRecord[]; skipped: { ref: string; reason: string }[] } {
+  const records: OfferRecord[] = [];
+  const skipped: { ref: string; reason: string }[] = [];
+  const max = cfg.maxRecords ?? 5000;
+  const collective = (cfg.collectiveTag ?? 'Shopify Collective').toLowerCase();
+  const origin = cfg.storeUrl.replace(/\/+$/, '');
+  const shippingFor = (price: number) => {
+    const s = cfg.shipping ?? {};
+    if (s.free_over_cents != null && price >= s.free_over_cents) return 0;
+    return Math.max(0, s.flat_cents ?? 0);
+  };
+  const link = (handle: string, variantId?: string) => {
+    const u = new URL(`${origin}/products/${encodeURIComponent(handle)}`);
+    if (variantId) u.searchParams.set('variant', variantId);
+    if (cfg.utmSource) {
+      u.searchParams.set('utm_source', cfg.utmSource);
+      u.searchParams.set('utm_medium', 'referral');
+    }
+    return u.toString();
+  };
+
+  for (const p of products) {
+    const productRef = `product-${p.id}`;
+    if (!p.handle || !p.id) {
+      skipped.push({ ref: productRef, reason: 'no handle' });
+      continue;
+    }
+    if (/gift\s*card/i.test(p.productType) || /gift-card/.test(p.handle)) {
+      skipped.push({ ref: productRef, reason: 'gift card' });
+      continue;
+    }
+    const shippable = p.variants.filter((v) => v.requiresShipping);
+    if (!shippable.length) {
+      skipped.push({ ref: productRef, reason: 'nothing to ship' });
+      continue;
+    }
+    const vendor = p.vendor.trim();
+    const shipsFrom = vendor && p.tags.some((t) => t.trim().toLowerCase() === collective) ? vendor.slice(0, 80) : undefined;
+    const names = shippable[0]!.options.map((o) => o.name);
+    const sizeOption = names.find((n) => SIZE_OPTION.test(n));
+    const collapsing = new Set(names.filter((n) => n === sizeOption || COSMETIC_OPTION.test(n)));
+    const collapsed = collapsing.size > 0;
+
+    // One group per combination of the defining options (every variant on its own when none collapse).
+    const groups = new Map<string, ShopifyVariant[]>();
+    for (const v of shippable) {
+      const key = collapsed
+        ? v.options
+            .filter((o) => !collapsing.has(o.name))
+            .map((o) => o.value)
+            .join(' / ')
+        : v.id;
+      groups.set(key, [...(groups.get(key) ?? []), v]);
+    }
+    const multi = groups.size > 1;
+
+    for (const [key, variants] of groups) {
+      if (records.length >= max) {
+        skipped.push({ ref: productRef, reason: 'over max_records' });
+        break;
+      }
+      const v0 = variants[0]!;
+      const ref = collapsed ? (key ? `${productRef}-${slugPart(key)}` : productRef) : `variant-${v0.id}`;
+      const priced = variants.filter((v) => v.priceCents != null);
+      if (!priced.length) {
+        skipped.push({ ref, reason: 'no price' });
+        continue;
+      }
+      const stockKnown = priced.some((v) => v.available != null);
+      const inStock = priced.filter((v) => v.available !== false);
+      const price = Math.min(...(inStock.length ? inStock : priced).map((v) => v.priceCents!));
+      const label = collapsed ? key : v0.title !== DEFAULT_TITLE ? v0.title : '';
+
+      const record: OfferRecord = {
+        retailer_slug: cfg.retailerSlug,
+        url: link(p.handle, !collapsed && multi ? v0.id : undefined),
+        external_ref: ref,
+        price_cents: price,
+        shipping_cents: shippingFor(price),
+        title: (label && multi ? `${p.title} – ${label}` : p.title).slice(0, 200),
+        retailer_sku: !collapsed && v0.sku && /^[A-Za-z0-9._/-]{3,64}$/.test(v0.sku) ? v0.sku : ref.slice(0, 64),
+      };
+      if (stockKnown) record.in_stock = priced.some((v) => v.available === true);
+      if (vendor) record.brand = vendor.slice(0, 80);
+      if (sizeOption) {
+        const sizes = variants
+          .filter((v) => v.available !== false)
+          .map((v) => v.options.find((o) => o.name === sizeOption)?.value ?? '')
+          .filter(Boolean);
+        record.available_sizes = [...new Set(sizes)];
+      }
+      // Any one variant's barcode identifies the product (colour and size UPCs all belong to it).
+      Object.assign(record, barcodeIdentifier(variants.find((v) => v.barcode)?.barcode ?? null));
+      if (shipsFrom) record.ships_from = shipsFrom;
+      records.push(record);
+    }
+  }
+  return { records, skipped };
 }
 
 // --- Affiliate links (go function) ---------------------------------------------------------------

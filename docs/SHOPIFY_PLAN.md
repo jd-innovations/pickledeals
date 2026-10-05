@@ -1,6 +1,49 @@
 # Shopify direct-store feed (Pickleball Grip Doctor) — plan
 
-Status: **proposed, waiting for the user's go-ahead** (Oct 5, 2026).
+Status: **Part B built (Oct 5, 2026); waiting for the user's Part A (Shopify token).** The source ships
+**off**. Defaults used: new feed items become draft products; only products in the PickleDeals channel.
+
+## What's built
+- Migration `20261018000000_shopify_direct.sql` (pgTAP `15_shopify_direct`):
+  - retailer **Pickleball Grip Doctor** with `ownership_note` "PickleDeals’ owner also owns this store"
+  - source `shopify-gripdoctor` (adapter `shopify`, every 30 min, off): mode `storefront` | `public`,
+    shipping rule, `store_url`, `utm_source`, env names `SHOPIFY_GRIPDOCTOR_DOMAIN` / `_TOKEN`
+  - `retailer_offers.ships_from` (Collective supplier, shown as its catalog brand name)
+  - `brand_vendor_aliases` + `brand_for_vendor()` ("EngagePickleball" → Engage)
+  - `staff_create_product_from_raw()` (draft product + default variant, remembers barcode/SKU and vendor name)
+  - ranking tie-break is now in stock → lower shipping → retailer name (it used to favour the most
+    recently refreshed offer, which would have favoured a 30-minute feed)
+- Adapter: `supabase/functions/_shared/integrations.ts` (`fromStorefront`, `fromPublicJson`,
+  `shopifyRecords`; unit tests in `packages/shared/src/integrations.test.ts`) and `ingest` (`fetchShopify`).
+  One offer per product per defining option (thickness, shape); sizes become `available_sizes`; colours
+  and graphics fold into one offer. Compare-at price is never used.
+- Admin: review queue **Create product…** (brand pre-filled from the vendor, editable; name suggested);
+  Integrations → Shopify settings (mode, shipping, full-catalog) and a **Vendor names** list.
+- App: "Ships from Engage" on offers; the ownership note in the disclosure line on Product, All offers and Deal detail.
+
+## Dry run against the real store (Oct 5, 2026, public mode, local only)
+- 32 products → 32 offers, no errors. 12 tagged *Shopify Collective* (Engage); 13 with vendor
+  "Pickleball Grip Doctor"; also Joola (3), Selkirk (1), Holbrook (2), and 1 Engage item without the tag.
+- **The public product list has no barcodes**, so nothing matched automatically there. The
+  Storefront API returns barcodes, which is why mode `storefront` is the default.
+- Suggestions: Trigger Grip Attachment 95%; Engage Pursuit items get Engage suggestions. Several are
+  newer generations than the catalog (Agassi Pro **V** vs Pro IV): create new products, don't match.
+- The local review queue now holds these 32 items for trying **Create product…**.
+
+## Questions for the user (from the dry run)
+1. Items ending in **"PGD"** (e.g. *Agassi Pro V … 16MM PGD* $249, *Engage X2 … PGD* $219 vs $199.99
+   plain): are these paddles modified by Grip Doctor? If so they're separate products, not the brand's paddle.
+2. **Joola, Selkirk, Holbrook** items and one Engage item have no *Shopify Collective* tag: does Grip
+   Doctor stock and ship these itself? If they're Collective too, the tag is missing in Shopify.
+3. Several items list vendor "Pickleball Grip Doctor" but are other brands (Scorpeus Pro V is JOOLA,
+   Luzz, HEXXO). Fixing the vendor in Shopify makes brand mapping automatic.
+4. The ownership wording "PickleDeals’ owner also owns this store" (lawyer to confirm).
+5. Your shipping rule (Integrations → Settings), e.g. free over $50, otherwise $6.95.
+
+## To go live (after Part A)
+1. Put `SHOPIFY_GRIPDOCTOR_DOMAIN` (the .myshopify.com domain) and `SHOPIFY_GRIPDOCTOR_TOKEN` in `supabase/functions/.env`.
+2. Serve functions with `--env-file supabase/functions/.env`, set the shipping rule, turn the source on, **Run now**.
+3. Work the review queue: match or **Create product…**, add MSRP and a licensed image, publish.
 
 ## Context
 - PickleDeals never sells. **Pickleball Grip Doctor** (pickleballgripdoctor.com) is a separate

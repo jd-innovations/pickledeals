@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildCatalogPayload, dollarsToCents, slugify } from './catalog';
+import { buildCatalogPayload, dollarsToCents, slugify, suggestProductName } from './catalog';
 import { parseCsv } from './csv';
 
 describe('parseCsv', () => {
@@ -64,5 +64,21 @@ describe('buildCatalogPayload', () => {
       { file: 'products', line: 3, message: 'MSRP must be a dollar amount like 279.95' },
       { file: 'products', line: 0, message: 'ok-two: unknown brand "nobody"' },
     ]);
+  });
+});
+
+describe('suggestProductName', () => {
+  it('turns store titles into catalog-style names', () => {
+    expect(suggestProductName('Engage X2 Elongated Pickleball Paddle', 'Engage')).toEqual({ name: 'X2 Elongated', variant: null });
+    expect(suggestProductName('NEW GRAPHIC. Pursuit Pro MX 12.7 | Raw Carbon Fiber', 'Engage')).toEqual({ name: 'Pursuit Pro MX 12.7', variant: null });
+    expect(suggestProductName('NEW. ProFoam. | High Density Foam Core Performance. – Fusion-Sunset / 14 mm', 'Engage')).toEqual({
+      name: 'ProFoam',
+      variant: 'Fusion-Sunset / 14 mm',
+    });
+    expect(suggestProductName('Pickleball Grip Doctor Pro Towel', 'Pickleball Grip Doctor')).toEqual({ name: 'Pro Towel', variant: null });
+  });
+
+  it('falls back to the title when nothing is left', () => {
+    expect(suggestProductName('Engage', 'Engage').name).toBe('Engage');
   });
 });

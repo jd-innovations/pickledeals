@@ -28,6 +28,7 @@ const TABLES: Record<string, string> = {
   listing_catalog_reviews: 'custom listing review',
   ingestion_sources: 'integration',
   affiliate_programs: 'affiliate program',
+  brand_vendor_aliases: 'vendor name',
 };
 
 /** Plain-English line for an audit entry. */
@@ -49,6 +50,8 @@ export function describeAction(a: Action): string {
       return `ran the ${d.slug} integration`;
     case 'listing_review.promote':
       return `promoted a custom listing to draft product ${d.slug}`;
+    case 'raw_offer.create_product':
+      return `created draft product ${d.slug} from an imported offer`;
   }
   const what = TABLES[a.target_type] ?? a.target_type;
   const name = d.code ?? d.title ?? d.campaign ?? d.term ?? null;

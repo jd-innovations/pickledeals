@@ -9,7 +9,7 @@ import { useTheme } from '@/design/theme';
 import { productImage, useProduct, useProductSlug } from '@/features/catalog/hooks';
 import { Chip, ErrorState, Group, Icon, ListRow, Skeleton, Text } from '@/ui';
 
-import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, priceAsOf, shippingLabel } from '../format';
+import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, ownershipDisclosure, priceAsOf, shippingLabel, shipsFromLabel } from '../format';
 import { openDeal, useLivePromos, useOffer } from '../hooks';
 
 /** Deal detail (design: "Deal detail (promo code)"): one offer, its code and what you pay. */
@@ -41,7 +41,8 @@ export default function DealScreen() {
     openDeal(o.offerId, checkPrice ? 'deal_check_price' : 'deal_detail', o.promo?.id);
   };
 
-  const title = !product || !o ? '' : o.promo ? `${product.name} — extra ${formatPrice(o.promo.discountCents)} off with code` : `${product.name} at ${o.retailer.name}`;
+  const title =
+    !product || !o ? '' : o.promo ? `${product.name} — extra ${formatPrice(o.promo.discountCents)} off with code` : `${product.name} at ${o.retailer.name}`;
 
   return (
     <View style={{ flex: 1 }}>
@@ -93,9 +94,9 @@ export default function DealScreen() {
                   referenceCents={msrp}
                 />
               )}
-              {isApiPrice(o) && (
+              {(isApiPrice(o) || o.shipsFrom) && (
                 <Text variant="footnote" tone="secondary" numeric style={{ paddingTop: 8 }}>
-                  {priceAsOf(o)}
+                  {[isApiPrice(o) ? priceAsOf(o) : null, shipsFromLabel(o)].filter(Boolean).join(' · ')}
                 </Text>
               )}
             </View>
@@ -104,7 +105,9 @@ export default function DealScreen() {
               <View style={{ paddingHorizontal: 16 }}>
                 <PromoCodeRow
                   title={promo?.title ?? `Code ${o.promo.code}`}
-                  detail={[o.retailer.name, promo ? `verified ${formatAgo(promo.verifiedAt)}` : null, promo?.isExclusive ? 'PickleDeals exclusive' : null].filter(Boolean).join(' · ')}
+                  detail={[o.retailer.name, promo ? `verified ${formatAgo(promo.verifiedAt)}` : null, promo?.isExclusive ? 'PickleDeals exclusive' : null]
+                    .filter(Boolean)
+                    .join(' · ')}
                   code={o.promo.code}
                 />
               </View>
@@ -129,13 +132,19 @@ export default function DealScreen() {
                   title={`Compare all offers for this ${product.category.name === 'Shoes' ? 'shoe' : 'product'}`}
                   onPress={() => router.push({ pathname: '/deals/product/[slug]/offers', params: { slug: product.slug, variant: o.variantId } })}
                 />
-                <ListRow title={`${product.brand.name} ${product.name}`} onPress={() => router.push({ pathname: '/deals/product/[slug]', params: { slug: product.slug } })} last />
+                <ListRow
+                  title={`${product.brand.name} ${product.name}`}
+                  onPress={() => router.push({ pathname: '/deals/product/[slug]', params: { slug: product.slug } })}
+                  last
+                />
               </Group>
             </View>
 
             <View style={{ paddingHorizontal: 16 }}>
               <Text variant="caption" weight="400" tone="tertiary">
-                Opens {o.retailer.name}.{o.promo ? ' The code is copied for you.' : ''} PickleDeals doesn’t handle checkout. {AFFILIATE_DISCLOSURE.replace('Affiliate links — ', '')}
+                Opens {o.retailer.name}.{o.promo ? ' The code is copied for you.' : ''} PickleDeals doesn’t handle checkout.{' '}
+                {AFFILIATE_DISCLOSURE.replace('Affiliate links — ', '')}
+                {ownershipDisclosure([o]) ? ` ${ownershipDisclosure([o])}` : ''}
                 {apiPriceDisclaimer([o]) ? ` ${apiPriceDisclaimer([o])}` : ''}
               </Text>
             </View>

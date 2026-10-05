@@ -18,9 +18,11 @@ import {
   deltaLabel,
   isApiPrice,
   offerBreakdown,
+  ownershipDisclosure,
   priceAsOf,
   qualityDetail,
   shippingLabel,
+  shipsFromLabel,
 } from '@/features/offers/format';
 import { openDeal, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
 import { Button, Chip, ChipRow, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
@@ -151,6 +153,7 @@ export default function ProductScreen() {
                       best.promo ? `with code ${best.promo.code}` : null,
                       shippingLabel(best),
                       best.inStock ? 'in stock' : 'out of stock',
+                      best.shipsFrom ? `ships from ${best.shipsFrom}` : null,
                       isApiPrice(best) ? priceAsOf(best).toLowerCase() : null,
                     ]
                       .filter(Boolean)
@@ -170,7 +173,7 @@ export default function ProductScreen() {
                   />
                   {actions}
                   <Text variant="caption" weight="400" tone="tertiary">
-                    {[AFFILIATE_DISCLOSURE, apiPriceDisclaimer([best, ...others])].filter(Boolean).join(' ')}
+                    {[AFFILIATE_DISCLOSURE, ownershipDisclosure([best, ...others]), apiPriceDisclaimer([best, ...others])].filter(Boolean).join(' ')}
                   </Text>
                 </View>
               ) : checkPriceOnly ? (
@@ -214,7 +217,7 @@ export default function ProductScreen() {
                         detail:
                           o.priceDisplay === 'check_price'
                             ? 'Price shown at retailer'
-                            : [o.inStock ? 'In stock' : 'Out of stock', offerBreakdown(o), isApiPrice(o) ? priceAsOf(o).toLowerCase() : null]
+                            : [o.inStock ? 'In stock' : 'Out of stock', offerBreakdown(o), shipsFromLabel(o), isApiPrice(o) ? priceAsOf(o).toLowerCase() : null]
                                 .filter(Boolean)
                                 .join(' · '),
                         priceCents: o.deliveredCents,

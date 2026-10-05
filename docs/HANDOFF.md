@@ -40,7 +40,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Accessibility: `packages/shared/src/a11y.ts` (`spoken`, `speakable`, `spokenPrice`, `spokenBadge`). Cards and rows now carry full VoiceOver labels (before, name-only labels hid prices). Controls use `minHeight` so Dynamic Type grows them.
   - `delete-account` now removes `listing-images/{uid}/` and the photos in the user's seller threads.
   - Drafts for review: `docs/legal/PRIVACY_POLICY_DRAFT.md`, `docs/legal/TERMS_DRAFT.md`, plus the checklist `docs/APP_STORE.md` (guidelines, privacy labels, metadata, open questions).
-  - Proposed (not built): Pickleball Grip Doctor Shopify feed, see `docs/SHOPIFY_PLAN.md`.
+  - **Shopify direct-store feed built (Oct 5)**: Pickleball Grip Doctor source (off until the user adds the Storefront token), Create product in review, vendor names, Ships from, ownership note, neutral ranking tie-break. Status, dry-run results and open questions: `docs/SHOPIFY_PLAN.md`.
   - Still waiting on the user: the three Phase 13 decisions (hosted Supabase for TestFlight, analytics choice, legal page hosting), the Phase 13 go-ahead for the rest of 13a and 13d/13e, and the questions at the end of `docs/APP_STORE.md`.
 - **Agreed order from here** (user, Oct 4):
   1. Finish the remaining on-device checks (list below), including the dark-mode toggle fix.

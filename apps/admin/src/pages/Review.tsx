@@ -1,4 +1,4 @@
-import { formatAgo, formatPrice } from '@pickledeals/shared';
+import { dollarsToCents, formatAgo, formatPrice, suggestProductName } from '@pickledeals/shared';
 import { useCallback, useEffect, useState } from 'react';
 
 import { supabase } from '../lib/supabase';
@@ -18,11 +18,18 @@ type Raw = {
   mpn: string | null;
   retailer_sku: string | null;
   suggestions: Suggestion[];
+  payload: { ships_from?: string } | null;
   created_at: string;
   resolved_at: string | null;
   retailer: { name: string } | null;
 };
-type Run = { id: string; created_at: string; report: { matched?: number; unmatched?: number; offers_created?: number; offers_updated?: number; errors?: unknown[] }; source: { name: string } | null };
+type Option = { id: string; name: string };
+type Run = {
+  id: string;
+  created_at: string;
+  report: { matched?: number; unmatched?: number; offers_created?: number; offers_updated?: number; errors?: unknown[] };
+  source: { name: string } | null;
+};
 
 /**
  * Review queue (§9): offers the matcher couldn't place. Matching one can remember its identifiers,
@@ -39,7 +46,9 @@ export function ReviewPage() {
   const load = useCallback(async () => {
     let query = supabase
       .from('raw_offer_records')
-      .select('id, title, brand_text, url, price_cents, gtin, upc, ean, asin, mpn, retailer_sku, suggestions, created_at, resolved_at, retailer:retailers(name)')
+      .select(
+        'id, title, brand_text, url, price_cents, gtin, upc, ean, asin, mpn, retailer_sku, suggestions, payload, created_at, resolved_at, retailer:retailers(name)',
+      )
       .eq('match_status', tab)
       .order('created_at', { ascending: false })
       .limit(100);
@@ -47,15 +56,57 @@ export function ReviewPage() {
     const { data, error } = await query.returns<Raw[]>();
     if (error) setMessage({ error: true, text: error.message });
     setRows(data ?? []);
-    const r = await supabase.from('ingestion_runs').select('id, created_at, report, source:ingestion_sources(name)').order('created_at', { ascending: false }).limit(10).returns<Run[]>();
+    const r = await supabase
+      .from('ingestion_runs')
+      .select('id, created_at, report, source:ingestion_sources(name)')
+      .order('created_at', { ascending: false })
+      .limit(10)
+      .returns<Run[]>();
     setRuns(r.data ?? []);
   }, [tab, retailer]);
   useEffect(() => {
     load();
   }, [load]);
+  const [brands, setBrands] = useState<Option[]>([]);
+  const [categories, setCategories] = useState<Option[]>([]);
   useEffect(() => {
-    supabase.from('retailers').select('id, name').order('name').then(({ data }) => setRetailers(data ?? []));
+    supabase
+      .from('retailers')
+      .select('id, name')
+      .order('name')
+      .then(({ data }) => setRetailers(data ?? []));
+    supabase
+      .from('brands')
+      .select('id, name')
+      .order('name')
+      .then(({ data }) => setBrands(data ?? []));
+    supabase
+      .from('categories')
+      .select('id, name')
+      .order('sort')
+      .then(({ data }) => setCategories(data ?? []));
   }, []);
+
+  const createProduct = async (raw: Raw, p: { brand: string; category: string; name: string; variantLabel: string; msrpCents: number | null }) => {
+    const { data, error } = await supabase.rpc('staff_create_product_from_raw', {
+      raw_id: raw.id,
+      brand: p.brand,
+      category: p.category,
+      name: p.name,
+      variant_label: p.variantLabel || undefined,
+      msrp_cents: p.msrpCents ?? undefined,
+    });
+    const slug = (data as { slug?: string } | null)?.slug;
+    setMessage(
+      error
+        ? { error: true, text: error.message }
+        : {
+            error: false,
+            text: `Created draft product ${slug}. Add a licensed image and publish it in Products (#/products/${slug}); the offer goes live then.`,
+          },
+    );
+    load();
+  };
 
   const resolve = async (raw: Raw, variantId: string, remember: boolean) => {
     const { error } = await supabase.rpc('resolve_raw_offer', { raw_id: raw.id, variant: variantId, remember });
@@ -99,7 +150,7 @@ export function ReviewPage() {
       <div style={{ display: 'grid', gap: 12, marginTop: 12 }}>
         {rows.map((r) =>
           tab === 'unmatched' ? (
-            <ReviewCard key={r.id} raw={r} onResolve={resolve} onReject={reject} />
+            <ReviewCard key={r.id} raw={r} brands={brands} categories={categories} onResolve={resolve} onReject={reject} onCreate={createProduct} />
           ) : (
             <div key={r.id} className="card">
               <div className="row">
@@ -109,7 +160,8 @@ export function ReviewPage() {
                     {r.title ?? '(no title)'}
                   </strong>
                   <div className="muted" style={{ fontSize: 12 }}>
-                    {r.retailer?.name} · {r.price_cents != null ? formatPrice(r.price_cents) : 'no price'} · rejected {r.resolved_at ? formatAgo(r.resolved_at) : ''}
+                    {r.retailer?.name} · {r.price_cents != null ? formatPrice(r.price_cents) : 'no price'} · rejected{' '}
+                    {r.resolved_at ? formatAgo(r.resolved_at) : ''}
                   </div>
                 </div>
                 <button className="btn" onClick={() => reopen(r)}>
@@ -156,9 +208,26 @@ export function ReviewPage() {
   );
 }
 
-function ReviewCard({ raw, onResolve, onReject }: { raw: Raw; onResolve: (r: Raw, variantId: string, remember: boolean) => void; onReject: (r: Raw) => void }) {
+type CreateInput = { brand: string; category: string; name: string; variantLabel: string; msrpCents: number | null };
+
+function ReviewCard({
+  raw,
+  brands,
+  categories,
+  onResolve,
+  onReject,
+  onCreate,
+}: {
+  raw: Raw;
+  brands: Option[];
+  categories: Option[];
+  onResolve: (r: Raw, variantId: string, remember: boolean) => void;
+  onReject: (r: Raw) => void;
+  onCreate: (r: Raw, p: CreateInput) => void;
+}) {
   const [picked, setPicked] = useState<PickedVariant | null>(null);
   const [remember, setRemember] = useState(true);
+  const [creating, setCreating] = useState(false);
   const identifiers = (['gtin', 'upc', 'ean', 'asin', 'mpn', 'retailer_sku'] as const).filter((k) => raw[k]).map((k) => `${k.toUpperCase()} ${raw[k]}`);
 
   return (
@@ -172,6 +241,7 @@ function ReviewCard({ raw, onResolve, onReject }: { raw: Raw; onResolve: (r: Raw
           <div className="muted" style={{ fontSize: 12 }}>
             {raw.retailer?.name} · {raw.price_cents != null ? formatPrice(raw.price_cents) : 'no price'} · {formatAgo(raw.created_at)}
             {identifiers.length ? ` · ${identifiers.join(' · ')}` : ''}
+            {raw.payload?.ships_from ? ` · Shopify Collective: ships from ${raw.payload.ships_from}` : ''}
           </div>
           {raw.url && (
             <a className="muted" style={{ fontSize: 12 }} href={raw.url} target="_blank" rel="noreferrer noopener">
@@ -205,6 +275,114 @@ function ReviewCard({ raw, onResolve, onReject }: { raw: Raw; onResolve: (r: Raw
         <span className="grow" />
         <button className="btn primary" disabled={!picked} onClick={() => picked && onResolve(raw, picked.variantId, remember)}>
           Match to chosen variant
+        </button>
+      </div>
+      {creating ? (
+        <CreateProductForm raw={raw} brands={brands} categories={categories} onCancel={() => setCreating(false)} onCreate={(p) => onCreate(raw, p)} />
+      ) : (
+        <div className="row">
+          <span className="muted" style={{ fontSize: 12 }}>
+            Not in the catalog yet?
+          </span>
+          <button className="btn" onClick={() => setCreating(true)}>
+            Create product…
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * A draft catalog product from this record. The brand starts from the feed's vendor name but is often
+ * different (stores list other brands' items under their own name), so staff confirm it. The record's
+ * barcode/SKU and vendor name are remembered, so the next import matches by itself.
+ */
+function CreateProductForm({
+  raw,
+  brands,
+  categories,
+  onCancel,
+  onCreate,
+}: {
+  raw: Raw;
+  brands: Option[];
+  categories: Option[];
+  onCancel: () => void;
+  onCreate: (p: CreateInput) => void;
+}) {
+  const [brand, setBrand] = useState('');
+  const [category, setCategory] = useState('');
+  const brandName = brands.find((b) => b.id === brand)?.name ?? null;
+  const suggested = suggestProductName(raw.title ?? '', brandName);
+  const [name, setName] = useState<string | null>(null);
+  const [variantLabel, setVariantLabel] = useState(suggested.variant ?? '');
+  const [msrp, setMsrp] = useState('');
+
+  useEffect(() => {
+    if (!raw.brand_text) return;
+    supabase.rpc('brand_for_vendor', { vendor: raw.brand_text }).then(({ data }) => {
+      if (typeof data === 'string') setBrand((b) => b || data);
+    });
+  }, [raw.brand_text]);
+
+  const finalName = (name ?? suggested.name).trim();
+  const msrpCents = msrp.trim() ? dollarsToCents(msrp) : null;
+  const ready = brand && category && finalName && (msrp.trim() === '' || msrpCents != null);
+
+  return (
+    <div className="card" style={{ background: 'var(--background)' }}>
+      <strong style={{ fontSize: 13 }}>New draft product</strong>
+      <div className="grid3">
+        <label className="field">
+          Brand {raw.brand_text ? <span className="muted">(feed vendor: {raw.brand_text})</span> : null}
+          <select value={brand} onChange={(e) => setBrand(e.target.value)}>
+            <option value="">Choose…</option>
+            {brands.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field">
+          Category
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="">Choose…</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field">
+          MSRP in dollars (from the brand’s own site; optional)
+          <input className="num" value={msrp} onChange={(e) => setMsrp(e.target.value)} placeholder="e.g. 199.99" />
+        </label>
+        <label className="field">
+          Product name (without the brand)
+          <input value={name ?? suggested.name} onChange={(e) => setName(e.target.value)} />
+        </label>
+        <label className="field">
+          Variant label (blank = Standard)
+          <input value={variantLabel} onChange={(e) => setVariantLabel(e.target.value)} placeholder="e.g. 16mm" />
+        </label>
+      </div>
+      <p className="muted" style={{ fontSize: 12, margin: 0 }}>
+        The product starts as a draft and this offer stays hidden until you add a licensed image and publish it. Don’t copy images from the store unless the
+        brand allows it.
+      </p>
+      <div className="row">
+        <span className="grow" />
+        <button className="btn" onClick={onCancel}>
+          Cancel
+        </button>
+        <button
+          className="btn primary"
+          disabled={!ready}
+          onClick={() => onCreate({ brand, category, name: finalName, variantLabel: variantLabel.trim(), msrpCents })}>
+          Create draft product
         </button>
       </div>
     </div>

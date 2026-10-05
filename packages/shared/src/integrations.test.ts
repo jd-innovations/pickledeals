@@ -6,6 +6,9 @@ import {
   batches,
   detectDelimiter,
   feedRecords,
+  fromPublicJson,
+  fromStorefront,
+  shopifyRecords,
   toCents,
   unwrapTrackingUrl,
   type FeedColumns,
@@ -156,5 +159,144 @@ describe('affiliateUrl', () => {
 
   it('ignores inactive programs', () => {
     expect(affiliateUrl(product, { tag_template: 'tag=x', link_template: null, is_active: false }, hosts).toString()).toBe(product.toString());
+  });
+});
+
+describe('shopifyRecords', () => {
+  const cfg = {
+    retailerSlug: 'pickleball-grip-doctor',
+    storeUrl: 'https://pickleballgripdoctor.com/',
+    utmSource: 'pickledeals',
+    shipping: { flat_cents: 695, free_over_cents: 5000 },
+  };
+  // The Engage X2 as the store's public JSON returns it (Oct 2026): a Collective supplier product.
+  const x2 = {
+    id: 8001,
+    handle: 'engage-x2-elongated-pickleball-paddle',
+    title: 'Engage X2 Elongated Pickleball Paddle',
+    vendor: 'EngagePickleball',
+    product_type: 'Paddle',
+    tags: 'EngagePickleball, Shopify Collective',
+    options: [{ name: 'Shape' }],
+    variants: [{ id: 9001, title: 'Elongated', price: '199.99', compare_at_price: '259.99', sku: 'X2E-AQU-001', barcode: '810957038755', option1: 'Elongated' }],
+  };
+
+  it('maps a Collective supplier product', () => {
+    const { records, skipped } = shopifyRecords(fromPublicJson([x2]), cfg);
+    expect(skipped).toEqual([]);
+    expect(records).toEqual([
+      {
+        retailer_slug: 'pickleball-grip-doctor',
+        url: 'https://pickleballgripdoctor.com/products/engage-x2-elongated-pickleball-paddle?utm_source=pickledeals&utm_medium=referral',
+        external_ref: 'variant-9001',
+        price_cents: 19999,
+        shipping_cents: 0,
+        title: 'Engage X2 Elongated Pickleball Paddle',
+        retailer_sku: 'X2E-AQU-001',
+        brand: 'EngagePickleball',
+        upc: '810957038755',
+        ships_from: 'EngagePickleball',
+      },
+    ]);
+  });
+
+  it('never uses compare-at as the price', () => {
+    const [r] = shopifyRecords(fromPublicJson([x2]), cfg).records;
+    expect(r!.price_cents).toBe(19999);
+    expect(JSON.stringify(r)).not.toContain('259');
+  });
+
+  it("doesn't mark the store's own products as shipped by someone else", () => {
+    const own = { ...x2, id: 8002, vendor: 'Pickleball Grip Doctor', tags: ['Grips'], variants: [{ ...x2.variants[0]!, id: 9002, price: '24.99', barcode: '' }] };
+    const [r] = shopifyRecords(fromPublicJson([own]), cfg).records;
+    expect(r!.ships_from).toBeUndefined();
+    expect(r!.shipping_cents).toBe(695);
+    expect(r!.upc).toBeUndefined();
+  });
+
+  it('keeps one record per variant, linked to that variant', () => {
+    const paddle = {
+      ...x2,
+      options: [{ name: 'Thickness' }],
+      variants: [
+        { id: 1, title: '14mm', price: '189.99', barcode: '00012345678905', option1: '14mm', available: true },
+        { id: 2, title: '16mm', price: '199.99', barcode: '4006381333931', option1: '16mm', available: false },
+      ],
+    };
+    const { records } = shopifyRecords(fromPublicJson([paddle]), cfg);
+    expect(records.map((r) => [r.external_ref, r.title, r.in_stock, r.gtin ?? r.ean])).toEqual([
+      ['variant-1', 'Engage X2 Elongated Pickleball Paddle – 14mm', true, '00012345678905'],
+      ['variant-2', 'Engage X2 Elongated Pickleball Paddle – 16mm', false, '4006381333931'],
+    ]);
+    expect(records[0]!.url).toContain('variant=1');
+  });
+
+  it('collapses sizes into one record with available sizes', () => {
+    const shoe = fromStorefront([
+      {
+        id: 'gid://shopify/Product/77',
+        handle: 'court-shoe',
+        title: 'Court Shoe',
+        vendor: 'ASICS',
+        productType: 'Shoes',
+        tags: [],
+        variants: {
+          nodes: [
+            { id: 'gid://shopify/ProductVariant/1', title: 'White / 9', price: { amount: '120.0', currencyCode: 'USD' }, availableForSale: true, selectedOptions: [{ name: 'Color', value: 'White' }, { name: 'Shoe Size', value: '9' }] },
+            { id: 'gid://shopify/ProductVariant/2', title: 'White / 10', price: { amount: '110.0', currencyCode: 'USD' }, availableForSale: false, selectedOptions: [{ name: 'Color', value: 'White' }, { name: 'Shoe Size', value: '10' }] },
+            { id: 'gid://shopify/ProductVariant/3', title: 'White / 11', price: { amount: '120.0', currencyCode: 'USD' }, availableForSale: true, selectedOptions: [{ name: 'Color', value: 'White' }, { name: 'Shoe Size', value: '11' }] },
+          ],
+        },
+      },
+    ]);
+    const { records } = shopifyRecords(shoe, cfg);
+    expect(records).toHaveLength(1);
+    expect(records[0]).toMatchObject({ external_ref: 'product-77', price_cents: 12000, in_stock: true, available_sizes: ['9', '11'], title: 'Court Shoe' });
+    expect(records[0]!.upc).toBeUndefined();
+  });
+
+  it('skips gift cards, digital items and unpriced or non-USD variants', () => {
+    const products = fromStorefront([
+      { id: '1', handle: 'gift-card', title: 'Gift card', productType: 'Gift Card', variants: { nodes: [{ id: '1', price: { amount: '25' } }] } },
+      { id: '2', handle: 'ebook', title: 'Guide', variants: { nodes: [{ id: '2', requiresShipping: false, price: { amount: '9' } }] } },
+      { id: '3', handle: 'cad', title: 'Paddle', variants: { nodes: [{ id: '3', price: { amount: '99', currencyCode: 'CAD' } }] } },
+    ]);
+    const { records, skipped } = shopifyRecords(products, cfg);
+    expect(records).toEqual([]);
+    expect(skipped.map((s) => s.reason)).toEqual(['gift card', 'nothing to ship', 'no price']);
+  });
+});
+
+describe('shopifyRecords, cosmetic options', () => {
+  it('lists one offer per store for colour variants, keeping thickness separate', () => {
+    const paddle = fromPublicJson([
+      {
+        id: 5,
+        handle: 'profoam',
+        title: 'ProFoam',
+        vendor: 'EngagePickleball',
+        tags: ['Shopify Collective'],
+        options: [{ name: 'Color' }, { name: 'Thickness' }],
+        variants: [
+          { id: 1, price: '219.99', option1: 'Fusion-Sunset', option2: '14 mm', available: false, barcode: '810957038700' },
+          { id: 2, price: '209.99', option1: 'Arctic-Gold', option2: '14 mm', available: true },
+          { id: 3, price: '219.99', option1: 'Fusion-Sunset', option2: '16 mm', available: true },
+        ],
+      },
+    ]);
+    const { records } = shopifyRecords(paddle, { retailerSlug: 'r', storeUrl: 'https://example.com' });
+    expect(records.map((r) => [r.external_ref, r.title, r.price_cents, r.in_stock, r.available_sizes, r.upc])).toEqual([
+      ['product-5-14-mm', 'ProFoam – 14 mm', 20999, true, undefined, '810957038700'],
+      ['product-5-16-mm', 'ProFoam – 16 mm', 21999, true, undefined, undefined],
+    ]);
+  });
+
+  it('collapses a colour-only product into a single offer', () => {
+    const grip = fromPublicJson([
+      { id: 6, handle: 'trigger', title: 'PGD Trigger', vendor: 'Pickleball Grip Doctor', options: [{ name: 'Color' }], variants: ['Pink', 'Black'].map((c, i) => ({ id: i + 1, price: '24.99', option1: c, available: true })) },
+    ]);
+    const { records } = shopifyRecords(grip, { retailerSlug: 'r', storeUrl: 'https://example.com' });
+    expect(records).toHaveLength(1);
+    expect(records[0]).toMatchObject({ external_ref: 'product-6', title: 'PGD Trigger', url: 'https://example.com/products/trigger' });
   });
 });

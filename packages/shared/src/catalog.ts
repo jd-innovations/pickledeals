@@ -26,6 +26,25 @@ export function slugify(text: string): string {
 }
 
 /** "279", "279.9", "279.95", "$1,299.00" → integer cents, exactly (no float arithmetic). */
+/**
+ * A store's product title → a catalog-style name to start from (staff edit it): drops "NEW." /
+ * "NEW GRAPHIC." prefixes, the brand, marketing after "|", the variant after " – " and the generic
+ * "pickleball paddle" words. "Engage X2 Elongated Pickleball Paddle" → "X2 Elongated".
+ */
+export function suggestProductName(title: string, brandName?: string | null): { name: string; variant: string | null } {
+  let t = title.replace(/^\s*(new(\s+graphic)?\s*[.!:]\s*)+/i, '');
+  const dash = t.split(/\s+[–—]\s+/);
+  const variant = dash.length > 1 ? dash.pop()!.trim() : null;
+  t = dash.join(' – ').split('|')[0]!;
+  if (brandName) t = t.replace(new RegExp(`^\\s*${brandName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i'), '');
+  t = t
+    .replace(/\bpickleball\s+paddle\b/gi, '')
+    .replace(/[\s.,-]+$/, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  return { name: t || title.trim(), variant };
+}
+
 export function dollarsToCents(input: string): number | null {
   const m = input.replace(/[$,\s]/g, '').match(/^(\d+)(?:\.(\d{1,2}))?$/);
   if (!m) return null;

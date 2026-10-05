@@ -18,6 +18,16 @@ export function offerBreakdown(o: RankedOffer): string {
   return parts.join(' ');
 }
 
+/** "Ships from Engage" for items a supplier ships on the retailer's behalf. */
+export const shipsFromLabel = (o: RankedOffer) => (o.shipsFrom ? `Ships from ${o.shipsFrom}` : null);
+
+/** "Pickleball Grip Doctor: PickleDeals’ owner also owns this store." for each connected retailer shown. */
+export function ownershipDisclosure(offers: (RankedOffer | null | undefined)[]): string | null {
+  const seen = new Map<string, string>();
+  for (const o of offers) if (o?.ownershipNote) seen.set(o.retailer.name, o.ownershipNote);
+  return seen.size ? [...seen].map(([name, note]) => `${name}: ${note}.`).join(' ') : null;
+}
+
 export function stockLabel(o: RankedOffer): string {
   return o.inStock ? 'In stock' : 'Out of stock';
 }
@@ -31,7 +41,10 @@ export function deltaLabel(o: RankedOffer, bestCents: number | null): string | u
 
 /** Deal-quality detail line: "Typical $219 · 90-day low $159". */
 export function qualityDetail(s: VariantStats): string | undefined {
-  const parts = [s.typicalCents != null ? `Typical ${formatPrice(s.typicalCents)}` : null, s.low90dCents != null ? `90-day low ${formatPrice(s.low90dCents)}` : null];
+  const parts = [
+    s.typicalCents != null ? `Typical ${formatPrice(s.typicalCents)}` : null,
+    s.low90dCents != null ? `90-day low ${formatPrice(s.low90dCents)}` : null,
+  ];
   const text = parts.filter(Boolean).join(' · ');
   return text || undefined;
 }

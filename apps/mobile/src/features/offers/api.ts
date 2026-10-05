@@ -25,6 +25,10 @@ export type RankedOffer = {
   priceSource: 'manual' | 'feed' | 'api';
   /** Retailer kept out of price history, deal quality and alerts (always Amazon). */
   trackingExcluded: boolean;
+  /** Supplier that ships the item for the retailer (Shopify Collective). */
+  shipsFrom: string | null;
+  /** Disclosure for a retailer connected to PickleDeals (e.g. the same owner). */
+  ownershipNote: string | null;
 };
 
 export type VariantStats = {
@@ -74,10 +78,12 @@ type RankingRow = {
   last_checked_at: string;
   price_source: RankedOffer['priceSource'];
   tracking_excluded: boolean;
+  ships_from: string | null;
+  ownership_note: string | null;
 };
 
 const RANKING_COLUMNS =
-  'offer_id, variant_id, retailer_slug, retailer_name, retailer_kind, price_display, price_cents, shipping_cents, delivered_cents, promo_id, promo_code, promo_discount_cents, rank, in_stock, available_sizes, last_checked_at, price_source, tracking_excluded';
+  'offer_id, variant_id, retailer_slug, retailer_name, retailer_kind, price_display, price_cents, shipping_cents, delivered_cents, promo_id, promo_code, promo_discount_cents, rank, in_stock, available_sizes, last_checked_at, price_source, tracking_excluded, ships_from, ownership_note';
 
 const toOffer = (r: RankingRow): RankedOffer => ({
   offerId: r.offer_id,
@@ -94,6 +100,8 @@ const toOffer = (r: RankingRow): RankedOffer => ({
   checkedAt: r.last_checked_at,
   priceSource: r.price_source,
   trackingExcluded: r.tracking_excluded,
+  shipsFrom: r.ships_from,
+  ownershipNote: r.ownership_note,
 });
 
 /** Priced offers in rank order, then check-price offers (D1: listed, never ranked). */

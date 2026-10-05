@@ -7,12 +7,32 @@
 //   amazon-creators — Creators API GetItems for every ASIN in product_identifiers (10 per request,
 //                     ≤ 1 request/second, at most config.max_requests per run)
 //   delimited-feed  — CSV/TSV/pipe product datafeed (AvantLink and similar), column names from config
-// Secrets come from env only: AMAZON_CREATORS_CLIENT_ID / _SECRET, AMAZON_PARTNER_TAG, and the feed URL
-// in the env var named by config.url_env (FEED_URL_*). AMAZON_CREATORS_TOKEN_URL / _API_URL can point
-// at a local mock (scripts/mock-integrations.mjs).
+//   shopify         — a Shopify store: the Storefront API with a private token (mode 'storefront': only
+//                     products published to that headless storefront), or the store's public product
+//                     JSON (mode 'public': the whole Online Store, no channel scoping; a stopgap)
+// Secrets come from env only: AMAZON_CREATORS_CLIENT_ID / _SECRET, AMAZON_PARTNER_TAG, the feed URL
+// in the env var named by config.url_env (FEED_URL_*), and a Shopify store's domain and token in the
+// env vars named by config.domain_env / token_env (SHOPIFY_*). AMAZON_CREATORS_TOKEN_URL / _API_URL can
+// point at a local mock (scripts/mock-integrations.mjs).
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
 
-import { AMAZON_RESOURCES, amazonRecords, batches, feedRecords, type AmazonResponse, type FeedColumns, type OfferRecord } from '../_shared/integrations.ts';
+import {
+  AMAZON_RESOURCES,
+  amazonRecords,
+  batches,
+  feedRecords,
+  fromPublicJson,
+  fromStorefront,
+  SHOPIFY_PRODUCTS_QUERY,
+  shopifyRecords,
+  type AmazonResponse,
+  type FeedColumns,
+  type GqlProduct,
+  type JsonProduct,
+  type OfferRecord,
+  type ShopifyConfig,
+  type ShopifyProduct,
+} from '../_shared/integrations.ts';
 
 type Source = { slug: string; name: string; kind: 'feed' | 'api'; retailer_slug: string | null; config: Record<string, unknown> };
 type Fetched = { records: OfferRecord[]; complete: boolean; notes: string[] };
@@ -118,13 +138,95 @@ async function fetchFeed(source: Source): Promise<Fetched> {
   return { records, complete: source.config.complete === true, notes };
 }
 
+// --- Shopify stores ------------------------------------------------------------------------------------
+
+const SHOPIFY_API_VERSION = '2026-10';
+
+function shopifyEnv(source: Source, key: 'domain_env' | 'token_env'): string | undefined {
+  const name = String(source.config[key] ?? '');
+  if (!/^SHOPIFY_[A-Z0-9_]{1,60}$/.test(name)) return undefined;
+  return Deno.env.get(name)?.trim() || undefined;
+}
+
+async function fetchShopify(source: Source): Promise<Fetched> {
+  if (!source.retailer_slug) throw new ConfigError('config.retailer_slug is required.');
+  const storeUrl = String(source.config.store_url ?? '');
+  if (!/^https:\/\/[a-z0-9.-]+$/i.test(storeUrl)) throw new ConfigError('config.store_url must be the store’s https origin, e.g. https://pickleballgripdoctor.com.');
+  const domain = shopifyEnv(source, 'domain_env');
+  if (!domain || !/^[a-z0-9.-]+$/i.test(domain)) throw new ConfigError(`The store domain secret ${String(source.config.domain_env)} isn’t configured.`);
+  const mode = source.config.mode === 'public' ? 'public' : 'storefront';
+
+  const products: ShopifyProduct[] = [];
+  let complete = true;
+  if (mode === 'storefront') {
+    const token = shopifyEnv(source, 'token_env');
+    if (!token) throw new ConfigError(`The Storefront API token secret ${String(source.config.token_env)} isn’t configured.`);
+    let cursor: string | null = null;
+    for (let page = 0; ; page++) {
+      if (page >= 200) {
+        complete = false;
+        break;
+      }
+      const res = await fetch(`https://${domain}/api/${SHOPIFY_API_VERSION}/graphql.json`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'Shopify-Storefront-Private-Token': token },
+        body: JSON.stringify({ query: SHOPIFY_PRODUCTS_QUERY, variables: { cursor } }),
+      });
+      const body = (await res.json().catch(() => ({}))) as {
+        data?: { products?: { pageInfo?: { hasNextPage?: boolean; endCursor?: string }; nodes?: GqlProduct[] } };
+        errors?: { message?: string }[];
+      };
+      if (!res.ok || body.errors?.length) throw new Error(`Shopify Storefront API failed (${res.status}): ${body.errors?.[0]?.message ?? 'no details'}`);
+      products.push(...fromStorefront(body.data?.products?.nodes ?? []));
+      const info = body.data?.products?.pageInfo;
+      if (!info?.hasNextPage || !info.endCursor) break;
+      cursor = info.endCursor;
+    }
+  } else {
+    for (let page = 1; ; page++) {
+      if (page > 100) {
+        complete = false;
+        break;
+      }
+      if (page > 1) await sleep(500);
+      const res = await fetch(`https://${domain}/products.json?limit=250&page=${page}`, { headers: { accept: 'application/json' } });
+      if (!res.ok) throw new Error(`Shopify product JSON failed (${res.status}).`);
+      const batch = ((await res.json().catch(() => ({}))) as { products?: JsonProduct[] }).products ?? [];
+      products.push(...fromPublicJson(batch));
+      if (batch.length < 250) break;
+    }
+  }
+
+  const cfg: ShopifyConfig = {
+    retailerSlug: source.retailer_slug,
+    storeUrl,
+    utmSource: typeof source.config.utm_source === 'string' ? source.config.utm_source : undefined,
+    shipping: (source.config.shipping ?? {}) as ShopifyConfig['shipping'],
+    collectiveTag: typeof source.config.collective_tag === 'string' ? source.config.collective_tag : undefined,
+    maxRecords: Math.min(Number(source.config.max_records ?? 5000), 20000),
+  };
+  const { records, skipped } = shopifyRecords(products, cfg);
+  const notes = [`${products.length} product(s) via ${mode === 'storefront' ? 'the Storefront API' : 'the public product JSON'}.`];
+  if (skipped.length) notes.push(`Skipped ${skipped.length}: ${[...new Set(skipped.map((s) => s.reason))].slice(0, 4).join('; ')}.`);
+  if (!complete) notes.push('Stopped at the page limit; offers not seen this run are kept.');
+  const truncated = !complete || skipped.some((s) => s.reason === 'over max_records');
+  return { records, complete: source.config.complete === true && !truncated, notes };
+}
+
 // --- Runner ----------------------------------------------------------------------------------------------
 
 async function runSource(db: SupabaseClient, source: Source) {
   let runId: string | null = null;
   try {
     const adapter = source.config.adapter;
-    const fetched = adapter === 'amazon-creators' ? await fetchAmazon(db, source) : adapter === 'delimited-feed' ? await fetchFeed(source) : null;
+    const fetched =
+      adapter === 'amazon-creators'
+        ? await fetchAmazon(db, source)
+        : adapter === 'delimited-feed'
+          ? await fetchFeed(source)
+          : adapter === 'shopify'
+            ? await fetchShopify(source)
+            : null;
     if (!fetched) throw new ConfigError(`Unknown adapter "${String(adapter)}".`);
 
     const { data: report, error } = await db.rpc('ingest_offers', { source: source.slug, records: fetched.records as never, dry_run: false, automated: true });

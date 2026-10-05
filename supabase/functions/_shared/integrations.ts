@@ -20,7 +20,17 @@ export type OfferRecord = {
   available_sizes?: string[];
   /** Vendor that ships the item for the retailer (Shopify Collective); shown as "Ships from …". */
   ships_from?: string;
+  // Store content (Shopify): kept on the import record so a product created from it starts complete.
+  /** The store's product this offer belongs to ('shopify-product-123'); content sync key. */
+  content_ref?: string;
+  product_type?: string;
+  description?: DescriptionBlock[];
+  specs?: Record<string, string>;
+  images?: StoreImage[];
 };
+
+/** A store product image, in the store's order (first = main image). */
+export type StoreImage = { url: string; width?: number | null; height?: number | null; alt?: string | null };
 
 // --- money ---------------------------------------------------------------------------------------
 
@@ -238,6 +248,8 @@ export type ShopifyProduct = {
   vendor: string;
   productType: string;
   tags: string[];
+  descriptionHtml: string;
+  images: StoreImage[];
   variants: ShopifyVariant[];
 };
 export type ShopifyVariant = {
@@ -272,7 +284,8 @@ export const SHOPIFY_PRODUCTS_QUERY = `query Products($cursor: String) {
   products(first: 100, after: $cursor) {
     pageInfo { hasNextPage endCursor }
     nodes {
-      id handle title vendor productType tags
+      id handle title vendor productType tags descriptionHtml
+      images(first: 20) { nodes { url width height altText } }
       variants(first: 100) {
         nodes {
           id title sku barcode availableForSale currentlyNotInStock requiresShipping
@@ -303,6 +316,8 @@ export type GqlProduct = {
   vendor?: string;
   productType?: string;
   tags?: string[];
+  descriptionHtml?: string;
+  images?: { nodes?: { url?: string; width?: number | null; height?: number | null; altText?: string | null }[] };
   variants?: { nodes?: GqlVariant[] };
 };
 
@@ -314,6 +329,8 @@ export function fromStorefront(nodes: GqlProduct[]): ShopifyProduct[] {
     vendor: p.vendor ?? '',
     productType: p.productType ?? '',
     tags: p.tags ?? [],
+    descriptionHtml: p.descriptionHtml ?? '',
+    images: (p.images?.nodes ?? []).filter((i) => i.url).map((i) => ({ url: i.url!, width: i.width ?? null, height: i.height ?? null, alt: i.altText ?? null })),
     variants: (p.variants?.nodes ?? []).map((v) => ({
       id: shopifyId(v.id),
       title: v.title ?? '',
@@ -349,6 +366,8 @@ export type JsonProduct = {
   product_type?: string;
   tags?: string[] | string;
   options?: { name: string }[];
+  body_html?: string | null;
+  images?: { src?: string; width?: number | null; height?: number | null; alt?: string | null }[];
   variants?: JsonVariant[];
 };
 
@@ -362,6 +381,8 @@ export function fromPublicJson(products: JsonProduct[]): ShopifyProduct[] {
       title: p.title ?? '',
       vendor: p.vendor ?? '',
       productType: p.product_type ?? '',
+      descriptionHtml: p.body_html ?? '',
+      images: (p.images ?? []).filter((i) => i.src).map((i) => ({ url: i.src!, width: i.width ?? null, height: i.height ?? null, alt: i.alt ?? null })),
       tags: Array.isArray(p.tags)
         ? p.tags
         : String(p.tags ?? '')
@@ -412,6 +433,8 @@ const slugPart = (s: string) =>
  * - Items with nothing in stock are skipped: only items a shopper can buy are listed.
  * - Items tagged with the Collective tag carry ships_from = vendor (the supplier ships them).
  * - Links are built on the store's public origin, so they pass the retailer-domain check.
+ * - Each record carries the store product's content (description blocks, specs read from it, images)
+ *   and a content_ref, so catalog products can be created complete and kept in sync.
  */
 export function shopifyRecords(
   products: ShopifyProduct[],
@@ -454,6 +477,10 @@ export function shopifyRecords(
     }
     const vendor = p.vendor.trim();
     const shipsFrom = vendor && p.tags.some((t) => t.trim().toLowerCase() === collective) ? vendor.slice(0, 80) : undefined;
+    // Store content, shared by every offer of this product.
+    const description = descriptionBlocks(p.descriptionHtml);
+    const specs = specsFromDescription(description);
+    const images = p.images.slice(0, 12);
     const names = shippable[0]!.options.map((o) => o.name);
     const sizeOption = names.find((n) => SIZE_OPTION.test(n));
     const collapsing = new Set(names.filter((n) => n === sizeOption || COSMETIC_OPTION.test(n)));
@@ -516,10 +543,162 @@ export function shopifyRecords(
       // Any one variant's barcode identifies the product (colour and size UPCs all belong to it).
       Object.assign(record, barcodeIdentifier(variants.find((v) => v.barcode)?.barcode ?? null));
       if (shipsFrom) record.ships_from = shipsFrom;
+      record.content_ref = `shopify-product-${p.id}`;
+      if (p.productType.trim()) record.product_type = p.productType.trim().slice(0, 80);
+      if (description.length) record.description = description;
+      if (Object.keys(specs).length) record.specs = specs;
+      if (images.length) record.images = images;
       records.push(record);
     }
   }
   return { records, skipped };
+}
+
+// --- Store content (descriptions, specs) ------------------------------------------------------------
+
+/** A description as structured blocks: the app renders them in its own type styles (no store HTML/CSS). */
+export type DescriptionRun = { text: string; bold?: boolean };
+export type DescriptionBlock =
+  | { kind: 'heading'; text: string }
+  | { kind: 'paragraph'; runs: DescriptionRun[] }
+  | { kind: 'list'; items: DescriptionRun[][] };
+
+const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '–', mdash: '—', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“', hellip: '…', trade: '™', reg: '®', copy: '©', deg: '°' };
+
+function decodeEntities(s: string): string {
+  return s.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e: string) => {
+    if (e[0] === '#') {
+      const n = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10);
+      return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : '';
+    }
+    return ENTITIES[e.toLowerCase()] ?? m;
+  });
+}
+
+const textOf = (runs: DescriptionRun[]) => runs.map((r) => r.text).join('');
+
+function tidyRuns(runs: DescriptionRun[]): DescriptionRun[] {
+  const out: DescriptionRun[] = [];
+  for (const r of runs) {
+    const text = r.text.replace(/\s+/g, ' ');
+    if (!text) continue;
+    const last = out[out.length - 1];
+    if (last && !!last.bold === !!r.bold) last.text += text;
+    else out.push(r.bold ? { text, bold: true } : { text });
+  }
+  if (out.length) {
+    out[0]!.text = out[0]!.text.trimStart();
+    out[out.length - 1]!.text = out[out.length - 1]!.text.trimEnd();
+  }
+  return out.filter((r) => r.text !== '');
+}
+
+/**
+ * Store description HTML → blocks. Keeps paragraphs, headings, bullet lists and bold; drops every
+ * style, colour, font, link target, image, script and embedded widget. A short paragraph that is
+ * entirely bold becomes a heading. Capped so a runaway description can't bloat the catalog.
+ */
+export function descriptionBlocks(html: string | null | undefined, maxChars = 8000): DescriptionBlock[] {
+  if (!html) return [];
+  const src = html.replace(/<(script|style|iframe|svg|noscript)[\s\S]*?<\/\1\s*>/gi, '').replace(/<!--[\s\S]*?-->/g, '');
+  const blocks: DescriptionBlock[] = [];
+  let runs: DescriptionRun[] = [];
+  let heading = false;
+  let bold = 0;
+  let list: DescriptionRun[][] | null = null;
+  let item: DescriptionRun[] | null = null;
+  let used = 0;
+
+  const flush = () => {
+    const tidy = tidyRuns(runs);
+    runs = [];
+    if (!tidy.length) return (heading = false);
+    const text = textOf(tidy);
+    if (used + text.length > maxChars) return (heading = false);
+    used += text.length;
+    if (heading || (tidy.every((r) => r.bold) && text.length <= 80)) blocks.push({ kind: 'heading', text });
+    else blocks.push({ kind: 'paragraph', runs: tidy });
+    heading = false;
+  };
+  const endItem = () => {
+    if (!list || !item) return;
+    const tidy = tidyRuns(item);
+    const text = textOf(tidy);
+    if (tidy.length && used + text.length <= maxChars) {
+      used += text.length;
+      list.push(tidy);
+    }
+    item = null;
+  };
+  const endList = () => {
+    endItem();
+    if (list?.length) blocks.push({ kind: 'list', items: list });
+    list = null;
+  };
+  const push = (text: string) => {
+    if (!text) return;
+    const run: DescriptionRun = bold > 0 ? { text, bold: true } : { text };
+    if (item) item.push(run);
+    else if (!list) runs.push(run);
+  };
+
+  for (const m of src.matchAll(/<\/?([a-z0-9]+)[^>]*>|[^<]+|</gi)) {
+    const token = m[0];
+    if (token[0] !== '<' || token === '<') {
+      push(decodeEntities(token));
+      continue;
+    }
+    const close = token[1] === '/';
+    const tag = m[1]!.toLowerCase();
+    if (tag === 'strong' || tag === 'b') bold = Math.max(0, bold + (close ? -1 : 1));
+    else if (tag === 'ul' || tag === 'ol') {
+      if (close) endList();
+      else {
+        flush();
+        endList();
+        list = [];
+      }
+    } else if (tag === 'li') {
+      if (close) endItem();
+      else if (list) {
+        endItem();
+        item = [];
+      }
+    } else if (/^h[1-6]$/.test(tag)) {
+      if (!item) {
+        flush();
+        heading = !close;
+      }
+    } else if (tag === 'p' || tag === 'div' || tag === 'br' || tag === 'hr' || tag === 'tr' || tag === 'section') {
+      if (item) {
+        if (tag === 'br') item.push({ text: ' ' });
+      } else if (!list) flush();
+    }
+  }
+  endList();
+  flush();
+  return blocks.slice(0, 80);
+}
+
+/**
+ * "Label: value" bullet points → specs ({ core_thickness: '16mm', average_weight: '8.0 oz' }), as staff
+ * would type them. Only list items, short labels and short values; at most 16.
+ */
+export function specsFromDescription(blocks: DescriptionBlock[]): Record<string, string> {
+  const specs: Record<string, string> = {};
+  for (const b of blocks) {
+    if (b.kind !== 'list') continue;
+    for (const runs of b.items) {
+      const m = textOf(runs).match(/^\s*([A-Za-z][A-Za-z0-9 &/().'-]{1,30}?)\s*:\s*(.{1,80}?)\s*$/);
+      if (!m) continue;
+      const key = m[1]!
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/(^_|_$)/g, '');
+      if (key && !(key in specs) && Object.keys(specs).length < 16) specs[key] = m[2]!.replace(/\s*\.$/, '');
+    }
+  }
+  return specs;
 }
 
 // --- Discount links (go function) ---------------------------------------------------------------------

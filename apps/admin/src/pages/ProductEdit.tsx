@@ -4,6 +4,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { go } from '../App';
 import { supabase } from '../lib/supabase';
 import { ProductImages } from './ProductImages';
+import { StoreContentPanel } from './StoreContent';
 
 type Option = { id: string; slug: string; name: string };
 type VariantForm = { label: string; msrp: string; isDefault: boolean; attributes: string };
@@ -58,15 +59,25 @@ export function ProductEditPage({ slug }: { slug: string | null }) {
   const isNew = slug === null;
 
   useEffect(() => {
-    supabase.from('brands').select('id, slug, name').order('name').then(({ data }) => setBrands(data ?? []));
-    supabase.from('categories').select('id, slug, name').order('sort').then(({ data }) => setCategories(data ?? []));
+    supabase
+      .from('brands')
+      .select('id, slug, name')
+      .order('name')
+      .then(({ data }) => setBrands(data ?? []));
+    supabase
+      .from('categories')
+      .select('id, slug, name')
+      .order('sort')
+      .then(({ data }) => setCategories(data ?? []));
   }, []);
 
   useEffect(() => {
     if (!slug) return;
     supabase
       .from('products')
-      .select('id, slug, name, model_year, msrp_cents, status, specs, brand:brands(slug), category:categories(slug), aliases:product_aliases(alias), variants:product_variants(label, msrp_cents, is_default, attributes, sort)')
+      .select(
+        'id, slug, name, model_year, msrp_cents, status, specs, brand:brands(slug), category:categories(slug), aliases:product_aliases(alias), variants:product_variants(label, msrp_cents, is_default, attributes, sort)',
+      )
       .eq('slug', slug)
       .single()
       .then(({ data, error }) => {
@@ -135,8 +146,17 @@ export function ProductEditPage({ slug }: { slug: string | null }) {
       msrp_cents: msrp ?? undefined,
       status: form.status,
       specs: pairs(form.specs),
-      aliases: form.aliases.split(',').map((a) => a.trim()).filter(Boolean),
-      variants: variants.map((v) => ({ label: v.label, msrp_cents: v.cents ?? undefined, is_default: v.isDefault, attributes: pairs(v.attributes), identifiers: [] })),
+      aliases: form.aliases
+        .split(',')
+        .map((a) => a.trim())
+        .filter(Boolean),
+      variants: variants.map((v) => ({
+        label: v.label,
+        msrp_cents: v.cents ?? undefined,
+        is_default: v.isDefault,
+        attributes: pairs(v.attributes),
+        identifiers: [],
+      })),
     };
 
     setBusy(true);
@@ -269,7 +289,16 @@ export function ProductEditPage({ slug }: { slug: string | null }) {
                   <input value={v.attributes} onChange={(e) => setVariant(i, { attributes: e.target.value })} placeholder="thickness_mm=16" />
                 </td>
                 <td>
-                  <button type="button" className="btn danger" disabled={form.variants.length === 1} onClick={() => set('variants', form.variants.filter((_, j) => j !== i))}>
+                  <button
+                    type="button"
+                    className="btn danger"
+                    disabled={form.variants.length === 1}
+                    onClick={() =>
+                      set(
+                        'variants',
+                        form.variants.filter((_, j) => j !== i),
+                      )
+                    }>
                     Remove
                   </button>
                 </td>
@@ -279,6 +308,7 @@ export function ProductEditPage({ slug }: { slug: string | null }) {
         </table>
       </div>
 
+      {productId && <StoreContentPanel productId={productId} />}
       {productId ? <ProductImages productId={productId} /> : <p className="muted">Save the product to add images.</p>}
     </form>
   );

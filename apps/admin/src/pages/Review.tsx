@@ -18,7 +18,7 @@ type Raw = {
   mpn: string | null;
   retailer_sku: string | null;
   suggestions: Suggestion[];
-  payload: { ships_from?: string } | null;
+  payload: { ships_from?: string; product_type?: string; description?: unknown[]; images?: unknown[]; specs?: Record<string, string> } | null;
   created_at: string;
   resolved_at: string | null;
   retailer: { name: string } | null;
@@ -293,6 +293,29 @@ function ReviewCard({
   );
 }
 
+/** Shopify product type ("Paddle") → the catalog category with that name ("Paddles"), if one matches. */
+function guessCategory(productType: string | undefined, categories: Option[]): string {
+  const norm = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim()
+      .replace(/(es|s)$/, '');
+  const t = productType ? norm(productType) : '';
+  if (!t) return '';
+  return (categories.find((c) => norm(c.name) === t) ?? categories.find((c) => norm(c.name).includes(t) || t.includes(norm(c.name))))?.id ?? '';
+}
+
+function storeContent(raw: Raw): string {
+  const p = raw.payload;
+  const parts = [
+    p?.description?.length ? 'description' : null,
+    p?.images?.length ? `${p.images.length} image${p.images.length === 1 ? '' : 's'}` : null,
+    p?.specs && Object.keys(p.specs).length ? `${Object.keys(p.specs).length} specs` : null,
+  ].filter(Boolean);
+  return parts.join(', ');
+}
+
 /**
  * A draft catalog product from this record. The brand starts from the feed's vendor name but is often
  * different (stores list other brands' items under their own name), so staff confirm it. The record's
@@ -312,7 +335,7 @@ function CreateProductForm({
   onCreate: (p: CreateInput) => void;
 }) {
   const [brand, setBrand] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(() => guessCategory(raw.payload?.product_type, categories));
   const brandName = brands.find((b) => b.id === brand)?.name ?? null;
   const suggested = suggestProductName(raw.title ?? '', brandName);
   const [name, setName] = useState<string | null>(null);
@@ -333,6 +356,11 @@ function CreateProductForm({
   return (
     <div className="card" style={{ background: 'var(--background)' }}>
       <strong style={{ fontSize: 13 }}>New draft product</strong>
+      {storeContent(raw) && (
+        <p className="muted" style={{ fontSize: 12, margin: 0 }}>
+          From the store, added automatically: {storeContent(raw)}. Images arrive with the source’s next run (within minutes).
+        </p>
+      )}
       <div className="grid3">
         <label className="field">
           Brand {raw.brand_text ? <span className="muted">(feed vendor: {raw.brand_text})</span> : null}

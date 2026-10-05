@@ -184,3 +184,13 @@ export function buildCatalogPayload(csv: { brands?: string; categories?: string;
   }
   return { payload, issues };
 }
+
+/**
+ * A store description as structured blocks (written by the ingest function's sync; same shape as
+ * DescriptionBlock in supabase/functions/_shared/integrations.ts). The app renders it in its own styles.
+ */
+export type DescriptionRun = { text: string; bold?: boolean };
+export type DescriptionBlock =
+  | { kind: 'heading'; text: string }
+  | { kind: 'paragraph'; runs: DescriptionRun[] }
+  | { kind: 'list'; items: DescriptionRun[][] };

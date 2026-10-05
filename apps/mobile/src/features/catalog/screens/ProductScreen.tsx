@@ -5,7 +5,18 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Share, View } from 'react-native';
 
-import { DealQualityMeter, DiscountPill, PriceBlock, PriceChart, ProductCard, ProductImage, RetailerRow, retailerMonogram, StickyDealBar } from '@/commerce';
+import {
+  DealQualityMeter,
+  DiscountPill,
+  PriceBlock,
+  PriceChart,
+  ProductCard,
+  ProductDescription,
+  ProductImage,
+  RetailerRow,
+  retailerMonogram,
+  StickyDealBar,
+} from '@/commerce';
 import { useTheme } from '@/design/theme';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
@@ -285,6 +296,12 @@ export default function ProductScreen() {
             )}
 
             <PreOwnedSection productId={p.id} slug={p.slug} />
+
+            {!!p.description?.length && (
+              <View style={{ paddingHorizontal: 16 }}>
+                <ProductDescription blocks={p.description} />
+              </View>
+            )}
 
             {specs.length > 0 && (
               <View style={{ paddingHorizontal: 16 }}>

@@ -1,3 +1,4 @@
+import type { DescriptionBlock } from '@pickledeals/shared';
 import { requireSupabase } from '@/lib/supabase';
 
 /** Catalog reads (Phase 2). All public (D6): anon and signed-in users see the same visible rows. */
@@ -30,6 +31,8 @@ export type ProductDetail = ProductSummary & {
   modelYear: number | null;
   status: 'draft' | 'active' | 'discontinued';
   specs: Record<string, string>;
+  /** Store description (synced from a connected Shopify store), or null. */
+  description: DescriptionBlock[] | null;
   variants: { id: string; label: string; msrpCents: number | null; isDefault: boolean; attributes: Record<string, string> }[];
   images: CatalogImage[];
 };
@@ -180,7 +183,7 @@ export async function fetchProduct(slug: string): Promise<ProductDetail> {
   const { data, error } = await requireSupabase()
     .from('products')
     .select(
-      `${PRODUCT_COLUMNS}, model_year, status, specs, variants:product_variants(id, label, msrp_cents, is_default, attributes, sort)`,
+      `${PRODUCT_COLUMNS}, model_year, status, specs, description, variants:product_variants(id, label, msrp_cents, is_default, attributes, sort)`,
     )
     .eq('slug', slug)
     .single<
@@ -188,6 +191,7 @@ export async function fetchProduct(slug: string): Promise<ProductDetail> {
         model_year: number | null;
         status: ProductDetail['status'];
         specs: Record<string, string>;
+        description: DescriptionBlock[] | null;
         variants: { id: string; label: string; msrp_cents: number | null; is_default: boolean; attributes: Record<string, string>; sort: number }[];
       }
     >();
@@ -197,6 +201,7 @@ export async function fetchProduct(slug: string): Promise<ProductDetail> {
     modelYear: data.model_year,
     status: data.status,
     specs: data.specs,
+    description: data.description,
     images: [...data.images].sort((a, b) => a.sort - b.sort).map((i) => ({ path: i.storage_path, isCutout: i.is_cutout, blurhash: i.blurhash })),
     variants: [...data.variants]
       .sort((a, b) => a.sort - b.sort)

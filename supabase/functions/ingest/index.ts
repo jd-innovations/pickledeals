@@ -223,6 +223,105 @@ async function fetchShopify(source: Source): Promise<Fetched> {
   return { records, complete: source.config.complete === true && !truncated, notes, unavailable };
 }
 
+// --- Store content sync (descriptions, specs, images) ----------------------------------------------------
+
+type StoreContent = Pick<OfferRecord, 'description' | 'specs' | 'images'>;
+const IMAGE_TYPES: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const IMAGE_WIDTH = 1600;
+
+async function sha256(text: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Products linked to this source (created from it, or adopted because they had no content) get the
+ * store's description, specs (only while empty) and images. Images are copied into the catalog bucket,
+ * never hotlinked; ones the store drops are removed. Curated images (no content_source_id) are untouched.
+ */
+async function syncStoreContent(db: SupabaseClient, source: Source, sourceId: string, records: OfferRecord[]): Promise<string[]> {
+  const contents = new Map<string, StoreContent>();
+  for (const r of records) if (r.content_ref && !contents.has(r.content_ref)) contents.set(r.content_ref, r);
+  if (!contents.size) return [];
+
+  const { data: linked, error } = await db.rpc('link_store_content', { source: sourceId });
+  if (error) return [`Store content not synced: ${error.message}`];
+  let synced = 0;
+  const failures: string[] = [];
+  for (const p of (linked ?? []) as { product_id: string; slug: string; content_ref: string; content_hash: string | null }[]) {
+    const c = contents.get(p.content_ref);
+    if (!c) continue; // not in this run (e.g. sold out): keep the last synced content
+    const images = c.images ?? [];
+    const hash = await sha256(JSON.stringify([c.description ?? [], c.specs ?? {}, images.map((i) => i.url)]));
+    if (hash === p.content_hash) continue;
+    try {
+      const { data: existing } = await db
+        .from('product_images')
+        .select('id, source_url, storage_path')
+        .eq('product_id', p.product_id)
+        .eq('content_source_id', sourceId);
+      const have = new Map((existing ?? []).map((i) => [i.source_url as string, i]));
+      const wanted = new Set(images.map((i) => i.url));
+      for (const [index, img] of images.entries()) {
+        const sort = 100 + index; // after any curated images
+        const kept = have.get(img.url);
+        if (kept) {
+          await db.from('product_images').update({ sort }).eq('id', kept.id);
+          continue;
+        }
+        const res = await fetch(`${img.url}${img.url.includes('?') ? '&' : '?'}width=${IMAGE_WIDTH}`);
+        const type = (res.headers.get('content-type') ?? '').split(';')[0]!.trim();
+        const ext = IMAGE_TYPES[type];
+        const body = res.ok && ext ? new Uint8Array(await res.arrayBuffer()) : null;
+        if (!body || !ext || body.byteLength > MAX_IMAGE_BYTES) {
+          failures.push(`image skipped for ${p.slug} (${res.status} ${type || 'unknown type'})`);
+          continue;
+        }
+        const path = `products/${p.product_id}/store-${(await sha256(img.url)).slice(0, 16)}.${ext}`;
+        const up = await db.storage.from('catalog').upload(path, body, { contentType: type, cacheControl: '31536000', upsert: true });
+        if (up.error) throw new Error(up.error.message);
+        const scale = img.width && img.width > IMAGE_WIDTH ? IMAGE_WIDTH / img.width : 1;
+        const { error: insertError } = await db.from('product_images').insert({
+          product_id: p.product_id,
+          storage_path: path,
+          sort,
+          width: img.width ? Math.round(img.width * scale) : null,
+          height: img.height ? Math.round(img.height * scale) : null,
+          is_cutout: false,
+          source: 'retailer_feed',
+          source_url: img.url,
+          license_note: `Store content synced from ${source.name}; the store owner holds the rights.`,
+          status: 'active',
+          content_source_id: sourceId,
+        });
+        if (insertError) {
+          await db.storage.from('catalog').remove([path]);
+          throw new Error(insertError.message);
+        }
+      }
+      const gone = (existing ?? []).filter((i) => !wanted.has(i.source_url as string));
+      if (gone.length) {
+        await db.from('product_images').delete().in('id', gone.map((i) => i.id));
+        await db.storage.from('catalog').remove(gone.map((i) => i.storage_path as string));
+      }
+      const { error: applyError } = await db.rpc('apply_store_content', {
+        product: p.product_id,
+        description: (c.description ?? []) as never,
+        specs: (c.specs ?? {}) as never,
+        hash,
+      });
+      if (applyError) throw new Error(applyError.message);
+      synced++;
+    } catch (e) {
+      failures.push(`${p.slug}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+  const notes = synced ? [`Synced store content for ${synced} product(s).`] : [];
+  if (failures.length) notes.push(`Content issues: ${failures.slice(0, 3).join('; ')}.`);
+  return notes;
+}
+
 // --- Runner ----------------------------------------------------------------------------------------------
 
 async function runSource(db: SupabaseClient, source: Source) {
@@ -249,19 +348,21 @@ async function runSource(db: SupabaseClient, source: Source) {
     const ok = !(fetched.records.length > 0 && r.error_count === fetched.records.length);
     // Items the store says can't be bought right now are hidden even when the full-feed rule holds back
     // (that rule guards against truncated feeds; these were seen and are known to be unavailable).
+    const { data: src } = await db.from('ingestion_sources').select('id').eq('slug', source.slug).single();
+    const sourceId = (src?.id as string | undefined) ?? '';
     let soldOut = 0;
-    if (ok && fetched.unavailable?.length) {
-      const { data: src } = await db.from('ingestion_sources').select('id').eq('slug', source.slug).single();
+    if (ok && sourceId && fetched.unavailable?.length) {
       const { data: hidden } = await db
         .from('retailer_offers')
         .update({ status: 'inactive' })
-        .eq('source_id', src?.id ?? '')
+        .eq('source_id', sourceId)
         .eq('status', 'active')
         .in('external_ref', fetched.unavailable)
         .select('id');
       soldOut = hidden?.length ?? 0;
       if (soldOut) notes.push(`Hid ${soldOut} offer(s) that are sold out or pre-order only.`);
     }
+    if (ok && sourceId) notes.push(...(await syncStoreContent(db, source, sourceId, fetched.records)));
     const { data: finish } = await db.rpc('finish_ingestion_run', { source_slug: source.slug, run: runId, ok, message: notes.join(' ') || undefined, complete: fetched.complete && ok });
     return { source: source.slug, ok, records: fetched.records.length, matched: r.matched, unmatched: r.unmatched, errors: r.error_count ?? 0, sold_out_hidden: soldOut, ...(finish as object) };
   } catch (e) {

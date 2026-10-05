@@ -7,4 +7,5 @@ export { BrandMark, BrandRow, CategoryTile, ProductCard, ProductRow, brandMonogr
 export { categoryArt, productArt } from './catalogArt';
 export { PriceChart, shortDate, type ChartPoint } from './PriceChart';
 export { PriceBreakdown, RetailerOfferCard, retailerMonogram, StatGrid, StickyDealBar, type RetailerOfferCardData } from './Retail';
+export { ProductDescription } from './Description';
 export { CollectionBanner, DealHero, PriceDropRow, type DealHeroData, type PriceDropRowData } from './Deals';

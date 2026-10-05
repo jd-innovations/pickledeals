@@ -767,16 +767,22 @@ isOneToOne: false
                   ]
                 },"product_images": {
                   Row: {
-                    "added_by": string | null,"blurhash": string | null,"created_at": string,"height": number | null,"id": string,"is_cutout": boolean,"license_note": string | null,"product_id": string,"rights_expires_at": string | null,"sort": number,"source": Database["public"]['Enums']["image_source"],"source_url": string | null,"status": Database["public"]['Enums']["image_status"],"storage_path": string,"updated_at": string,"variant_id": string | null,"width": number | null
+                    "added_by": string | null,"blurhash": string | null,"content_source_id": string | null,"created_at": string,"height": number | null,"id": string,"is_cutout": boolean,"license_note": string | null,"product_id": string,"rights_expires_at": string | null,"sort": number,"source": Database["public"]['Enums']["image_source"],"source_url": string | null,"status": Database["public"]['Enums']["image_status"],"storage_path": string,"updated_at": string,"variant_id": string | null,"width": number | null
                   }
                   Insert: {
-                    "added_by"?: string | null,"blurhash"?: string | null,"created_at"?: string,"height"?: number | null,"id"?: string,"is_cutout"?: boolean,"license_note"?: string | null,"product_id": string,"rights_expires_at"?: string | null,"sort"?: number,"source": Database["public"]['Enums']["image_source"],"source_url"?: string | null,"status"?: Database["public"]['Enums']["image_status"],"storage_path": string,"updated_at"?: string,"variant_id"?: string | null,"width"?: number | null
+                    "added_by"?: string | null,"blurhash"?: string | null,"content_source_id"?: string | null,"created_at"?: string,"height"?: number | null,"id"?: string,"is_cutout"?: boolean,"license_note"?: string | null,"product_id": string,"rights_expires_at"?: string | null,"sort"?: number,"source": Database["public"]['Enums']["image_source"],"source_url"?: string | null,"status"?: Database["public"]['Enums']["image_status"],"storage_path": string,"updated_at"?: string,"variant_id"?: string | null,"width"?: number | null
                   }
                   Update: {
-                    "added_by"?: string | null,"blurhash"?: string | null,"created_at"?: string,"height"?: number | null,"id"?: string,"is_cutout"?: boolean,"license_note"?: string | null,"product_id"?: string,"rights_expires_at"?: string | null,"sort"?: number,"source"?: Database["public"]['Enums']["image_source"],"source_url"?: string | null,"status"?: Database["public"]['Enums']["image_status"],"storage_path"?: string,"updated_at"?: string,"variant_id"?: string | null,"width"?: number | null
+                    "added_by"?: string | null,"blurhash"?: string | null,"content_source_id"?: string | null,"created_at"?: string,"height"?: number | null,"id"?: string,"is_cutout"?: boolean,"license_note"?: string | null,"product_id"?: string,"rights_expires_at"?: string | null,"sort"?: number,"source"?: Database["public"]['Enums']["image_source"],"source_url"?: string | null,"status"?: Database["public"]['Enums']["image_status"],"storage_path"?: string,"updated_at"?: string,"variant_id"?: string | null,"width"?: number | null
                   }
                   Relationships: [
                     {
+      foreignKeyName: "product_images_content_source_id_fkey"
+      columns: ["content_source_id"]
+isOneToOne: false
+      referencedRelation: "ingestion_sources"
+      referencedColumns: ["id"]
+    },{
       foreignKeyName: "product_images_product_id_fkey"
       columns: ["product_id"]
 isOneToOne: false
@@ -823,13 +829,13 @@ isOneToOne: false
                   ]
                 },"products": {
                   Row: {
-                    "brand_id": string,"category_id": string,"created_at": string,"id": string,"model_year": number | null,"msrp_cents": number | null,"name": string,"search": unknown,"search_text": string,"slug": string,"specs": NonNullable<Json>,"status": Database["public"]['Enums']["product_status"],"updated_at": string
+                    "brand_id": string,"category_id": string,"content_hash": string | null,"content_ref": string | null,"content_source_id": string | null,"content_synced_at": string | null,"created_at": string,"description": Json | null,"id": string,"model_year": number | null,"msrp_cents": number | null,"name": string,"search": unknown,"search_text": string,"slug": string,"specs": NonNullable<Json>,"status": Database["public"]['Enums']["product_status"],"updated_at": string
                   }
                   Insert: {
-                    "brand_id": string,"category_id": string,"created_at"?: string,"id"?: string,"model_year"?: number | null,"msrp_cents"?: number | null,"name": string,"search"?: unknown,"search_text"?: string,"slug": string,"specs"?: NonNullable<Json>,"status"?: Database["public"]['Enums']["product_status"],"updated_at"?: string
+                    "brand_id": string,"category_id": string,"content_hash"?: string | null,"content_ref"?: string | null,"content_source_id"?: string | null,"content_synced_at"?: string | null,"created_at"?: string,"description"?: Json | null,"id"?: string,"model_year"?: number | null,"msrp_cents"?: number | null,"name": string,"search"?: unknown,"search_text"?: string,"slug": string,"specs"?: NonNullable<Json>,"status"?: Database["public"]['Enums']["product_status"],"updated_at"?: string
                   }
                   Update: {
-                    "brand_id"?: string,"category_id"?: string,"created_at"?: string,"id"?: string,"model_year"?: number | null,"msrp_cents"?: number | null,"name"?: string,"search"?: unknown,"search_text"?: string,"slug"?: string,"specs"?: NonNullable<Json>,"status"?: Database["public"]['Enums']["product_status"],"updated_at"?: string
+                    "brand_id"?: string,"category_id"?: string,"content_hash"?: string | null,"content_ref"?: string | null,"content_source_id"?: string | null,"content_synced_at"?: string | null,"created_at"?: string,"description"?: Json | null,"id"?: string,"model_year"?: number | null,"msrp_cents"?: number | null,"name"?: string,"search"?: unknown,"search_text"?: string,"slug"?: string,"specs"?: NonNullable<Json>,"status"?: Database["public"]['Enums']["product_status"],"updated_at"?: string
                   }
                   Relationships: [
                     {
@@ -855,6 +861,12 @@ isOneToOne: false
       columns: ["category_id"]
 isOneToOne: false
       referencedRelation: "category_summaries"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "products_content_source_id_fkey"
+      columns: ["content_source_id"]
+isOneToOne: false
+      referencedRelation: "ingestion_sources"
       referencedColumns: ["id"]
     }
                   ]
@@ -1073,13 +1085,13 @@ isOneToOne: false
                   ]
                 },"retailer_offers": {
                   Row: {
-                    "available_sizes": (string)[],"created_at": string,"external_ref": string | null,"first_seen_at": string,"id": string,"in_stock": boolean,"last_changed_at": string,"last_checked_at": string,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"],"price_source": Database["public"]['Enums']["price_source"],"retailer_id": string,"shipping_cents": number,"ships_from": string | null,"source_id": string | null,"status": Database["public"]['Enums']["offer_status"],"updated_at": string,"url": string,"variant_id": string
+                    "available_sizes": (string)[],"content_ref": string | null,"created_at": string,"external_ref": string | null,"first_seen_at": string,"id": string,"in_stock": boolean,"last_changed_at": string,"last_checked_at": string,"price_cents": number | null,"price_display": Database["public"]['Enums']["price_display"],"price_source": Database["public"]['Enums']["price_source"],"retailer_id": string,"shipping_cents": number,"ships_from": string | null,"source_id": string | null,"status": Database["public"]['Enums']["offer_status"],"updated_at": string,"url": string,"variant_id": string
                   }
                   Insert: {
-                    "available_sizes"?: (string)[],"created_at"?: string,"external_ref"?: string | null,"first_seen_at"?: string,"id"?: string,"in_stock"?: boolean,"last_changed_at"?: string,"last_checked_at"?: string,"price_cents"?: number | null,"price_display": Database["public"]['Enums']["price_display"],"price_source"?: Database["public"]['Enums']["price_source"],"retailer_id": string,"shipping_cents"?: number,"ships_from"?: string | null,"source_id"?: string | null,"status"?: Database["public"]['Enums']["offer_status"],"updated_at"?: string,"url": string,"variant_id": string
+                    "available_sizes"?: (string)[],"content_ref"?: string | null,"created_at"?: string,"external_ref"?: string | null,"first_seen_at"?: string,"id"?: string,"in_stock"?: boolean,"last_changed_at"?: string,"last_checked_at"?: string,"price_cents"?: number | null,"price_display": Database["public"]['Enums']["price_display"],"price_source"?: Database["public"]['Enums']["price_source"],"retailer_id": string,"shipping_cents"?: number,"ships_from"?: string | null,"source_id"?: string | null,"status"?: Database["public"]['Enums']["offer_status"],"updated_at"?: string,"url": string,"variant_id": string
                   }
                   Update: {
-                    "available_sizes"?: (string)[],"created_at"?: string,"external_ref"?: string | null,"first_seen_at"?: string,"id"?: string,"in_stock"?: boolean,"last_changed_at"?: string,"last_checked_at"?: string,"price_cents"?: number | null,"price_display"?: Database["public"]['Enums']["price_display"],"price_source"?: Database["public"]['Enums']["price_source"],"retailer_id"?: string,"shipping_cents"?: number,"ships_from"?: string | null,"source_id"?: string | null,"status"?: Database["public"]['Enums']["offer_status"],"updated_at"?: string,"url"?: string,"variant_id"?: string
+                    "available_sizes"?: (string)[],"content_ref"?: string | null,"created_at"?: string,"external_ref"?: string | null,"first_seen_at"?: string,"id"?: string,"in_stock"?: boolean,"last_changed_at"?: string,"last_checked_at"?: string,"price_cents"?: number | null,"price_display"?: Database["public"]['Enums']["price_display"],"price_source"?: Database["public"]['Enums']["price_source"],"retailer_id"?: string,"shipping_cents"?: number,"ships_from"?: string | null,"source_id"?: string | null,"status"?: Database["public"]['Enums']["offer_status"],"updated_at"?: string,"url"?: string,"variant_id"?: string
                   }
                   Relationships: [
                     {
@@ -1394,6 +1406,9 @@ isOneToOne: false
 "apply_raw_offer":
 { Args: { "raw_id": string,"vid": string }; Returns: Json
                            },
+"apply_store_content":
+{ Args: { "description": Json,"hash": string,"product": string,"specs": Json }; Returns: undefined
+                           },
 "badge_count":
 { Args: { "uid": string }; Returns: number
                            },
@@ -1484,6 +1499,11 @@ isOneToOne: false
                            },
 "learn_identifiers":
 { Args: { "raw_id": string,"vid": string }; Returns: Json
+                           },
+"link_store_content":
+{ Args: { "source": string }; Returns: {
+              "content_hash": string,"content_ref": string,"product_id": string,"slug": string
+            }[]
                            },
 "listing_is_public":
 { Args: { "lid": string }; Returns: boolean
@@ -1722,6 +1742,9 @@ isOneToOne: false
                            },
 "staff_unsuspend_user":
 { Args: { "restore_listings"?: boolean,"target": string }; Returns: number
+                           },
+"staff_use_store_content":
+{ Args: { "offer": string,"product": string }; Returns: undefined
                            },
 "staff_users":
 { Args: { "max_rows"?: number,"only_suspended"?: boolean,"q"?: string,"skip"?: number }; Returns: {

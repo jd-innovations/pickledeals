@@ -4,12 +4,14 @@ import {
   affiliateUrl,
   amazonRecords,
   batches,
+  descriptionBlocks,
   detectDelimiter,
   discountLinkUrl,
   feedRecords,
   fromPublicJson,
   fromStorefront,
   shopifyRecords,
+  specsFromDescription,
   toCents,
   unwrapTrackingUrl,
   type FeedColumns,
@@ -197,6 +199,8 @@ describe('shopifyRecords', () => {
         brand: 'EngagePickleball',
         upc: '810957038755',
         ships_from: 'EngagePickleball',
+        content_ref: 'shopify-product-8001',
+        product_type: 'Paddle',
       },
     ]);
   });
@@ -338,5 +342,80 @@ describe('shopifyRecords, pre-orders', () => {
     const { records, skipped } = shopifyRecords(products, { retailerSlug: 'r', storeUrl: 'https://example.com' });
     expect(records).toEqual([]);
     expect(skipped).toEqual([{ ref: 'variant-9', reason: 'out of stock' }]);
+  });
+});
+
+describe('descriptionBlocks', () => {
+  // Trimmed from the Engage X2's real description (Collective supplier content).
+  const x2 = `<p data-start="101"><strong><span style="text-decoration: underline; color: rgb(255, 42, 0);">5/1 Shipping Update<span style="color: rgb(255, 42, 0);">:</span> <span>The X2 is sold out.</span> </span></strong></p>
+<p><strong>Engage X2 Pickleball Paddle — 100% Foam. Fully Engineered.</strong></p>
+<p><em>Built for aggressive players who want to hit harder.</em><strong></strong></p>
+<p><strong>What you get:</strong></p>
+<ul><li>Explosive, controllable power</li><li>Maximum spin &amp; ball bite</li></ul>
+<p>The X2 is engineered on a <strong>100% foam architecture</strong>, combining quad-density foam.</p>
+<hr>
+<p><strong>Specifications:</strong></p>
+<ul>
+<li><strong>Colors:</strong> Aqua Surge</li>
+<li><strong>Shape: </strong><strong>Elongated: </strong>16.5 inch x 7.5 inch with a 5.5 inch handle length.</li>
+<li><strong>Core Thickness: </strong>16mm</li>
+<li><strong>Average Weight:</strong> 8.0 oz</li>
+<li><strong>USA Pickleball Certified and PBCoR .43 Approved</strong></li>
+</ul>
+<script>alert(1)</script><div class='jdgm-rev-widg'><style>.x{}</style></div>`;
+
+  it('keeps structure and bold, drops styling and scripts', () => {
+    const blocks = descriptionBlocks(x2);
+    expect(blocks[0]).toEqual({ kind: 'heading', text: '5/1 Shipping Update: The X2 is sold out.' });
+    expect(blocks[1]).toEqual({ kind: 'heading', text: 'Engage X2 Pickleball Paddle — 100% Foam. Fully Engineered.' });
+    expect(blocks[2]).toEqual({ kind: 'paragraph', runs: [{ text: 'Built for aggressive players who want to hit harder.' }] });
+    expect(blocks[4]).toEqual({ kind: 'list', items: [[{ text: 'Explosive, controllable power' }], [{ text: 'Maximum spin & ball bite' }]] });
+    expect(blocks[5]).toEqual({
+      kind: 'paragraph',
+      runs: [{ text: 'The X2 is engineered on a ' }, { text: '100% foam architecture', bold: true }, { text: ', combining quad-density foam.' }],
+    });
+    expect(JSON.stringify(blocks)).not.toMatch(/alert|style|rgb|jdgm/);
+  });
+
+  it('reads specs from "Label: value" bullets', () => {
+    expect(specsFromDescription(descriptionBlocks(x2))).toEqual({
+      colors: 'Aqua Surge',
+      shape: 'Elongated: 16.5 inch x 7.5 inch with a 5.5 inch handle length',
+      core_thickness: '16mm',
+      average_weight: '8.0 oz',
+    });
+  });
+
+  it('handles empty input and caps size', () => {
+    expect(descriptionBlocks(null)).toEqual([]);
+    expect(descriptionBlocks(`<p>${'a'.repeat(50)}</p>`.repeat(10), 120)).toHaveLength(2);
+  });
+});
+
+describe('shopifyRecords, store content', () => {
+  it('carries description, specs and images on every offer of the product', () => {
+    const [p] = fromStorefront([
+      {
+        id: 'gid://shopify/Product/7',
+        handle: 'grip',
+        title: 'WrapCore Performance Grip',
+        vendor: 'Pickleball Grip Doctor',
+        productType: 'Grip',
+        descriptionHtml: '<p>Tacky and thin.</p><ul><li><strong>Thickness:</strong> 0.6mm</li></ul>',
+        images: { nodes: [{ url: 'https://cdn.shopify.com/a.jpg', width: 1200, height: 1200, altText: 'Grip' }, { url: 'https://cdn.shopify.com/b.jpg' }] },
+        variants: { nodes: [{ id: 'gid://shopify/ProductVariant/70', price: { amount: '19.99' }, availableForSale: true }] },
+      },
+    ]);
+    const [r] = shopifyRecords([p!], { retailerSlug: 'r', storeUrl: 'https://example.com' }).records;
+    expect(r).toMatchObject({
+      content_ref: 'shopify-product-7',
+      product_type: 'Grip',
+      description: [{ kind: 'paragraph', runs: [{ text: 'Tacky and thin.' }] }, { kind: 'list', items: [[{ text: 'Thickness:', bold: true }, { text: ' 0.6mm' }]] }],
+      specs: { thickness: '0.6mm' },
+      images: [
+        { url: 'https://cdn.shopify.com/a.jpg', width: 1200, height: 1200, alt: 'Grip' },
+        { url: 'https://cdn.shopify.com/b.jpg', width: null, height: null, alt: null },
+      ],
+    });
   });
 });

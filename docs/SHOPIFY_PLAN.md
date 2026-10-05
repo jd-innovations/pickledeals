@@ -51,6 +51,23 @@ Status: **Part B built (Oct 5, 2026); waiting for the user's Part A (Shopify tok
   offers are hidden on each run and return once stock arrives. Example: the Engage X2's description still
   carries Engage's stale "5/1 shipping update" (supplier content synced by Collective; ask Engage to fix it).
 
+## Store content: descriptions, images, specs (user, Oct 5, 2026) — built
+- Products sold through the store show the **store's full description and images** (Grip Doctor holds
+  the rights), **kept in sync** on every run; specs are read from "Label: value" bullets while a
+  product's specs are empty (staff edits are never overwritten).
+- Descriptions are stored as blocks (headings, paragraphs, bullet lists, bold), never store HTML/CSS,
+  and render as an **"About"** section above Specs in the app's own styles (same pattern as a listing's
+  "From the seller"); long ones open with the first blocks and "Show full description".
+- Images are copied into the catalog bucket (`products/{id}/store-*.{jpg,png,webp}`, ≤ 12, 1600 px wide),
+  labelled `retailer_feed` with a rights note, and removed when the store drops them. Curated images
+  are never touched.
+- **Automation:** Create product copies description and specs at once and asks the source to run (images
+  within minutes); category is pre-filled from Shopify's product type; products with no description or
+  images adopt a matching store offer's content automatically. Admin → product → **Store content** shows
+  the link and switches a product with curated images to the store's content.
+- Note: supplier content synced by Collective (e.g. Engage's stale "5/1 shipping update" on the X2) is
+  shown as the store shows it; fix it in Shopify or with the supplier.
+
 ## Store check via the Shopify connector (Oct 5, 2026, read-only)
 - **No Headless channel is installed yet.** Channels: Online Store, Point of Sale, Shop, Google & YouTube,
   Facebook & Instagram, TikTok, Collective: Supplier, Sell on WordPress, Microsoft Copilot, Lovable,

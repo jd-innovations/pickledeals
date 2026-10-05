@@ -93,17 +93,20 @@ Notes:
 
 ## On-device checklist (open items from the handoff)
 
-- [ ] Sign in with Apple (native sheet) creates an account and signs in
-- [ ] Email code sign-in; sign out; account deletion (Apple token revocation needs the .p8 key in
+- [ ] Sign in with Apple (native sheet) creates an account and signs in. Blocked by Apple ("Sign Up Not Complete"), see the handoff
+- [ ] Dark mode: toggles readable (knob turns dark when on) after the `ui/Toggle` fix
+- [x] Email code sign-in (Oct 4)
+- [ ] Sign out; account deletion (Apple token revocation needs the .p8 key in
       `supabase/functions/.env`: `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_CLIENT_ID`, `APPLE_PRIVATE_KEY`)
-- [ ] Camera and photo library in the sell flow; photos upload and show on the listing
-- [ ] Location permission, approximate area, reverse geocoding, city/ZIP search
+- [x] Camera and photo library in the sell flow; photos upload and show on the listing (Oct 5)
+- [x] Location permission, approximate area, reverse geocoding, city/ZIP search (Oct 5)
 - [ ] Native dialogs (Alert, action sheets) in Manage listing, chat, offers
 - [x] Push (verified Oct 4, 2026): permission prompt from the first price alert, token registered, a
       message from the web account arrives as a push, tapping it opens the thread, app icon badge shows
 - [ ] Push: quiet hours hold pushes; badge clears after reading
-- [ ] Map: Apple Maps renders (`mutedStandard`), 500 pins pan smoothly, clusters open, Search this area
-- [ ] Sell flow: list an item in under 60 seconds
+- [x] Map: Apple Maps renders and the new listing's pin shows (Oct 5)
+- [ ] Map: 500 pins pan smoothly, clusters open, Search this area
+- [x] Sell flow: list an item in under 60 seconds (Oct 5)
 - [ ] Inbox swipe actions, composer and keyboard behaviour
 - [ ] Native tab bar (Liquid Glass on iOS 26), dark mode, Dynamic Type at large sizes
 - [ ] Get deal opens the retailer in the in-app browser (functions served)

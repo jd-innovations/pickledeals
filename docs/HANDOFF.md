@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (after Phase 12)
+# PickleDeals — session handoff (after Phase 12 + device testing, Oct 5, 2026)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -28,9 +28,16 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - Add mobile packages with `npx expo install`, and check the SDK 57 docs before using an Expo/RN API.
 
 ## Status
-- Phases 0–12 are done and pushed. The last commit is "Phase 12: affiliate and API integrations …".
-- Phase 12 runs end to end against a local mock. Real Amazon and AvantLink credentials are still needed (see Open items).
-- **Next: Phase 13, hardening and launch** (accessibility, performance, offline cache, analytics, App Store review prep, TestFlight). Propose the plan first.
+- Phases 0–12 are done and pushed. Since Phase 12 (all on `main`):
+  - **Price tracking excludes Amazon** (decision, see Open items).
+  - **Device testing is set up and largely passed on the user's iPhone** (development build; see `docs/DEVICE_SETUP.md`).
+  - Fixes found on device: the sell draft id (iOS has no `crypto.randomUUID` → `expo-crypto`), the sell flow's City/ZIP area search, dark-mode toggles (shared `ui/Toggle`), `/` → Deals redirect (`app/index.tsx`).
+  - Smaller fixes: ASINs in `import_catalog` (Phase 12 regression), no duplicate check-price row on Product, no Price alert button on Amazon-only products.
+  - The dev seed has 149 products, including 5 real Amazon products (Pickleball Grip Doctor, Fjalljós, JTJEI, Hesacore, Big Shot Golf) with untagged check-price Amazon offers.
+- **Agreed order from here** (user, Oct 4):
+  1. Finish the remaining on-device checks (list below), including the dark-mode toggle fix.
+  2. **Phase 13, hardening and launch** (accessibility, performance, offline cache, analytics, App Store review prep, TestFlight). Propose the plan first and wait for a go-ahead.
+  3. After launch: Amazon (Associates registration of the live app, tagged links, promo-code deals, Creators API once 10 sales/30 days).
 - D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. The one exception is a meet-up spot, which is an exact point but lives only in a private `location_share` message.
 
 ## Local environment
@@ -39,13 +46,17 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Regenerate types (from Bash, so the file has no BOM/CRLF): `npx supabase gen types typescript --local > packages/shared/src/database.types.ts`
   - Studio: http://127.0.0.1:54323
   - Mailpit: http://127.0.0.1:54324. Sign-in codes are in the API at `/api/v1/messages`.
+- **Device testing on the user's iPhone** (development build, Expo project `@dhjesus122/pickledeals`): full steps in `docs/DEVICE_SETUP.md`.
+  - Each session: Docker → `npx supabase start` → `npm run device:lan` → `npx supabase functions serve --env-file supabase/functions/.env` (Get deal + push) → `cd apps/mobile && npx expo start --dev-client` → optional `npm run admin`. Afterwards `npm run device:local`.
+  - JavaScript changes reload from Metro (press `r`); rebuild with EAS only for native/config changes.
+  - **Ask the user before `npx supabase db reset` while they're testing on the phone.** It signs them out and wipes any local test data.
 - **Dev servers** (`.claude/launch.json`):
   - `mobile-web` on :8081 (the Expo web preview, checked at the mobile viewport)
   - `admin` on :5174
   - `pickledeals-preview` on :5173 (the design files)
 - **Seeded local accounts:**
   - Dev admin `admin@pickledeals.test` (admin role) signs in with an email code from Mailpit.
-  - Three fictional sellers (Marcus T., Priya K., Jordan R.) with 8 listings around Sarasota, FL. One custom wooden paddle sits in the review queue.
+  - Three fictional sellers (Marcus T., Priya K., Jordan R.) with 8 listings around Sarasota, FL (plus anything the user listed from the phone since the last reset). One custom wooden paddle sits in the review queue.
   - The sellers also sign in with email codes: `seller1@` (Marcus), `seller2@` (Priya) and `seller3@pickledeals.test` (Jordan). A demo thread has Priya asking Marcus about his Perseus.
   - Two-account testing (chat, offers): use two tabs on different origins, `localhost:8081` and `127.0.0.1:8081`, so each keeps its own session. A `db reset` invalidates existing sessions, so sign in again afterwards.
   - The seed is generated: edit `supabase/seed/build-seed.ts`, then run `npm run catalog:seed`.
@@ -157,44 +168,40 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - **React Compiler lint:** no `setState` in effects (adjust state during render instead), and use Reanimated `.get()`/`.set()`.
 
 ## Open items
-- **Decision (Oct 4, 2026): track every retailer except Amazon.** `retailers.tracking_excluded` (forced on for amazon.* domains by trigger) keeps offers out of `variant_price_stats` (best price, deal quality, lows), target-price alerts, saved-product price drops, tracking-based deals ("below typical" / "lowest we've tracked") and the LOWEST PRICE / HOT DEAL badges and deal quality in `deal_feed`. Amazon still lists, ranks and links (discovery). The app says "Price history and alerts don't include Amazon" (Product, Price history) and the alert sheet says "Every retailer except Amazon". The user accepted the remaining risk that Amazon's rule is app-wide; Amazon stays untagged until after launch. Migration `20261015000000_tracking_exclusions.sql`, tests `13_tracking_exclusions`.
-- **Amazon Associates compliance (researched Oct 4, 2026). Read this before adding any Amazon tag:**
-  - Program Policies: "Unless otherwise agreed by Amazon, your Site must not have price tracking and/or price alerting functionality." A "Site" includes apps. PickleDeals has price history, price alerts and price-drop pushes, so participating at all (even tagged "Check price" links) needs Amazon's written agreement. Until then, leave the Amazon affiliate program unset; `go` then sends untagged Amazon links, which is compliant because we aren't participating.
-  - Mobile apps: must be live in an app store and registered in Associates Central, use the app's own tracking ID, not emulate Amazon's app, and not render Amazon pages in WebViews. Amazon links should open in Safari or the Amazon app, not `expo-web-browser`.
-  - Creators API access: at least 10 qualifying sales in the trailing 30 days, per marketplace (rolling; access pauses below it). Credentials are under Associates Central → Tools → Creators API.
-  - If granted: price "comparison" displays must show both Amazon's lowest new and lowest used price. Add the "As an Amazon Associate I earn from qualifying purchases" statement and the "CERTAIN CONTENT THAT APPEARS IN THIS APPLICATION COMES FROM AMAZON…" disclaimer. ASINs may be stored indefinitely; images can't be cached.
+- **Remaining on-device checks** (checklist in `docs/DEVICE_SETUP.md`):
+  - Dark-mode toggles after the `ui/Toggle` fix (knob turns dark when on). The web preview can't show it.
+  - The Phase 7 exit criterion: a smooth 500-pin map on the phone (the pin rendering itself is verified).
+  - Native dialogs, inbox swipe actions, composer and keyboard, Dynamic Type, Get deal in the in-app browser.
+  - Push: quiet hours and the badge clearing after reading; receipt handling with real tickets.
+  - Verified on device (Oct 4–5, 2026): email sign-in; push (message push, tap opens the thread, badge); camera and library photos (compressed to ≤2048 px JPEG 0.8, EXIF/GPS stripped); current location and City/ZIP area; publishing in under 60 s; listing photos and the map pin.
+- **Sign in with Apple fails on device ("Sign Up Not Complete" in Apple's sheet; Oct 3, 2026).** Email sign-in works. The capability is ticked on `app.pickledeals` and the same team's other app (dreambreaker) signs in fine, which matches Apple's known server-side issue with new App IDs (forum thread 837986; Apple fixes it by re-registering the App ID). The user may file a DTS request (a draft is in the Oct 3 conversation). No code change expected; retest after Apple replies.
+- **Decision (Oct 4, 2026): track every retailer except Amazon.** `retailers.tracking_excluded` (forced on for amazon.* domains by trigger) keeps offers out of `variant_price_stats` (best price, deal quality, lows), target-price alerts, saved-product price drops, tracking-based deals ("below typical" / "lowest we've tracked") and the LOWEST PRICE / HOT DEAL badges and deal quality in `deal_feed`. Amazon still lists, ranks and links (discovery). The app says "Price history and alerts don't include Amazon" and hides Price alert on Amazon-only products. The user accepted the remaining risk that Amazon's rule is app-wide. Migration `20261015000000_tracking_exclusions.sql`, tests `13_tracking_exclusions`.
+- **Amazon Associates (researched Oct 4, 2026). Read this before adding any Amazon tag:**
+  - Program Policies: "Unless otherwise agreed by Amazon, your Site must not have price tracking and/or price alerting functionality" ("Site" includes apps). The tracking exclusion above is the user's accepted mitigation.
+  - **The Amazon tag stays out of the seed and out of production until after launch.** For local tests, set it in admin → Retailers → Amazon (network `amazon-associates`, tag `tag=pickledeals-20`). The user's tracking ID is `pickledeals-20`; they shouldn't buy through their own links.
+  - Mobile apps: must be live in an app store and registered in Associates Central, use the app's own tracking ID, not emulate Amazon's app, and not render Amazon pages in WebViews. Amazon links should open in Safari or the Amazon app, not `expo-web-browser` (change before tagging).
+  - Creators API access: at least 10 qualifying sales in the trailing 30 days per marketplace (rolling). Credentials: Associates Central → Tools → Creators API. OffersV2 has price, savingBasis, savings, availability, merchant and dealDetails, but **no promotions, shipping or lowest new/used summaries**. Show "shipping at checkout" for Amazon, and the lowest used price only if provided.
+  - Required notices when live: "As an Amazon Associate I earn from qualifying purchases" and "CERTAIN CONTENT THAT APPEARS IN THIS APPLICATION COMES FROM AMAZON…". ASINs may be stored indefinitely; images can't be cached.
+  - **Promo codes:** sellers can share Percentage Off codes with Associates. They appear in Associates Central → Promotions → Amazon Promo Codes (Amazon's guide is a 2020 Amazon Live document). There's no API, and scraping Associates Central is off-limits (Conditions of Use). Rules on reposting codes publicly aren't documented. The plan: manual entry or a file import (if the page has an export) of ASIN + code + % → the existing promo engine computes "$X after code" once API prices exist.
+  - Post-launch design idea (not built): **Amazon-only code deals** keyed by ASIN without a catalog product (DealSeek-style); needs the user's go-ahead.
 - **Integrations need the user:**
-  - Amazon Creators API credentials (Associates Central). New accounts start at 1 request/second and 8,640/day, and API access depends on qualifying sales. Verify the resource names in `AMAZON_RESOURCES` and the `externalIds` casing against a live response.
-  - An AvantLink account approved for Selkirk (or another network/merchant). Get the datafeed download URL and check its column names against the source config (editable in admin → Integrations → Settings). Add the AvantLink click URL (`mi`/`pw`) on Retailers.
-  - Legal review: price-alert and price-drop notifications can quote an Amazon API price, and notifications are kept longer than 24 hours.
+  - Amazon Creators API credentials (after launch, see above). Verify `AMAZON_RESOURCES` names and `externalIds` casing against a live response.
+  - An AvantLink account approved for Selkirk (or another network/merchant): the datafeed download URL and its column names (editable in admin → Integrations → Settings), plus the AvantLink click URL (`mi`/`pw`) on Retailers.
+  - Legal review: notifications that quote prices are kept longer than 24 hours (relevant once Amazon API prices exist; Amazon is excluded from alerts).
+- **Possible small follow-ups (offered, not requested):** an optional git-ignored local setting so the Amazon tag survives `db reset` on the user's machine only.
 - **Admin follow-ups:**
-  - Sponsored clicks aren't attributed exactly: the app opens a deal's detail from the trending row, so `outbound_clicks.placement` never says "sponsored". Exact attribution needs the placement passed through navigation.
+  - Sponsored clicks aren't attributed exactly: the app opens a deal's detail from the trending row, so `outbound_clicks.placement` never says "sponsored".
   - A pending listing hidden by a suspension comes back as active when the suspension is lifted.
   - Removed listings don't appear in My listings; the seller reaches them from the notification.
-- **Not yet verified on a real iPhone:**
-  - camera and photo library
-  - reverse geocoding and city/ZIP search
-  - native dialogs
-  - push delivery (Expo → APNs) **verified on device Oct 4, 2026** (message push, tap opens the thread, badge). Still open: quiet hours on device and receipt handling with real tickets
-  - the "list in under 60 seconds" timing. The automated browser run took 77 s, inflated by tool overhead.
-  - **the Phase 7 exit criterion**: Apple Maps rendering and a smooth 500-pin map on a mid-range iPhone. So far only measured off-device:
-    - the bounds RPC takes ~190 ms locally with 2,000 listings in view (500 returned)
-    - supercluster takes ~2 ms to index 500 pins and ~0.2 ms per pan (Node)
-    - Markers use `tracksViewChanges={false}`, except the selected one.
-- **Device testing (set up, waiting on the user's first build):** see `docs/DEVICE_SETUP.md`.
-  - Apple Team `ZSH27U747N`, bundle `app.pickledeals` (`app.json` → `ios.appleTeamId`). `expo-dev-client` is installed.
-  - Option a: the phone uses local Supabase over Wi-Fi. `npm run device:lan` / `device:local` switch `EXPO_PUBLIC_SUPABASE_URL`. Development builds relax ATS for this (`app.config.ts`, `APP_ENV=development` only).
-  - The user runs `eas login` / `eas init` (projectId → `app.json` extra.eas.projectId and owner), `eas device:create`, `eas build --profile development --platform ios` and the Windows Firewall rule (the Wi-Fi is a Public network).
-- **Sign in with Apple fails on device ("Sign Up Not Complete" in Apple's sheet; Oct 3, 2026).** Email sign-in works. The capability is ticked on `app.pickledeals`, and the same team's other app (dreambreaker) signs in fine, so this matches Apple's known server-side issue with new App IDs (forum thread 837986: "Invalid client"; fixed by Apple re-registering the App ID). The user is filing a DTS request. No code change is expected; retest after Apple replies.
 - **Need the user:**
-  - Sign in with Apple key (.p8 and Key ID) for token revocation
+  - Sign in with Apple key (.p8 and Key ID) for token revocation (goes in `supabase/functions/.env`, never chat or git)
   - a decision on a staging Supabase project (costs money; the user prefers local)
   - Vault secrets for production push dispatch
 - **Chat follow-ups:**
   - Blocks hide threads and stop messages, but blocked sellers' listings still appear in the marketplace.
-  - Swiping the inbox and the native composer and keyboard behaviour need checking on a device.
 - **Known web-only quirks; iOS is unaffected:**
   - the native tab bar renders on top of headers
-  - Switch thumbs are teal
+  - Switch thumbs are teal (web ignores `thumbColor`)
   - the map is a flat stand-in (drag to pan, +/− to zoom), and the tab bar covers the map's search row
   - `chooseAction` uses `window.prompt` and the photo picker needs the file-input stub
+  - City/ZIP search is native-only (expo-location geocoding)

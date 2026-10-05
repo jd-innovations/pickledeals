@@ -26,45 +26,45 @@ select is((select ownership_note from public.retailers where slug = 'pickleball-
   'Pickleball Grip Doctor carries the ownership disclosure');
 select is((select config ->> 'adapter' from public.ingestion_sources where slug = 'shopify-gripdoctor'), 'shopify', 'it has a Shopify source');
 
--- A Collective supplier item (the Engage X2, as the adapter emits it) isn't in the catalog: review.
+-- A Collective supplier item (shaped like the Engage X2, with test identifiers) isn't in the catalog: review.
 create temp table x2 as select jsonb_build_object(
-  'retailer_slug', 'pickleball-grip-doctor', 'external_ref', 'variant-9001', 'retailer_sku', 'X2E-AQU-001',
-  'url', 'https://pickleballgripdoctor.com/products/engage-x2-elongated-pickleball-paddle?utm_source=pickledeals&utm_medium=referral',
-  'title', 'Engage X2 Elongated Pickleball Paddle', 'brand', 'EngagePickleball', 'upc', '810957038755',
+  'retailer_slug', 'pickleball-grip-doctor', 'external_ref', 'variant-pdtest-9001', 'retailer_sku', 'PDT-X9-001',
+  'url', 'https://pickleballgripdoctor.com/products/engage-test-x9-pickleball-paddle?utm_source=pickledeals&utm_medium=referral',
+  'title', 'Engage Test X9 Pickleball Paddle', 'brand', 'EngagePickleball', 'upc', '000000099017',
   'price_cents', 19999, 'shipping_cents', 0, 'in_stock', true, 'ships_from', 'EngagePickleball') as rec;
 
 select is((public.ingest_offers('shopify-gripdoctor', jsonb_build_array((select rec from x2)), false, true) ->> 'unmatched')::int, 1,
   'a new store item goes to the review queue');
 create temp table raw as
-  select id from public.raw_offer_records where external_ref = 'variant-9001' and match_status = 'unmatched';
+  select id from public.raw_offer_records where external_ref = 'variant-pdtest-9001' and match_status = 'unmatched';
 grant select on raw to authenticated;
 
 -- Creating the product from review ------------------------------------------------------------------
 
 select pg_temp.act_as('20202020-0000-0000-0000-000000000002');
 select throws_ok($$select public.staff_create_product_from_raw((select id from raw), (select id from public.brands where slug = 'engage'),
-                    (select id from public.categories where slug = 'paddles'), 'X2 Elongated')$$,
+                    (select id from public.categories where slug = 'paddles'), 'Test X9')$$,
   '42501', null, 'shoppers can’t create products');
 reset role;
 
 select pg_temp.act_as('20202020-0000-0000-0000-000000000001', 'editor');
 create temp table made as
   select public.staff_create_product_from_raw((select id from raw), (select id from public.brands where slug = 'engage'),
-                                              (select id from public.categories where slug = 'paddles'), 'X2 Elongated', null, 25999) as r;
+                                              (select id from public.categories where slug = 'paddles'), 'Test X9', null, 25999) as r;
 reset role;
 
-select is((select r ->> 'slug' from made), 'engage-x2-elongated', 'the slug comes from brand and name');
-select is((select status::text from public.products where slug = 'engage-x2-elongated'), 'draft', 'the product starts as a draft');
+select is((select r ->> 'slug' from made), 'engage-test-x9', 'the slug comes from brand and name');
+select is((select status::text from public.products where slug = 'engage-test-x9'), 'draft', 'the product starts as a draft');
 select is((select label from public.product_variants where id = (select (r ->> 'variant_id')::uuid from made)), 'Standard', 'with a default variant');
 select is((select match_status::text from public.raw_offer_records where id = (select id from raw)), 'matched', 'the record is matched to it');
-select is((select source from public.product_identifiers where kind = 'upc' and value = '810957038755'), 'review',
+select is((select source from public.product_identifiers where kind = 'upc' and value = '000000099017'), 'review',
   'the barcode is remembered for the next import');
-select is((select ships_from from public.retailer_offers where external_ref = 'variant-9001'), 'Engage',
+select is((select ships_from from public.retailer_offers where external_ref = 'variant-pdtest-9001'), 'Engage',
   'the offer ships from the supplier, named as its catalog brand');
 select is_empty($$select 1 from public.variant_offer_ranking where product_id = (select (r ->> 'product_id')::uuid from made)$$,
   'and stays hidden while the product is a draft');
 
-update public.products set status = 'active' where slug = 'engage-x2-elongated';
+update public.products set status = 'active' where slug = 'engage-test-x9';
 select results_eq($$select ships_from, ownership_note from public.variant_offer_ranking where product_id = (select (r ->> 'product_id')::uuid from made)$$,
   $$values ('Engage'::text, 'PickleDeals’ owner also owns this store; it’s listed first when prices tie'::text)$$,
   'once published, the app gets "Ships from Engage" and the ownership note');
@@ -96,9 +96,9 @@ create function pg_temp.first() returns text language sql as $$
 $$;
 
 select is(pg_temp.first(), 'pickleball-grip-doctor', 'an exact tie goes to Grip Doctor (a disclosed preference)');
-update public.retailer_offers set in_stock = false where external_ref = 'variant-9001';
+update public.retailer_offers set in_stock = false where external_ref = 'variant-pdtest-9001';
 select is(pg_temp.first(), 'baseline-sports', 'but never when it’s out of stock');
-update public.retailer_offers set in_stock = true where external_ref = 'variant-9001';
+update public.retailer_offers set in_stock = true where external_ref = 'variant-pdtest-9001';
 
 update public.retailers set wins_price_ties = false where slug = 'pickleball-grip-doctor';
 select is(pg_temp.first(), 'baseline-sports', 'without the preference, a fresher feed doesn’t win ties (retailer name decides)');
@@ -127,8 +127,8 @@ select public.ingest_offers('shopify-gripdoctor', jsonb_build_array(jsonb_build_
   'title', 'Grip', 'brand', 'Pickleball Grip Doctor', 'price_cents', 1999)), false, true);
 select public.ingest_offers('shopify-gripdoctor', jsonb_build_array(jsonb_build_object(
   'retailer_slug', 'pickleball-grip-doctor', 'external_ref', 'variant-9200', 'url', 'https://pickleballgripdoctor.com/products/grip',
-  'title', 'Grip', 'brand', 'Pickleball Grip Doctor', 'price_cents', 1999, 'upc', '850081191063')), false, true);
-select is((select upc from public.raw_offer_records where external_ref = 'variant-9200' and match_status = 'unmatched'), '850081191063',
+  'title', 'Grip', 'brand', 'Pickleball Grip Doctor', 'price_cents', 1999, 'upc', '000000099024')), false, true);
+select is((select upc from public.raw_offer_records where external_ref = 'variant-9200' and match_status = 'unmatched'), '000000099024',
   'a barcode that arrives later is stored on the waiting record');
 
 -- Vendor names are staff data -----------------------------------------------------------------------

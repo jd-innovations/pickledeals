@@ -71,9 +71,13 @@ Run these from `apps/mobile`, in a terminal where you can answer prompts.
    cd apps/mobile && npx expo start --dev-client
    ```
    Allow the **Local Network** prompt the first time.
-5. Sign in with an email code. Seed accounts: `seller1@` (Marcus), `seller2@` (Priya),
+5. Optional, the admin (http://localhost:5174, `admin@pickledeals.test`). In another terminal:
+   ```bash
+   npm run admin
+   ```
+6. Sign in with an email code. Seed accounts: `seller1@` (Marcus), `seller2@` (Priya),
    `seller3@pickledeals.test` (Jordan). Read codes in Mailpit on the PC: http://127.0.0.1:54324
-6. When you're done, `npm run device:local` sets the app back to `127.0.0.1` for the web preview.
+7. When you're done, `npm run device:local` sets the app back to `127.0.0.1` for the web preview.
 
 Notes:
 - `npx supabase db reset` signs everyone out; sign in again on the phone.

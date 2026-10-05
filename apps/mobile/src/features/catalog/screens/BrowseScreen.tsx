@@ -41,7 +41,7 @@ function Categories() {
   const { width } = useWindowDimensions();
   const tileW = Math.floor((Math.min(width, 600) - 32 - 10) / 2);
   const { data, isError, refetch } = useCategories();
-  if (isError) return <LoadError onRetry={refetch} />;
+  if (isError && !data) return <LoadError onRetry={refetch} />;
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 16 }}>
       {data
@@ -55,7 +55,7 @@ function Categories() {
 
 function Brands() {
   const { data, isError, refetch } = useBrands();
-  if (isError) return <LoadError onRetry={refetch} />;
+  if (isError && !data) return <LoadError onRetry={refetch} />;
   if (!data) return <View style={{ paddingHorizontal: 16, gap: 12 }}>{[0, 1, 2, 3].map((i) => <Skeleton key={i} height={48} round={12} />)}</View>;
   return (
     <View>

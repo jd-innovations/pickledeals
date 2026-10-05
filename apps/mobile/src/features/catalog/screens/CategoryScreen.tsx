@@ -84,7 +84,7 @@ function Products({ slug, header }: { slug: string; header: React.ReactNode }) {
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 120, gap: 16 }}>
       {header}
-      {isError ? (
+      {isError && !data ? (
         <LoadError onRetry={refetch} />
       ) : !data ? (
         <GridSkeleton />

@@ -21,7 +21,11 @@ export default function DealScreen() {
   const { data: product } = useProduct(slug.data ?? '');
   const promos = useLivePromos(offer.data ? [offer.data.retailer.slug] : []);
 
-  if (offer.isError) return <ErrorState title="This offer has ended" message="It’s no longer listed. Check the product for current offers." onRetry={() => router.back()} />;
+  // No row (PGRST116) means the offer is gone; any other error is a failed fetch, and a cached copy beats an error.
+  if (offer.isError && (offer.error as { code?: string }).code === 'PGRST116')
+    return <ErrorState title="This offer has ended" message="It’s no longer listed. Check the product for current offers." onRetry={() => router.back()} />;
+  if (offer.isError && !offer.data)
+    return <ErrorState title="Couldn’t load this deal" message="Check your connection and try again." onRetry={() => offer.refetch()} />;
   const o = offer.data;
   const variant = product?.variants.find((v) => v.id === o?.variantId);
   const msrp = variant?.msrpCents ?? product?.msrpCents ?? null;

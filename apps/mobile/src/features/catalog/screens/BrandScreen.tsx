@@ -48,7 +48,7 @@ export default function BrandScreen() {
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 120, gap: 16 }}>
       <Stack.Screen options={{ title: '', headerLargeTitle: false }} />
-      {isError ? (
+      {isError && !data ? (
         <LoadError onRetry={refetch} />
       ) : (
         <>

@@ -80,7 +80,7 @@ export default function ProductScreen() {
     <View style={{ flex: 1 }}>
       <Stack.Screen options={{ headerRight: () => <IconButton icon="share" label="Share" size={34} onPress={share} /> }} />
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: best ? 140 : 120, gap: 20 }}>
-        {isError ? (
+        {isError && !p ? (
           <LoadError onRetry={refetch} />
         ) : !p ? (
           <View style={{ paddingHorizontal: 16, gap: 12 }}>

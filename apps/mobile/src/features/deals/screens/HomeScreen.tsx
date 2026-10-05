@@ -80,7 +80,7 @@ export default function HomeScreen() {
         )}
       </View>
 
-      {isError ? (
+      {isError && !data ? (
         <ErrorState title="Couldn’t load deals" message="Check your connection and try again." onRetry={() => refetch()} />
       ) : isPending ? (
         <View style={{ paddingHorizontal: 16, gap: 12 }}>

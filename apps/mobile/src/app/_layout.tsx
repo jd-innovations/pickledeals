@@ -1,4 +1,4 @@
-import { QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider, type NativeStackNavigationOptions } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -11,6 +11,7 @@ import { usePush } from '@/features/alerts/push';
 import { startAuthListener } from '@/features/auth/authStore';
 import { useInboxChannel } from '@/features/chat/hooks';
 import { queryClient } from '@/lib/queryClient';
+import { persistOptions } from '@/lib/queryPersist';
 
 function RootNavigator() {
   const { colors, scheme } = useTheme();
@@ -61,11 +62,11 @@ export default function RootLayout() {
   useEffect(startAuthListener, []);
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
         <ThemeProvider>
           <RootNavigator />
         </ThemeProvider>
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
     </GestureHandlerRootView>
   );
 }

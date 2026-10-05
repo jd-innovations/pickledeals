@@ -70,7 +70,7 @@ export function DealList({ scope, query, header }: { scope: string; query: FeedQ
           />
         ))}
       </ChipRow>
-      {isError ? (
+      {isError && !data ? (
         <LoadError onRetry={refetch} />
       ) : isPending ? (
         <GridSkeleton />

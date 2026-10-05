@@ -6,11 +6,16 @@ Status: **proposed, waiting for the user's go-ahead** (Oct 5, 2026).
 - PickleDeals never sells. **Pickleball Grip Doctor** (pickleballgripdoctor.com) is a separate
   business owned by the same person, listed as an ordinary retailer. It is the pilot for a generic
   "direct Shopify store" source that other stores can use later.
-- The store carries its own products plus **Shopify Collective** items from suppliers (currently
-  Engage). Collective items arrive in the store as normal products, so one feed covers both.
+- The store carries two kinds of products:
+  - **Grip Doctor's own products** (e.g. the Trigger Grip Attachment), made and shipped by Grip Doctor.
+  - **Shopify Collective supplier products**, made and shipped by the supplier, currently
+    **Engage Pickleball**. Grip Doctor is only the retailer for these.
+  Collective items arrive in the store as normal products, so one feed covers both; the
+  `Shopify Collective` tag tells them apart.
 - This feed is expected to be the **primary source** of new catalog products.
 
-What the store's data looks like (Engage X2 Elongated, read Oct 5, 2026 from the public endpoint):
+What a **Collective supplier product** looks like in the store's data (Engage X2 Elongated, an
+Engage product sold by Grip Doctor through Collective; read Oct 5, 2026 from the public endpoint):
 
 | Field | Value | Use |
 |---|---|---|
@@ -32,7 +37,7 @@ supported read-only route is the **Headless channel**, which issues Storefront A
 2. **Create a storefront** named **PickleDeals** (Headless → Create storefront). It gets a public and a **private** access token.
 3. **Permissions**: in the storefront's Storefront API settings, allow **product listings** and **product inventory** (inventory returns stock levels).
 4. **Publish products**: Products → select → **Include in sales channels → PickleDeals**. Only products published to this channel reach the app.
-5. **Check Collective items**: try publishing *Engage X2 Elongated* to PickleDeals. Not confirmed in Shopify's docs that Collective items can be published to a headless storefront; if it can't be selected, report back (fallback below).
+5. **Check Collective items**: try publishing a supplier product (e.g. *Engage X2 Elongated*) to PickleDeals, and one of your own products for comparison. Not confirmed in Shopify's docs that Collective items can be published to a headless storefront; if it can't be selected, report back (fallback below).
 6. **Secrets** — never in chat or git. Add to `supabase/functions/.env`:
    ```
    SHOPIFY_GRIPDOCTOR_DOMAIN=<your-store>.myshopify.com

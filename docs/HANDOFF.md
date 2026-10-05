@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (after Phase 12 + device testing, Oct 5, 2026)
+# PickleDeals — session handoff (Phase 13 started, Oct 4, 2026)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -34,6 +34,13 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Fixes found on device: the sell draft id (iOS has no `crypto.randomUUID` → `expo-crypto`), the sell flow's City/ZIP area search, dark-mode toggles (shared `ui/Toggle`), `/` → Deals redirect (`app/index.tsx`).
   - Smaller fixes: ASINs in `import_catalog` (Phase 12 regression), no duplicate check-price row on Product, no Price alert button on Amazon-only products.
   - The dev seed has 149 products, including 5 real Amazon products (Pickleball Grip Doctor, Fjalljós, JTJEI, Hesacore, Big Shot Golf) with untagged check-price Amazon offers.
+- **Phase 13 work done overnight (Oct 4), while the user was away; all pushed:**
+  - Blocked users' listings are hidden from each other in the marketplace (`market_match`, pgTAP 14).
+  - Offline cache: `lib/queryPersist.ts` persists only `catalog` (not search), `deals` and `offers` for 24 h. Never `market` (keys hold the device point, D2), personal data, or live Amazon API prices. Screens keep cached data when a refetch fails.
+  - Accessibility: `packages/shared/src/a11y.ts` (`spoken`, `speakable`, `spokenPrice`, `spokenBadge`). Cards and rows now carry full VoiceOver labels (before, name-only labels hid prices). Controls use `minHeight` so Dynamic Type grows them.
+  - `delete-account` now removes `listing-images/{uid}/` and the photos in the user's seller threads.
+  - Drafts for review: `docs/legal/PRIVACY_POLICY_DRAFT.md`, `docs/legal/TERMS_DRAFT.md`, plus the checklist `docs/APP_STORE.md` (guidelines, privacy labels, metadata, open questions).
+  - Still waiting on the user: the three Phase 13 decisions (hosted Supabase for TestFlight, analytics choice, legal page hosting), the Phase 13 go-ahead for the rest of 13a and 13d/13e, and the questions at the end of `docs/APP_STORE.md`.
 - **Agreed order from here** (user, Oct 4):
   1. Finish the remaining on-device checks (list below), including the dark-mode toggle fix.
   2. **Phase 13, hardening and launch** (accessibility, performance, offline cache, analytics, App Store review prep, TestFlight). Propose the plan first and wait for a go-ahead.
@@ -197,8 +204,6 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Sign in with Apple key (.p8 and Key ID) for token revocation (goes in `supabase/functions/.env`, never chat or git)
   - a decision on a staging Supabase project (costs money; the user prefers local)
   - Vault secrets for production push dispatch
-- **Chat follow-ups:**
-  - Blocks hide threads and stop messages, but blocked sellers' listings still appear in the marketplace.
 - **Known web-only quirks; iOS is unaffected:**
   - the native tab bar renders on top of headers
   - Switch thumbs are teal (web ignores `thumbColor`)

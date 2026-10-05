@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { ListingCondition } from '@pickledeals/shared';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import * as Crypto from 'expo-crypto';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -128,8 +129,12 @@ export type SellDraft = {
   ships: boolean;
 };
 
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// expo-crypto works on iOS/Android and web. (Hermes has no globalThis.crypto.randomUUID; the old
+// fallback produced a non-UUID id that publish_listing rejects.)
 const newDraft = (): SellDraft => ({
-  id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`,
+  id: Crypto.randomUUID(),
   product: null,
   custom: null,
   photos: [],
@@ -156,6 +161,13 @@ export const useSellDraft = create<DraftStore>()(
       storage: createJSONStorage(() => AsyncStorage),
       // In-flight uploads don't survive a restart; keep only finished photos.
       partialize: (s) => ({ draft: { ...s.draft, photos: s.draft.photos.filter((p) => p.path) } }),
+      // Drafts saved with a non-UUID id (older builds on iOS) can never publish: give them a fresh id.
+      // Their photos live under the old id's folder, so they're dropped and re-added.
+      merge: (persisted, current) => {
+        const draft = (persisted as { draft?: SellDraft } | undefined)?.draft;
+        if (!draft) return current;
+        return { ...current, draft: UUID.test(draft.id) ? draft : { ...draft, id: Crypto.randomUUID(), photos: [] } };
+      },
     },
   ),
 );

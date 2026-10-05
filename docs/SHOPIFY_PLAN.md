@@ -30,6 +30,21 @@ Status: **Part B built (Oct 5, 2026); waiting for the user's Part A (Shopify tok
   newer generations than the catalog (Agassi Pro **V** vs Pro IV): create new products, don't match.
 - The local review queue now holds these 32 items for trying **Create product…**.
 
+## Store check via the Shopify connector (Oct 5, 2026, read-only)
+- **No Headless channel is installed yet.** Channels: Online Store, Point of Sale, Shop, Google & YouTube,
+  Facebook & Instagram, TikTok, Collective: Supplier, Sell on WordPress, Microsoft Copilot, Lovable,
+  Meta AI and Muse, Google AI Mode and Gemini.
+- **Collective items can be published beyond Online Store and Shop**: the active Engage items are also on
+  the **Lovable** channel (an app storefront that reads the same storefront data a Headless storefront
+  does), and Thrive items are on Point of Sale. None are on Google, Facebook or TikTok. Strong evidence
+  (not yet proof) that publishing them to a PickleDeals Headless storefront will work: Part A step 5 confirms it.
+- The store has **36 Collective items from three suppliers**, not only Engage: Engage (20; 11 active,
+  9 draft), **Thrive Pickleball** (15; mostly *unlisted*, which the public data hides) and
+  **TriggerGrip Pro** (1 draft). Only active, published items reach the app.
+- Grip Doctor is also a Collective **supplier** (its own products are on the Collective: Supplier channel).
+- **Barcodes:** every active Engage item has one (UPC 810957…). Thrive items and most of Grip Doctor's
+  own products have none (WrapCore does). Items without barcodes go through review once, then match by SKU/previous match.
+
 ## Questions for the user (from the dry run)
 1. Items ending in **"PGD"** (e.g. *Agassi Pro V … 16MM PGD* $249, *Engage X2 … PGD* $219 vs $199.99
    plain): are these paddles modified by Grip Doctor? If so they're separate products, not the brand's paddle.

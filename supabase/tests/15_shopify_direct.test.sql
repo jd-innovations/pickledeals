@@ -1,5 +1,5 @@
 begin;
-select plan(26);
+select plan(27);
 
 create function pg_temp.act_as(uid uuid, app_role text default null) returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'app_role', app_role)::text, true);
@@ -24,7 +24,7 @@ select is(public.brand_for_vendor('Unknown Paddle Co'), null, 'unknown vendors m
 
 select is((select ownership_note from public.retailers where slug = 'pickleball-grip-doctor'), 'PickleDeals’ owner also owns this store; it’s listed first when prices tie',
   'Pickleball Grip Doctor carries the ownership disclosure');
-select ok(not (select is_active from public.ingestion_sources where slug = 'shopify-gripdoctor'), 'its Shopify source ships turned off');
+select is((select config ->> 'adapter' from public.ingestion_sources where slug = 'shopify-gripdoctor'), 'shopify', 'it has a Shopify source');
 
 -- A Collective supplier item (the Engage X2, as the adapter emits it) isn't in the catalog: review.
 create temp table x2 as select jsonb_build_object(
@@ -120,6 +120,16 @@ select results_eq($$select retailer_slug::text, delivered_cents, code_auto_appli
                      where variant_id = (select (r ->> 'variant_id')::uuid from made) order by rank$$,
   $$values ('pickleball-grip-doctor'::text, 17000, true), ('baseline-sports'::text, 18999, false)$$,
   'Grip Doctor’s code lowers what you pay and is applied automatically');
+
+-- A waiting item picks up identifiers from later runs (public data first, Storefront API later).
+select public.ingest_offers('shopify-gripdoctor', jsonb_build_array(jsonb_build_object(
+  'retailer_slug', 'pickleball-grip-doctor', 'external_ref', 'variant-9200', 'url', 'https://pickleballgripdoctor.com/products/grip',
+  'title', 'Grip', 'brand', 'Pickleball Grip Doctor', 'price_cents', 1999)), false, true);
+select public.ingest_offers('shopify-gripdoctor', jsonb_build_array(jsonb_build_object(
+  'retailer_slug', 'pickleball-grip-doctor', 'external_ref', 'variant-9200', 'url', 'https://pickleballgripdoctor.com/products/grip',
+  'title', 'Grip', 'brand', 'Pickleball Grip Doctor', 'price_cents', 1999, 'upc', '850081191063')), false, true);
+select is((select upc from public.raw_offer_records where external_ref = 'variant-9200' and match_status = 'unmatched'), '850081191063',
+  'a barcode that arrives later is stored on the waiting record');
 
 -- Vendor names are staff data -----------------------------------------------------------------------
 

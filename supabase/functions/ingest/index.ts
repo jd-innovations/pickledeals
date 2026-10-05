@@ -152,7 +152,10 @@ async function fetchShopify(source: Source): Promise<Fetched> {
   if (!source.retailer_slug) throw new ConfigError('config.retailer_slug is required.');
   const storeUrl = String(source.config.store_url ?? '');
   if (!/^https:\/\/[a-z0-9.-]+$/i.test(storeUrl)) throw new ConfigError('config.store_url must be the store’s https origin, e.g. https://pickleballgripdoctor.com.');
-  const domain = shopifyEnv(source, 'domain_env');
+  // Accept "store.myshopify.com" as well as a pasted "https://store.myshopify.com/".
+  const domain = shopifyEnv(source, 'domain_env')
+    ?.replace(/^https?:\/\//i, '')
+    .replace(/\/+$/, '');
   if (!domain || !/^[a-z0-9.-]+$/i.test(domain)) throw new ConfigError(`The store domain secret ${String(source.config.domain_env)} isn’t configured.`);
   const mode = source.config.mode === 'public' ? 'public' : 'storefront';
 

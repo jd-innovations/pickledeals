@@ -1,27 +1,27 @@
-import { formatPrice, percentOff, radius } from '@pickledeals/shared';
+import { formatPrice, percentOff, radius, spoken } from '@pickledeals/shared';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Share, View } from 'react-native';
 
-import {
-  DealQualityMeter,
-  DiscountPill,
-  PriceBlock,
-  PriceChart,
-  ProductCard,
-  ProductImage,
-  RetailerRow,
-  retailerMonogram,
-  StickyDealBar,
-} from '@/commerce';
+import { DealQualityMeter, DiscountPill, PriceBlock, PriceChart, ProductCard, ProductImage, RetailerRow, retailerMonogram, StickyDealBar } from '@/commerce';
 import { useTheme } from '@/design/theme';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { PreOwnedSection } from '@/features/market/PreOwned';
 import type { RankedOffer } from '@/features/offers/api';
-import { AFFILIATE_DISCLOSURE, UNTRACKED_NOTE, apiPriceDisclaimer, deltaLabel, isApiPrice, offerBreakdown, priceAsOf, qualityDetail, shippingLabel } from '@/features/offers/format';
+import {
+  AFFILIATE_DISCLOSURE,
+  UNTRACKED_NOTE,
+  apiPriceDisclaimer,
+  deltaLabel,
+  isApiPrice,
+  offerBreakdown,
+  priceAsOf,
+  qualityDetail,
+  shippingLabel,
+} from '@/features/offers/format';
 import { openDeal, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
 import { Button, Chip, ChipRow, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
 
@@ -60,7 +60,14 @@ export default function ProductScreen() {
   const untrackedOnly = offers.length > 0 && offers.every((o) => o.trackingExcluded);
   const actions = p ? (
     <View style={{ flexDirection: 'row', gap: 10 }}>
-      <Button label={isSaved ? 'Saved' : 'Save'} variant="secondary" size="md" icon="heart" style={{ flex: 1 }} onPress={() => toggleSave('product', p.id, isSaved)} />
+      <Button
+        label={isSaved ? 'Saved' : 'Save'}
+        variant="secondary"
+        size="md"
+        icon="heart"
+        style={{ flex: 1 }}
+        onPress={() => toggleSave('product', p.id, isSaved)}
+      />
       {!untrackedOnly && <Button label="Price alert" variant="secondary" size="md" icon="bell" style={{ flex: 1 }} onPress={openAlert} />}
     </View>
   ) : null;
@@ -116,7 +123,14 @@ export default function ProductScreen() {
                 {p.variants.map((v) => {
                   const s = offersQuery.data?.stats.find((x) => x.variantId === v.id);
                   const price = s?.bestDeliveredCents;
-                  return <Chip key={v.id} label={price ? `${v.label}  ${formatPrice(price)}` : v.label} selected={v.id === variant?.id} onPress={() => setVariantId(v.id)} />;
+                  return (
+                    <Chip
+                      key={v.id}
+                      label={price ? `${v.label}  ${formatPrice(price)}` : v.label}
+                      selected={v.id === variant?.id}
+                      onPress={() => setVariantId(v.id)}
+                    />
+                  );
                 })}
               </ChipRow>
             )}
@@ -133,7 +147,12 @@ export default function ProductScreen() {
                     referenceCents={msrp && msrp > best.deliveredCents ? msrp : undefined}
                   />
                   <Text variant="footnote" tone="secondary" numeric>
-                    {[best.promo ? `with code ${best.promo.code}` : null, shippingLabel(best), best.inStock ? 'in stock' : 'out of stock', isApiPrice(best) ? priceAsOf(best).toLowerCase() : null]
+                    {[
+                      best.promo ? `with code ${best.promo.code}` : null,
+                      shippingLabel(best),
+                      best.inStock ? 'in stock' : 'out of stock',
+                      isApiPrice(best) ? priceAsOf(best).toLowerCase() : null,
+                    ]
                       .filter(Boolean)
                       .join(' · ')}
                   </Text>
@@ -162,7 +181,13 @@ export default function ProductScreen() {
                   <Text variant="subhead" weight="400" tone="secondary">
                     {checkPriceOnly.retailer.name} prices change often, so we show the current price on their site.
                   </Text>
-                  <Button label={`Check price at ${checkPriceOnly.retailer.name}`} icon="external" iconPosition="trailing" fullWidth onPress={() => openDeal(checkPriceOnly.offerId, 'product_check_price')} />
+                  <Button
+                    label={`Check price at ${checkPriceOnly.retailer.name}`}
+                    icon="external"
+                    iconPosition="trailing"
+                    fullWidth
+                    onPress={() => openDeal(checkPriceOnly.offerId, 'product_check_price')}
+                  />
                   {actions}
                 </View>
               ) : (
@@ -189,11 +214,17 @@ export default function ProductScreen() {
                         detail:
                           o.priceDisplay === 'check_price'
                             ? 'Price shown at retailer'
-                            : [o.inStock ? 'In stock' : 'Out of stock', offerBreakdown(o), isApiPrice(o) ? priceAsOf(o).toLowerCase() : null].filter(Boolean).join(' · '),
+                            : [o.inStock ? 'In stock' : 'Out of stock', offerBreakdown(o), isApiPrice(o) ? priceAsOf(o).toLowerCase() : null]
+                                .filter(Boolean)
+                                .join(' · '),
                         priceCents: o.deliveredCents,
                         deltaLabel: deltaLabel(o, best?.deliveredCents ?? null),
                       }}
-                      onPress={() => (o.priceDisplay === 'check_price' ? openDeal(o.offerId, 'product_check_price') : router.push({ pathname: '/deals/offer/[id]', params: { id: o.offerId } }))}
+                      onPress={() =>
+                        o.priceDisplay === 'check_price'
+                          ? openDeal(o.offerId, 'product_check_price')
+                          : router.push({ pathname: '/deals/offer/[id]', params: { id: o.offerId } })
+                      }
                       last={i === others.length - 1}
                     />
                   ))}
@@ -204,7 +235,24 @@ export default function ProductScreen() {
             {best && stats && stats.historyDays >= 7 && (history.data?.length ?? 0) > 1 && (
               <View style={{ gap: 10 }}>
                 <SectionHeader title="Price history" actionLabel="90 days" onAction={openHistory} />
-                <Pressable accessibilityRole="button" accessibilityLabel="Open price history" onPress={openHistory} style={{ marginHorizontal: 16, padding: 14, borderRadius: radius.card, backgroundColor: colors.surface, gap: 12 }}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={spoken(
+                    'Open price history',
+                    (
+                      [
+                        ['now', stats.bestDeliveredCents],
+                        ['typical', stats.typicalCents],
+                        ['90-day low', stats.low90dCents],
+                        ['all-time low', stats.lowAllTimeCents],
+                      ] as const
+                    )
+                      .map(([label, cents]) => (cents != null ? `${label} ${formatPrice(cents)}` : null))
+                      .filter(Boolean)
+                      .join(', '),
+                  )}
+                  onPress={openHistory}
+                  style={{ marginHorizontal: 16, padding: 14, borderRadius: radius.card, backgroundColor: colors.surface, gap: 12 }}>
                   <PriceChart points={history.data!} typicalCents={stats.typicalCents} height={100} />
                   <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
                     {[

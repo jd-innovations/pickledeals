@@ -1,4 +1,4 @@
-import { formatPrice, LISTING_CONDITIONS, radius, type ListingCondition } from '@pickledeals/shared';
+import { formatPrice, LISTING_CONDITIONS, radius, speakable, spoken, type ListingCondition } from '@pickledeals/shared';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { useState } from 'react';
@@ -21,49 +21,63 @@ export type RetailerOfferRowData = {
 export function RetailerRow({ offer, onPress, last }: { offer: RetailerOfferRowData; onPress?: () => void; last?: boolean }) {
   const { colors } = useTheme();
   const checkPrice = offer.priceCents == null;
+  const actionLabel = checkPrice ? 'Check price' : offer.isBest ? 'Get deal' : 'View';
   return (
     <View style={[styles.retailer, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator }]}>
-      <View style={[styles.mono, { backgroundColor: colors.surface }]}>
-        <Text variant="footnote" weight="700">
-          {offer.monogram}
-        </Text>
-      </View>
-      <View style={{ flex: 1, gap: 1 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Text variant="subhead" weight="600">
-            {offer.retailer}
+      <View
+        accessible
+        accessibilityLabel={spoken(
+          offer.retailer,
+          offer.isBest && 'lowest price',
+          offer.sponsored && 'sponsored',
+          !checkPrice && formatPrice(offer.priceCents!),
+          offer.deltaLabel && speakable(offer.deltaLabel),
+          speakable(offer.detail),
+        )}
+        style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+        <View style={[styles.mono, { backgroundColor: colors.surface }]}>
+          <Text variant="footnote" weight="700">
+            {offer.monogram}
           </Text>
-          {offer.isBest && (
-            <View style={[styles.tag, { backgroundColor: colors.interactive }]}>
-              <Text variant="badge" style={{ fontSize: 10, color: colors.onInteractive }}>
-                LOWEST
+        </View>
+        <View style={{ flex: 1, gap: 1 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Text variant="subhead" weight="600">
+              {offer.retailer}
+            </Text>
+            {offer.isBest && (
+              <View style={[styles.tag, { backgroundColor: colors.interactive }]}>
+                <Text variant="badge" style={{ fontSize: 10, color: colors.onInteractive }}>
+                  LOWEST
+                </Text>
+              </View>
+            )}
+            {offer.sponsored && (
+              <Text variant="caption" tone="tertiary">
+                Sponsored
               </Text>
-            </View>
-          )}
-          {offer.sponsored && (
-            <Text variant="caption" tone="tertiary">
-              Sponsored
-            </Text>
-          )}
-        </View>
-        <Text variant="caption" weight="400" tone="secondary" numeric numberOfLines={1}>
-          {offer.detail}
-        </Text>
-      </View>
-      {!checkPrice && (
-        <View style={{ alignItems: 'flex-end' }}>
-          <Text variant="headline" weight={offer.isBest ? '700' : '600'} numeric>
-            {formatPrice(offer.priceCents!)}
+            )}
+          </View>
+          <Text variant="caption" weight="400" tone="secondary" numeric numberOfLines={1}>
+            {offer.detail}
           </Text>
-          {offer.deltaLabel && (
-            <Text variant="caption" weight="400" tone="secondary" numeric>
-              {offer.deltaLabel}
-            </Text>
-          )}
         </View>
-      )}
+        {!checkPrice && (
+          <View style={{ alignItems: 'flex-end' }}>
+            <Text variant="headline" weight={offer.isBest ? '700' : '600'} numeric>
+              {formatPrice(offer.priceCents!)}
+            </Text>
+            {offer.deltaLabel && (
+              <Text variant="caption" weight="400" tone="secondary" numeric>
+                {offer.deltaLabel}
+              </Text>
+            )}
+          </View>
+        )}
+      </View>
       <Button
-        label={checkPrice ? 'Check price' : offer.isBest ? 'Get deal' : 'View'}
+        accessibilityLabel={`${actionLabel}, ${offer.retailer}`}
+        label={actionLabel}
         variant={offer.isBest ? 'primary' : 'secondary'}
         size="sm"
         icon={checkPrice ? 'external' : undefined}
@@ -141,7 +155,11 @@ export function SellerIdentity({
 }) {
   const { colors } = useTheme();
   return (
-    <Pressable accessibilityRole={onPress ? 'button' : undefined} onPress={onPress} style={styles.seller}>
+    <Pressable
+      accessibilityRole={onPress ? 'button' : undefined}
+      accessibilityLabel={spoken(name, speakable(areaLabel), `member since ${memberSince}`, `${soldCount} sold`, replyTime && `replies in ${replyTime}`)}
+      onPress={onPress}
+      style={styles.seller}>
       <View style={[styles.avatar, { backgroundColor: colors.surfacePressed }]}>
         <Text variant="headline" weight="700">
           {name.charAt(0)}
@@ -171,7 +189,7 @@ const styles = StyleSheet.create({
   mono: { width: 36, height: 36, borderRadius: radius.control, alignItems: 'center', justifyContent: 'center' },
   tag: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5 },
   promo: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.card, borderWidth: 1.5, borderStyle: 'dashed' },
-  code: { height: 36, paddingHorizontal: 10, borderRadius: radius.control, flexDirection: 'row', alignItems: 'center', gap: 6 },
+  code: { minHeight: 36, paddingHorizontal: 10, borderRadius: radius.control, flexDirection: 'row', alignItems: 'center', gap: 6 },
   cond: { alignSelf: 'flex-start', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 7 },
   seller: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },

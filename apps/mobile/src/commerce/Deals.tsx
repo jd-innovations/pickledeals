@@ -1,4 +1,4 @@
-import { formatPrice, percentOff, radius, type DealBadge as DealBadgeLabel } from '@pickledeals/shared';
+import { formatPrice, percentOff, radius, speakable, spoken, spokenBadge, spokenPrice, type DealBadge as DealBadgeLabel } from '@pickledeals/shared';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
@@ -27,7 +27,18 @@ export function DealHero({ deal, onPress, onGetDeal, onCompare }: { deal: DealHe
   const pct = deal.priceCents != null && deal.wasCents ? percentOff(deal.priceCents, deal.wasCents) : null;
   return (
     <View style={{ gap: 12 }}>
-      <Pressable accessibilityRole="button" accessibilityLabel={`${deal.brandLine} ${deal.title}`} onPress={onPress} style={({ pressed }) => ({ gap: 12, opacity: pressed ? 0.9 : 1 })}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={spoken(
+          speakable(deal.eyebrow),
+          speakable(deal.brandLine),
+          deal.title,
+          spokenPrice(deal.priceCents, deal.wasCents, 'Check price at retailer'),
+          spokenBadge(deal.badge),
+          speakable(deal.meta),
+        )}
+        onPress={onPress}
+        style={({ pressed }) => ({ gap: 12, opacity: pressed ? 0.9 : 1 })}>
         <ProductImage source={deal.image} round={radius.hero} aspectRatio={1.15} padding={32}>
           {deal.badge && (
             <View style={{ position: 'absolute', top: 12, left: 12 }}>
@@ -70,14 +81,23 @@ export function DealHero({ deal, onPress, onGetDeal, onCompare }: { deal: DealHe
   );
 }
 
-export type PriceDropRowData = { rank: number; image: ImageSource; brand: string; name: string; meta: string; priceCents: number | null; wasCents: number | null; dropLabel: string };
+export type PriceDropRowData = {
+  rank: number;
+  image: ImageSource;
+  brand: string;
+  name: string;
+  meta: string;
+  priceCents: number | null;
+  wasCents: number | null;
+  dropLabel: string;
+};
 
 export function PriceDropRow({ row, onPress, last }: { row: PriceDropRowData; onPress: () => void; last?: boolean }) {
   const { colors } = useTheme();
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${row.rank}. ${row.brand} ${row.name}`}
+      accessibilityLabel={spoken(`${row.rank}`, row.brand, row.name, spokenPrice(row.priceCents, row.wasCents), speakable(row.dropLabel), speakable(row.meta))}
       onPress={onPress}
       style={({ pressed }) => [styles.drop, { backgroundColor: pressed ? colors.surfacePressed : 'transparent' }]}>
       <Text variant="headline" tone="secondary" numeric style={{ width: 18 }}>
@@ -121,10 +141,28 @@ export function PriceDropRow({ row, onPress, last }: { row: PriceDropRowData; on
 }
 
 /** Editorial collection banner (design: "Staff picks · Court shoes on sale"). Inverted tokens. */
-export function CollectionBanner({ eyebrow, title, detail, ctaLabel, art, onPress }: { eyebrow?: string | null; title: string; detail: string; ctaLabel: string; art?: ImageSource; onPress: () => void }) {
+export function CollectionBanner({
+  eyebrow,
+  title,
+  detail,
+  ctaLabel,
+  art,
+  onPress,
+}: {
+  eyebrow?: string | null;
+  title: string;
+  detail: string;
+  ctaLabel: string;
+  art?: ImageSource;
+  onPress: () => void;
+}) {
   const { colors } = useTheme();
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`${title}. ${detail}`} onPress={onPress} style={({ pressed }) => [styles.banner, { backgroundColor: colors.interactive, opacity: pressed ? 0.92 : 1 }]}>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={spoken(eyebrow && speakable(eyebrow), title, speakable(detail), ctaLabel)}
+      onPress={onPress}
+      style={({ pressed }) => [styles.banner, { backgroundColor: colors.interactive, opacity: pressed ? 0.92 : 1 }]}>
       <View style={{ flex: 1, gap: 6, paddingRight: art ? 8 : 0 }}>
         {eyebrow ? (
           <Text variant="badge" style={{ color: colors.onInteractive, opacity: 0.7 }}>
@@ -153,5 +191,14 @@ const styles = StyleSheet.create({
   drop: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 16 },
   dropBody: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 10, paddingRight: 16, minHeight: 76 },
   banner: { marginHorizontal: 16, padding: 18, borderRadius: radius.hero, flexDirection: 'row', alignItems: 'center', minHeight: 170 },
-  bannerCta: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', paddingHorizontal: 12, height: 32, borderRadius: radius.capsule, marginTop: 6 },
+  bannerCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 12,
+    minHeight: 32,
+    borderRadius: radius.capsule,
+    marginTop: 6,
+  },
 });

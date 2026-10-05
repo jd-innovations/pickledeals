@@ -1,4 +1,13 @@
-import { formatPrice, percentOff, type DealBadge as DealBadgeLabel, type PriceDisplayMode } from '@pickledeals/shared';
+import {
+  formatPrice,
+  percentOff,
+  speakable,
+  spoken,
+  spokenBadge,
+  spokenPrice,
+  type DealBadge as DealBadgeLabel,
+  type PriceDisplayMode,
+} from '@pickledeals/shared';
 import * as Haptics from 'expo-haptics';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring } from 'react-native-reanimated';
@@ -66,7 +75,18 @@ export function DealCard({
   const pct = showPrice && deal.referenceCents ? percentOff(deal.priceCents!, deal.referenceCents) : null;
   return (
     <View style={{ width }}>
-      <Pressable accessibilityRole="button" accessibilityLabel={`${deal.brand} ${deal.name}`} onPress={onPress} style={({ pressed }) => ({ gap: 8, opacity: pressed ? 0.85 : 1 })}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={spoken(
+          deal.sponsoredBy && `Sponsored by ${deal.sponsoredBy}`,
+          deal.brand,
+          deal.name,
+          spokenPrice(showPrice ? deal.priceCents : null, deal.referenceCents),
+          spokenBadge(deal.badge),
+          speakable(deal.meta ?? deal.retailer),
+        )}
+        onPress={onPress}
+        style={({ pressed }) => ({ gap: 8, opacity: pressed ? 0.85 : 1 })}>
         <ProductImage source={deal.image} width={width}>
           {deal.badge && (
             <View style={styles.badge}>
@@ -147,7 +167,18 @@ export function ListingCard({
   const { colors } = useTheme();
   return (
     <View style={{ width }}>
-      <Pressable accessibilityRole="button" accessibilityLabel={listing.title} onPress={onPress} style={({ pressed }) => ({ gap: 5, opacity: pressed ? 0.85 : 1 })}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={spoken(
+          listing.title,
+          formatPrice(listing.askCents),
+          listing.conditionLabel,
+          listing.status,
+          listing.bestNewCents != null && `new ${formatPrice(listing.bestNewCents)}`,
+          speakable(`${listing.areaLabel} · ${listing.distance}`),
+        )}
+        onPress={onPress}
+        style={({ pressed }) => ({ gap: 5, opacity: pressed ? 0.85 : 1 })}>
         <ProductImage source={listing.image} width={width} aspectRatio={width / (width * 1.1)}>
           <View style={[styles.cond, { backgroundColor: colors.background }]}>
             <Text variant="caption" weight="600" style={{ fontSize: 11 }}>

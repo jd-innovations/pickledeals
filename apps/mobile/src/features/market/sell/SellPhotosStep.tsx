@@ -172,5 +172,5 @@ const styles = StyleSheet.create({
   cover: { position: 'absolute', left: 6, bottom: 6, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 5 },
   retry: { position: 'absolute', right: 6, top: 6, paddingHorizontal: 6, paddingVertical: 3, borderRadius: 5 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  shot: { height: 34, paddingHorizontal: 12, borderRadius: 17, flexDirection: 'row', alignItems: 'center', gap: 5 },
+  shot: { minHeight: 34, paddingHorizontal: 12, borderRadius: 17, flexDirection: 'row', alignItems: 'center', gap: 5 },
 });

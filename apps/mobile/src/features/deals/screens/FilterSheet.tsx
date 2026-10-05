@@ -155,7 +155,7 @@ export default function FilterSheet() {
 }
 
 const styles = StyleSheet.create({
-  price: { flex: 1, height: 48, borderRadius: radius.control + 2, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 6 },
+  price: { flex: 1, minHeight: 48, borderRadius: radius.control + 2, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 6 },
   wrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingTop: 16, borderTopWidth: StyleSheet.hairlineWidth },
   footer: { padding: 16, paddingBottom: 28, borderTopWidth: StyleSheet.hairlineWidth },

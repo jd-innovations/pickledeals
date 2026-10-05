@@ -1,4 +1,4 @@
-import { formatPrice, percentOff, radius } from '@pickledeals/shared';
+import { formatPrice, percentOff, radius, speakable, spoken } from '@pickledeals/shared';
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,7 +15,7 @@ export function StatGrid({ items, columns = 3 }: { items: { label: string; value
   return (
     <View style={[styles.grid, { backgroundColor: colors.surface }]}>
       {items.map((it) => (
-        <View key={it.label} style={{ width: `${100 / columns}%`, padding: 12, gap: 2 }}>
+        <View key={it.label} accessible accessibilityLabel={spoken(it.label, speakable(it.value))} style={{ width: `${100 / columns}%`, padding: 12, gap: 2 }}>
           <Text variant="caption" weight="400" tone="secondary">
             {it.label}
           </Text>
@@ -46,42 +46,64 @@ export function RetailerOfferCard({ offer, actionLabel, onAction }: { offer: Ret
   const checkPrice = offer.priceCents == null;
   return (
     <View style={[styles.card, { borderColor: offer.best ? colors.textPrimary : colors.border, borderWidth: offer.best ? 2 : StyleSheet.hairlineWidth * 2 }]}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <View style={[styles.mono, { backgroundColor: colors.surface }]}>
-          <Text variant="footnote" weight="700">
-            {offer.monogram}
-          </Text>
-        </View>
-        <View style={{ flex: 1, gap: 1 }}>
-          <Text variant="subhead" weight="700">
-            {offer.retailer}
-          </Text>
-          <Text variant="caption" weight="400" tone="secondary" numberOfLines={1}>
-            {offer.tagline}
-          </Text>
-        </View>
-        {!checkPrice && (
-          <View style={{ alignItems: 'flex-end' }}>
-            <Text variant="headline" weight="700" numeric>
-              {formatPrice(offer.priceCents!)}
-            </Text>
-            {offer.deltaLabel ? (
-              <Text variant="caption" weight="400" tone="secondary" numeric>
-                {offer.deltaLabel}
-              </Text>
-            ) : null}
-          </View>
+      <View
+        accessible
+        accessibilityLabel={spoken(
+          offer.retailer,
+          offer.best && 'best offer',
+          offer.tagline,
+          checkPrice ? 'Check price at retailer' : formatPrice(offer.priceCents!),
+          offer.deltaLabel && speakable(offer.deltaLabel),
+          speakable(offer.detail),
+          offer.checked,
         )}
+        style={{ gap: 10 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <View style={[styles.mono, { backgroundColor: colors.surface }]}>
+            <Text variant="footnote" weight="700">
+              {offer.monogram}
+            </Text>
+          </View>
+          <View style={{ flex: 1, gap: 1 }}>
+            <Text variant="subhead" weight="700">
+              {offer.retailer}
+            </Text>
+            <Text variant="caption" weight="400" tone="secondary" numberOfLines={1}>
+              {offer.tagline}
+            </Text>
+          </View>
+          {!checkPrice && (
+            <View style={{ alignItems: 'flex-end' }}>
+              <Text variant="headline" weight="700" numeric>
+                {formatPrice(offer.priceCents!)}
+              </Text>
+              {offer.deltaLabel ? (
+                <Text variant="caption" weight="400" tone="secondary" numeric>
+                  {offer.deltaLabel}
+                </Text>
+              ) : null}
+            </View>
+          )}
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+          <Text variant="caption" weight="400" tone="secondary" numeric style={{ flex: 1 }} numberOfLines={1}>
+            {offer.detail}
+          </Text>
+          <Text variant="caption" weight="400" tone="secondary">
+            {offer.checked}
+          </Text>
+        </View>
       </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
-        <Text variant="caption" weight="400" tone="secondary" numeric style={{ flex: 1 }} numberOfLines={1}>
-          {offer.detail}
-        </Text>
-        <Text variant="caption" weight="400" tone="secondary">
-          {offer.checked}
-        </Text>
-      </View>
-      <Button label={actionLabel} variant={offer.best ? 'primary' : 'secondary'} size="sm" icon={checkPrice ? 'external' : undefined} iconPosition="trailing" fullWidth onPress={onAction} />
+      <Button
+        accessibilityLabel={`${actionLabel}, ${offer.retailer}`}
+        label={actionLabel}
+        variant={offer.best ? 'primary' : 'secondary'}
+        size="sm"
+        icon={checkPrice ? 'external' : undefined}
+        iconPosition="trailing"
+        fullWidth
+        onPress={onAction}
+      />
     </View>
   );
 }
@@ -102,7 +124,7 @@ export function PriceBreakdown({
   return (
     <View style={[styles.breakdown, { backgroundColor: colors.surface }]}>
       {rows.map((r) => (
-        <View key={r.label} style={styles.line}>
+        <View key={r.label} accessible accessibilityLabel={spoken(r.label, r.strike ? `was ${r.value}` : r.value)} style={styles.line}>
           <Text variant="footnote" tone="secondary">
             {r.label}
           </Text>
@@ -111,14 +133,20 @@ export function PriceBreakdown({
           </Text>
         </View>
       ))}
-      <View style={[styles.line, { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingTop: 10, marginTop: 2 }]}>
+      <View
+        accessible
+        accessibilityLabel={`You pay ${formatPrice(totalCents)}`}
+        style={[styles.line, { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingTop: 10, marginTop: 2 }]}>
         <Text variant="headline">You pay</Text>
         <Text variant="priceLarge" numeric>
           {formatPrice(totalCents)}
         </Text>
       </View>
       {saved && pct ? (
-        <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
+        <View
+          accessible
+          accessibilityLabel={`Save ${formatPrice(saved)}, ${pct}% off`}
+          style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 8 }}>
           <DiscountPill pct={pct} />
           <Text variant="footnote" weight="600" numeric>
             Save {formatPrice(saved)}
@@ -131,17 +159,35 @@ export function PriceBreakdown({
 
 /** "CourtSide Pro Shop" → "CP", "JOOLA.com" → "J", "Racquet & Court Co." → "RC". */
 export function retailerMonogram(name: string): string {
-  const words = name.replace(/\.(com|net|co)$/i, '').split(/[\s&]+/).filter((w) => /[A-Za-z0-9]/.test(w));
-  return words.slice(0, 2).map((w) => w[0]!.toUpperCase()).join('');
+  const words = name
+    .replace(/\.(com|net|co)$/i, '')
+    .split(/[\s&]+/)
+    .filter((w) => /[A-Za-z0-9]/.test(w));
+  return words
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join('');
 }
 
 /** Bottom bar with the best price and the primary action (Product, Deal detail). */
-export function StickyDealBar({ title, subtitle, actionLabel, onAction, trailing }: { title: ReactNode; subtitle?: string; actionLabel: string; onAction: () => void; trailing?: ReactNode }) {
+export function StickyDealBar({
+  title,
+  subtitle,
+  actionLabel,
+  onAction,
+  trailing,
+}: {
+  title: ReactNode;
+  subtitle?: string;
+  actionLabel: string;
+  onAction: () => void;
+  trailing?: ReactNode;
+}) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.bar, { backgroundColor: colors.glass, borderTopColor: colors.separator, paddingBottom: Math.max(insets.bottom, 12) }]}>
-      <View style={{ flex: 1, gap: 1 }}>
+      <View accessible style={{ flex: 1, gap: 1 }}>
         {typeof title === 'string' ? (
           <Text variant="headline" weight="700" numeric>
             {title}

@@ -224,6 +224,6 @@ const styles = StyleSheet.create({
   marker: { position: 'absolute', alignItems: 'center', transform: [{ translateX: -45 }], width: 90 },
   you: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5 },
   knob: { width: 14, height: 14, borderRadius: 7, borderWidth: 3, marginTop: 2 },
-  preset: { flex: 1, height: 56, borderRadius: 14, alignItems: 'center', justifyContent: 'center', gap: 1 },
+  preset: { flex: 1, minHeight: 56, borderRadius: 14, alignItems: 'center', justifyContent: 'center', gap: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12 },
 });

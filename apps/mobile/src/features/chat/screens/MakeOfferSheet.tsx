@@ -139,7 +139,7 @@ export default function MakeOfferSheet() {
                 accessibilityRole="button"
                 accessibilityState={{ selected: on }}
                 onPress={() => setAmount(String(p))}
-                style={{ height: 34, paddingHorizontal: 12, borderRadius: 17, justifyContent: 'center', backgroundColor: on ? colors.interactive : colors.chip }}>
+                style={{ minHeight: 34, paddingHorizontal: 12, borderRadius: 17, justifyContent: 'center', backgroundColor: on ? colors.interactive : colors.chip }}>
                 <Text variant="footnote" weight="600" numeric style={{ color: on ? colors.onInteractive : colors.textPrimary }}>
                   ${p} · −{Math.round((1 - p / asking) * 100)}%
                 </Text>

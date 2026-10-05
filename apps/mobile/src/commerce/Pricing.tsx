@@ -4,6 +4,9 @@ import {
   formatPrice,
   percentOff,
   radius,
+  speakable,
+  spoken,
+  spokenBadge,
   type DealBadge as DealBadgeLabel,
   type DealQuality,
 } from '@pickledeals/shared';
@@ -16,7 +19,10 @@ import { Text } from '@/ui';
 export function DiscountPill({ pct, size = 'sm' }: { pct: number; size?: 'sm' | 'md' }) {
   const { colors } = useTheme();
   return (
-    <View style={[styles.pill, { backgroundColor: colors.interactive, paddingHorizontal: size === 'md' ? 7 : 6 }]}>
+    <View
+      accessible
+      accessibilityLabel={`${pct}% off`}
+      style={[styles.pill, { backgroundColor: colors.interactive, paddingHorizontal: size === 'md' ? 7 : 6 }]}>
       <Text variant={size === 'md' ? 'footnote' : 'caption'} weight="700" numeric style={{ color: colors.onInteractive }}>
         {formatPercentOff(pct)}
       </Text>
@@ -30,6 +36,8 @@ export function DealBadge({ label }: { label: DealBadgeLabel }) {
   const strong = label === 'LOWEST PRICE';
   return (
     <View
+      accessible
+      accessibilityLabel={spokenBadge(label) ?? undefined}
       style={[
         styles.badge,
         { backgroundColor: strong ? colors.interactive : colors.background },
@@ -57,8 +65,16 @@ export function PriceBlock({
 }) {
   const pct = referenceCents ? percentOff(priceCents, referenceCents) : null;
   const display = variant === 'display';
+  const a11yLabel = spoken(
+    label && speakable(label),
+    formatPrice(priceCents),
+    referenceCents != null && pct != null && `${display ? 'MSRP' : 'was'} ${formatPrice(referenceCents)}`,
+    pct != null && `${pct}% off`,
+    display && referenceCents != null && pct != null && `you save ${formatPrice(referenceCents - priceCents)}`,
+    display && pct != null && retailer && `at ${retailer}`,
+  );
   return (
-    <View style={{ gap: display ? 4 : 2 }}>
+    <View accessible accessibilityLabel={a11yLabel} style={{ gap: display ? 4 : 2 }}>
       {label && (
         <Text variant="badge" tone="secondary">
           {label}
@@ -108,7 +124,7 @@ export function DealQualityMeter({ quality, detail }: { quality: DealQuality; de
   const { colors } = useTheme();
   const level = DEAL_QUALITY.indexOf(quality);
   return (
-    <View style={{ gap: 8 }}>
+    <View accessible accessibilityLabel={spoken(QUALITY_LABEL[quality], detail && speakable(detail), `level ${level + 1} of 5`)} style={{ gap: 8 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
         <Text variant="headline" weight="700">
           {QUALITY_LABEL[quality]}
@@ -119,7 +135,7 @@ export function DealQualityMeter({ quality, detail }: { quality: DealQuality; de
           </Text>
         )}
       </View>
-      <View accessibilityLabel={`Deal quality ${level + 1} of 5`} style={{ flexDirection: 'row', gap: 3 }}>
+      <View style={{ flexDirection: 'row', gap: 3 }}>
         {DEAL_QUALITY.map((q, i) => (
           <View key={q} style={{ flex: 1, height: 5, borderRadius: 3, backgroundColor: i <= level ? colors.interactive : colors.border }} />
         ))}
@@ -141,8 +157,13 @@ export function UsedVsNew({
   bestNewRetailer?: string;
 }) {
   const { colors } = useTheme();
+  const a11yLabel = spoken(
+    `This listing, used, ${formatPrice(askCents)}, ${conditionLabel}`,
+    bestNewCents != null ? `best new price ${formatPrice(bestNewCents)}${bestNewRetailer ? ` at ${bestNewRetailer}` : ''}` : 'no verified new price',
+    bestNewCents != null && bestNewCents > askCents && `${formatPrice(bestNewCents - askCents)} less than new`,
+  );
   return (
-    <View style={{ gap: 10 }}>
+    <View accessible accessibilityLabel={a11yLabel} style={{ gap: 10 }}>
       <View style={[styles.split, { backgroundColor: colors.background, borderColor: colors.border }]}>
         <View style={styles.splitCell}>
           <Text variant="caption" weight="400" tone="secondary">

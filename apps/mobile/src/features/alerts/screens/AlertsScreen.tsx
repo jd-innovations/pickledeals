@@ -242,7 +242,7 @@ function AlertCard({ alert: a, nowCents }: { alert: PriceAlert; nowCents: number
         </Text>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Edit target"
+          accessibilityLabel={`Edit target, ${formatPrice(a.targetCents)}`}
           hitSlop={8}
           onPress={() =>
             router.push({
@@ -309,11 +309,7 @@ function Searches() {
               {formatAgo(s.createdAt)}
             </Text>
           </Pressable>
-          <Toggle
-            accessibilityLabel={`Notify for ${s.label}`}
-            value={s.notify}
-            onValueChange={(v) => updateSearch.mutate({ id: s.id, notify: v })}
-          />
+          <Toggle accessibilityLabel={`Notify for ${s.label}`} value={s.notify} onValueChange={(v) => updateSearch.mutate({ id: s.id, notify: v })} />
           <IconButton icon="close" label={`Delete ${s.label}`} size={30} onPress={() => deleteSearch.mutate(s.id)} />
         </View>
       ))}

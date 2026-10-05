@@ -1,4 +1,4 @@
-import { formatAgo, formatPrice, LISTING_CONDITIONS, radius } from '@pickledeals/shared';
+import { formatAgo, formatPrice, LISTING_CONDITIONS, radius, spoken } from '@pickledeals/shared';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, Share, StyleSheet, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
@@ -137,7 +137,11 @@ export default function ListingScreen() {
             {l.product && (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Compare with new prices"
+                accessibilityLabel={spoken(
+                  'Compare with new prices',
+                  `this listing ${formatPrice(l.priceCents)}`,
+                  l.bestNewCents != null && `best new price ${formatPrice(l.bestNewCents)}`,
+                )}
                 onPress={() => openProduct(l.product!.slug)}
                 style={({ pressed }) => ({ padding: 16, borderRadius: 20, backgroundColor: colors.surface, gap: 12, opacity: pressed ? 0.9 : 1 })}>
                 <UsedVsNew
@@ -234,7 +238,12 @@ export default function ListingScreen() {
           {own ? (
             <Button label="Manage listing" style={{ flex: 1 }} onPress={() => openManage(l.id)} />
           ) : l.status === 'sold' || l.status === 'removed' ? (
-            <Button label="See similar listings" variant="secondary" style={{ flex: 1 }} onPress={() => (l.product ? openProduct(l.product.slug) : router.push('/market'))} />
+            <Button
+              label="See similar listings"
+              variant="secondary"
+              style={{ flex: 1 }}
+              onPress={() => (l.product ? openProduct(l.product.slug) : router.push('/market'))}
+            />
           ) : (
             <>
               <Button label="Message" variant="secondary" style={{ flex: 1 }} onPress={message} />

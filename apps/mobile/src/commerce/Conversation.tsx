@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
   head: { flexDirection: 'row', justifyContent: 'space-between' },
   accepted: { borderRadius: 22, padding: 16, alignItems: 'center', gap: 6 },
   check: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  bannerBtn: { height: 34, paddingHorizontal: 12, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
+  bannerBtn: { minHeight: 34, paddingHorizontal: 12, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   bubble: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 18 },
   system: { alignSelf: 'center', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12 },
 });

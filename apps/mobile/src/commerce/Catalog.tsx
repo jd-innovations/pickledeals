@@ -1,4 +1,4 @@
-import { formatPrice } from '@pickledeals/shared';
+import { formatPrice, speakable, spoken } from '@pickledeals/shared';
 import { Image } from 'expo-image';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -16,7 +16,12 @@ export function ProductCard({ product, width, onPress }: { product: ProductCardD
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${product.brand} ${product.name}`}
+      accessibilityLabel={spoken(
+        product.brand,
+        product.name,
+        product.msrpCents != null && `MSRP ${formatPrice(product.msrpCents)}`,
+        product.meta && speakable(product.meta),
+      )}
       onPress={onPress}
       style={({ pressed }) => ({ width, gap: 8, opacity: pressed ? 0.85 : 1 })}>
       <ProductImage source={product.image} width={width} />
@@ -48,7 +53,7 @@ export function ProductRow({ title, meta, image, onPress, last }: { title: strin
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={title}
+      accessibilityLabel={spoken(title, meta && speakable(meta))}
       onPress={onPress}
       style={({ pressed }) => [styles.row, { backgroundColor: pressed ? colors.surfacePressed : 'transparent' }]}>
       <ProductImage source={image} width={44} round={12} padding={4} />
@@ -105,7 +110,15 @@ export function BrandMark({ name, logoUri, size = 44 }: { name: string; logoUri?
     <View
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
-      style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: colors.interactive, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        backgroundColor: colors.interactive,
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+      }}>
       {logoUri ? (
         <Image source={{ uri: logoUri }} contentFit="contain" style={{ width: size * 0.72, height: size * 0.72 }} />
       ) : (
@@ -115,7 +128,21 @@ export function BrandMark({ name, logoUri, size = 44 }: { name: string; logoUri?
   );
 }
 
-export function BrandRow({ name, meta, logoUri, trailing, onPress, last }: { name: string; meta?: string; logoUri?: string | null; trailing?: string; onPress?: () => void; last?: boolean }) {
+export function BrandRow({
+  name,
+  meta,
+  logoUri,
+  trailing,
+  onPress,
+  last,
+}: {
+  name: string;
+  meta?: string;
+  logoUri?: string | null;
+  trailing?: string;
+  onPress?: () => void;
+  last?: boolean;
+}) {
   const { colors } = useTheme();
   return (
     <Pressable

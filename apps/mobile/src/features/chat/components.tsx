@@ -104,7 +104,7 @@ export function ListingStrip({ t, onView }: { t: Thread; onView: () => void }) {
           )}
         </Text>
       </View>
-      <Pressable accessibilityRole="button" onPress={onView} style={({ pressed }) => ({ height: 30, paddingHorizontal: 12, borderRadius: 15, backgroundColor: colors.chip, justifyContent: 'center', opacity: pressed ? 0.75 : 1 })}>
+      <Pressable accessibilityRole="button" onPress={onView} style={({ pressed }) => ({ minHeight: 30, paddingHorizontal: 12, borderRadius: 15, backgroundColor: colors.chip, justifyContent: 'center', opacity: pressed ? 0.75 : 1 })}>
         <Text variant="caption" weight="700">
           View listing
         </Text>

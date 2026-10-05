@@ -140,5 +140,5 @@ export default function ManageListingSheet() {
 }
 
 const styles = StyleSheet.create({
-  price: { height: 48, borderRadius: radius.control + 2, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 6 },
+  price: { minHeight: 48, borderRadius: radius.control + 2, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, gap: 6 },
 });

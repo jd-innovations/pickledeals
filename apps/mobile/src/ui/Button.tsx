@@ -52,7 +52,8 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         {
-          height: variant === 'link' ? undefined : HEIGHT[size],
+          minHeight: variant === 'link' ? undefined : HEIGHT[size],
+          paddingVertical: variant === 'link' ? 0 : 6,
           paddingHorizontal: variant === 'link' ? 0 : size === 'sm' ? 14 : 22,
           backgroundColor: pressed && variant === 'primary' ? colors.interactivePressed : bg,
           borderColor: colors.border,

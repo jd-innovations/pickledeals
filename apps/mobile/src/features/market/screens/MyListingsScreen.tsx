@@ -1,4 +1,4 @@
-import { formatAgo, formatPrice, radius } from '@pickledeals/shared';
+import { formatAgo, formatPrice, radius, spoken } from '@pickledeals/shared';
 import { router, Stack } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
@@ -22,7 +22,9 @@ export default function MyListingsScreen() {
 
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 120, paddingHorizontal: 16, gap: 12 }}>
-      <Stack.Screen options={{ headerRight: () => <IconButton icon="plus" label="New listing" size={34} tone="solid" onPress={() => router.push('/sell')} /> }} />
+      <Stack.Screen
+        options={{ headerRight: () => <IconButton icon="plus" label="New listing" size={34} tone="solid" onPress={() => router.push('/sell')} /> }}
+      />
       <SegmentedControl
         options={[
           { value: 'active', label: `Active ${by('active').length}` },
@@ -63,7 +65,11 @@ function Row({ l }: { l: MyListing }) {
         : { label: 'Sell a similar item', run: () => router.push('/sell') };
   return (
     <View style={[styles.card, { borderColor: colors.border }]}>
-      <Pressable accessibilityRole="button" accessibilityLabel={title} onPress={() => openListing(l.id)} style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={spoken(title, l.status, formatPrice(l.priceCents), conditionLabel(l.condition), `listed ${formatAgo(l.publishedAt)}`)}
+        onPress={() => openListing(l.id)}
+        style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
         <ProductImage source={listingImage(l)} width={76} round={14} padding={7} />
         <View style={{ flex: 1, gap: 3, minWidth: 0 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>

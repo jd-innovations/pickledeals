@@ -221,11 +221,11 @@ export function Group({ label, children }: { label?: string; children: ReactNode
 }
 
 const styles = StyleSheet.create({
-  chip: { height: 36, paddingHorizontal: 14, borderRadius: radius.capsule, flexDirection: 'row', alignItems: 'center', gap: 6 },
+  chip: { minHeight: 36, paddingHorizontal: 14, borderRadius: radius.capsule, flexDirection: 'row', alignItems: 'center', gap: 6 },
   count: { minWidth: 20, height: 20, paddingHorizontal: 6, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   segment: { height: 36, borderRadius: radius.control, padding: 2, flexDirection: 'row' },
   segmentItem: { flex: 1, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  search: { height: 44, borderRadius: 22, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 8 },
+  search: { minHeight: 44, borderRadius: 22, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 8 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 16 },
   rowInner: { flex: 1, minHeight: 50, flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 16 },
 });

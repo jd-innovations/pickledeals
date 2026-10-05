@@ -125,7 +125,7 @@ export default function MarketMapScreen() {
                 accessibilityRole="button"
                 accessibilityLabel={`Distance: ${radiusLabel(f.radiusM)}. Change`}
                 onPress={() => router.push('/market/location')}
-                style={{ height: 36, paddingHorizontal: 12, borderRadius: 18, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.glass, borderWidth: 0.5, borderColor: colors.border }}>
+                style={{ minHeight: 36, paddingHorizontal: 12, borderRadius: 18, flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.glass, borderWidth: 0.5, borderColor: colors.border }}>
                 <Icon name="pin" size={14} color={colors.textPrimary} />
                 <Text variant="subhead" weight="700" numeric>
                   {radiusLabel(f.radiusM)}
@@ -253,7 +253,7 @@ function SheetButton({ icon, label, onPress }: { icon: 'grid' | 'refresh'; label
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => ({ height: 32, paddingHorizontal: 12, borderRadius: 16, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.chip, opacity: pressed ? 0.75 : 1 })}>
+      style={({ pressed }) => ({ minHeight: 32, paddingHorizontal: 12, borderRadius: 16, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.chip, opacity: pressed ? 0.75 : 1 })}>
       <Icon name={icon} size={14} color={colors.textPrimary} />
       <Text variant="footnote" weight="700">
         {label}

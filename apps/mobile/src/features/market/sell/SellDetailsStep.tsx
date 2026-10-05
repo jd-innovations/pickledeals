@@ -1,13 +1,13 @@
 import { radius, snapToCell } from '@pickledeals/shared';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Switch, TextInput, View } from 'react-native';
+import { Alert, Platform, StyleSheet, Switch, TextInput, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { AreaMap } from '@/features/map';
 import { Button, Icon, Text, TextField } from '@/ui';
 
-import { getDeviceArea, type DeviceArea } from '../device';
+import { geocodeArea, getDeviceArea, type DeviceArea } from '../device';
 import { useSellDraft, useViewer } from '../hooks';
 import { SellFrame } from './SellFrame';
 
@@ -16,32 +16,61 @@ export default function SellDetailsStep() {
   const { colors } = useTheme();
   const { draft, update } = useSellDraft();
   const viewer = useViewer();
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<'gps' | 'search' | null>(null);
   const [pending, setPending] = useState<DeviceArea | null>(null);
   const [label, setLabel] = useState('');
+  // "Change" (or no area yet) offers current location or a city/ZIP search, like the Marketplace sheet.
+  const [choosing, setChoosing] = useState(false);
+  const [query, setQuery] = useState('');
 
   // Reuse the area the buyer side already knows about, if any (still only a point the server snaps).
   useEffect(() => {
     if (!draft.location && viewer.point && viewer.label) update({ location: { ...viewer.point, label: viewer.label, postalCode: null } });
   }, [draft.location, viewer.point, viewer.label, update]);
 
+  const searchable = Platform.OS !== 'web'; // expo-location geocoding is native-only
+
+  const choose = (area: DeviceArea) => {
+    if (area.label) {
+      update({ location: { lat: area.lat, lng: area.lng, label: area.label, postalCode: area.postalCode } });
+      setChoosing(false);
+    } else {
+      setPending(area);
+      setLabel('');
+    }
+  };
+
   const locate = async () => {
-    setBusy(true);
+    setBusy('gps');
     try {
       const area = await getDeviceArea();
       if (area === 'denied') {
-        Alert.alert('Location is off', 'Allow location for PickleDeals in Settings. We only use it to show buyers an approximate area.');
+        Alert.alert(
+          'Location is off',
+          searchable
+            ? 'Search for your city or ZIP instead, or allow location for PickleDeals in Settings. Buyers only ever see an approximate area.'
+            : 'Allow location for PickleDeals in Settings. We only use it to show buyers an approximate area.',
+        );
+        setChoosing(true);
         return;
       }
-      if (area.label) update({ location: { lat: area.lat, lng: area.lng, label: area.label, postalCode: area.postalCode } });
-      else {
-        setPending(area);
-        setLabel('');
-      }
+      choose(area);
     } catch {
-      Alert.alert('Couldn’t find you', 'Try again in a moment.');
+      Alert.alert('Couldn’t find you', searchable ? 'Try again, or search for your city or ZIP.' : 'Try again in a moment.');
     } finally {
-      setBusy(false);
+      setBusy(null);
+    }
+  };
+
+  const find = async () => {
+    if (!query.trim()) return;
+    setBusy('search');
+    try {
+      const area = await geocodeArea(query.trim());
+      if (!area) Alert.alert('No match', 'Try a city name or a 5-digit ZIP.');
+      else choose(area);
+    } finally {
+      setBusy(null);
     }
   };
 
@@ -73,7 +102,9 @@ export default function SellDetailsStep() {
           <Text variant="headline" weight="700">
             Location
           </Text>
-          {draft.location && <Button label="Change" variant="link" size="sm" loading={busy} onPress={locate} />}
+          {draft.location && !pending && (
+            <Button label={choosing ? 'Cancel' : 'Change'} variant="link" size="sm" onPress={() => setChoosing(!choosing)} />
+          )}
         </View>
         {pending ? (
           <View style={{ gap: 10 }}>
@@ -85,16 +116,34 @@ export default function SellDetailsStep() {
               onPress={() => {
                 update({ location: { lat: pending.lat, lng: pending.lng, label: label.trim(), postalCode: null } });
                 setPending(null);
+                setChoosing(false);
               }}
             />
           </View>
-        ) : draft.location ? (
+        ) : draft.location && !choosing ? (
           <View style={{ borderRadius: 18, overflow: 'hidden' }}>
             {/* Preview the exact cell the server will snap to — what buyers will see (D2). */}
             <AreaMap center={snapToCell(draft.location.lat, draft.location.lng)} height={150} label={draft.location.label} labelStyle="title" areaName={draft.location.label} />
           </View>
         ) : (
-          <Button label="Use my approximate location" icon="pin" iconPosition="leading" variant="secondary" loading={busy} onPress={locate} />
+          <View style={{ gap: 10 }}>
+            <Button label="Use my approximate location" icon="pin" iconPosition="leading" variant="secondary" loading={busy === 'gps'} onPress={locate} />
+            {searchable && (
+              <View style={{ flexDirection: 'row', gap: 10, alignItems: 'flex-end' }}>
+                <TextField
+                  label="Or search"
+                  placeholder="City or ZIP"
+                  value={query}
+                  onChangeText={setQuery}
+                  onSubmitEditing={find}
+                  returnKeyType="search"
+                  autoCapitalize="words"
+                  containerStyle={{ flex: 1 }}
+                />
+                <Button label="Find" variant="secondary" size="md" loading={busy === 'search'} onPress={find} />
+              </View>
+            )}
+          </View>
         )}
         <View style={{ flexDirection: 'row', gap: 6 }}>
           <Icon name="shield" size={14} color={colors.textSecondary} />

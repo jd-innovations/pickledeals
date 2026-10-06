@@ -52,6 +52,22 @@ select vault.create_secret('<service role key>', 'dispatch_key');
   `insert into public.user_roles (user_id, role) select id, 'admin' from auth.users where email = '<your email>';`
 - **Shopify source:** admin → Integrations → Pickleball Grip Doctor → set shipping, turn on.
 
+## Sign in with Google (user, once)
+1. Google Cloud Console → APIs & Services → **OAuth consent screen**: app name PickleDeals, support
+   email, publish (External).
+2. **Credentials → Create OAuth client ID**, twice:
+   - **iOS**: bundle ID `app.pickledeals` → gives the *iOS client ID*.
+   - **Web application** (no redirect URIs needed) → gives the *web client ID* and a *client secret*.
+3. App (public values, safe to commit): put both IDs in `apps/mobile/eas.json` (preview, production,
+   development, simulator env) and `apps/mobile/.env.local` as `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` and
+   `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`. Claude can do this once you share the two IDs (not the secret).
+4. Hosted Supabase: Authentication → Providers → **Google**: enable; Client IDs = `<web ID>,<iOS ID>`;
+   Client secret = the web client secret; **Skip nonce check** on.
+5. Local: in `supabase/.env` set `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID=<web ID>,<iOS ID>` and
+   `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET=<secret>`, then `enabled = true` under
+   `[auth.external.google]` in `supabase/config.toml`.
+6. Native code changed (new module + URL scheme): new **development** and **preview** builds are needed.
+
 ## 5. App builds
 - `apps/mobile/eas.json`: the `preview` and `production` profiles point at the hosted project
   (`EXPO_PUBLIC_SUPABASE_URL` and the publishable key, both public values). The `development`

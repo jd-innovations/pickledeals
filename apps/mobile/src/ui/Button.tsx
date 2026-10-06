@@ -1,5 +1,6 @@
 import { radius } from '@pickledeals/shared';
 import * as Haptics from 'expo-haptics';
+import type { ReactNode } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View, type PressableProps, type ViewStyle } from 'react-native';
 
 import { useTheme } from '@/design/theme';
@@ -15,6 +16,8 @@ export type ButtonProps = Omit<PressableProps, 'style' | 'children'> & {
   size?: Size;
   icon?: IconName;
   iconPosition?: 'leading' | 'trailing';
+  /** A custom leading mark (e.g. a provider logo), shown before the label. */
+  leading?: ReactNode;
   loading?: boolean;
   fullWidth?: boolean;
   style?: ViewStyle;
@@ -28,6 +31,7 @@ export function Button({
   size = 'lg',
   icon,
   iconPosition = 'trailing',
+  leading,
   loading,
   fullWidth,
   disabled,
@@ -68,6 +72,7 @@ export function Button({
         <ActivityIndicator color={fg} />
       ) : (
         <View style={styles.row}>
+          {leading}
           {icon && iconPosition === 'leading' && <Icon name={icon} size={size === 'sm' ? 14 : 16} color={fg} weight="semibold" />}
           <Text variant={size === 'sm' ? 'footnote' : 'headline'} weight="700" style={{ color: fg, textDecorationLine: variant === 'link' ? 'underline' : 'none' }}>
             {label}

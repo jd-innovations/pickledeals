@@ -8,7 +8,7 @@ import { useAuth } from '@/features/auth/authStore';
 import { BlockedPeople } from '@/features/chat/components';
 import { Button, Group, ListRow, Text } from '@/ui';
 
-const PROVIDER_LABEL: Record<string, string> = { apple: 'Apple', email: 'Email code' };
+const PROVIDER_LABEL: Record<string, string> = { apple: 'Apple', google: 'Google', email: 'Email code' };
 
 /** Account details and permanent deletion (App Store Guideline 5.1.1(v)). */
 export default function AccountScreen() {

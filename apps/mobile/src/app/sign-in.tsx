@@ -5,7 +5,17 @@ import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
-import { AuthCanceled, authErrorMessage, isAppleSignInAvailable, sendEmailCode, signInWithApple, verifyEmailCode } from '@/features/auth/api';
+import {
+  AuthCanceled,
+  authErrorMessage,
+  isAppleSignInAvailable,
+  isGoogleSignInAvailable,
+  sendEmailCode,
+  signInWithApple,
+  signInWithGoogle,
+  verifyEmailCode,
+} from '@/features/auth/api';
+import { GoogleMark } from '@/features/auth/GoogleMark';
 import { INTENT_COPY, useAuth } from '@/features/auth/authStore';
 import { supabase } from '@/lib/supabase';
 import { Button, Text, TextField } from '@/ui';
@@ -13,7 +23,7 @@ import { Button, Text, TextField } from '@/ui';
 type Step = 'choose' | 'email' | 'code';
 const CODE_LENGTH = 6;
 
-/** D6 auth sheet (formSheet): Sign in with Apple or a 6-digit email code, then resume the intent. */
+/** D6 auth sheet (formSheet): Sign in with Apple or Google, or a 6-digit email code, then resume the intent. */
 export default function SignInSheet() {
   const { intent } = useLocalSearchParams<{ intent?: AuthIntent }>();
   const { scheme } = useTheme();
@@ -31,10 +41,13 @@ export default function SignInSheet() {
     isAppleSignInAvailable().then(setAppleAvailable, () => setAppleAvailable(false));
   }, []);
 
-  useEffect(() => () => {
-    // Swiping the sheet away abandons the pending action.
-    if (!useAuth.getState().user) cancel();
-  }, [cancel]);
+  useEffect(
+    () => () => {
+      // Swiping the sheet away abandons the pending action.
+      if (!useAuth.getState().user) cancel();
+    },
+    [cancel],
+  );
 
   const run = async (task: () => Promise<void>, onDone?: () => void) => {
     setBusy(true);
@@ -50,7 +63,13 @@ export default function SignInSheet() {
   };
 
   const onApple = () => run(signInWithApple, resumeAfterSignIn);
-  const onSendCode = () => run(() => sendEmailCode(email), () => setStep('code'));
+  const onGoogle = () => run(signInWithGoogle, resumeAfterSignIn);
+  const googleAvailable = isGoogleSignInAvailable();
+  const onSendCode = () =>
+    run(
+      () => sendEmailCode(email),
+      () => setStep('code'),
+    );
   const onVerify = (value = code) => run(() => verifyEmailCode(email, value), resumeAfterSignIn);
 
   const onCodeChange = (value: string) => {
@@ -82,15 +101,18 @@ export default function SignInSheet() {
           {appleAvailable && (
             <AppleAuthentication.AppleAuthenticationButton
               buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
-              buttonStyle={scheme === 'dark' ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+              buttonStyle={
+                scheme === 'dark' ? AppleAuthentication.AppleAuthenticationButtonStyle.WHITE : AppleAuthentication.AppleAuthenticationButtonStyle.BLACK
+              }
               cornerRadius={27}
               style={{ height: 54, opacity: busy ? 0.4 : 1 }}
               onPress={busy ? () => {} : onApple}
             />
           )}
+          {googleAvailable && <Button label="Continue with Google" variant="outline" leading={<GoogleMark />} onPress={onGoogle} disabled={busy} fullWidth />}
           <Button
             label="Continue with email"
-            variant={appleAvailable ? 'secondary' : 'primary'}
+            variant={appleAvailable || googleAvailable ? 'secondary' : 'primary'}
             onPress={() => setStep('email')}
             disabled={busy}
             fullWidth
@@ -114,7 +136,15 @@ export default function SignInSheet() {
             error={error}
           />
           <Button label="Send code" onPress={onSendCode} loading={busy} disabled={!email.includes('@')} fullWidth />
-          <Button label="Back" variant="link" size="sm" onPress={() => { setError(null); setStep('choose'); }} />
+          <Button
+            label="Back"
+            variant="link"
+            size="sm"
+            onPress={() => {
+              setError(null);
+              setStep('choose');
+            }}
+          />
         </View>
       ) : (
         <View style={{ gap: 12, marginTop: 8 }}>
@@ -134,7 +164,16 @@ export default function SignInSheet() {
           <Button label="Verify" onPress={() => onVerify()} loading={busy} disabled={code.length !== CODE_LENGTH} fullWidth />
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 24 }}>
             <Button label="Resend code" variant="link" size="sm" disabled={busy} onPress={() => run(() => sendEmailCode(email))} />
-            <Button label="Change email" variant="link" size="sm" onPress={() => { setCode(''); setError(null); setStep('email'); }} />
+            <Button
+              label="Change email"
+              variant="link"
+              size="sm"
+              onPress={() => {
+                setCode('');
+                setError(null);
+                setStep('email');
+              }}
+            />
           </View>
         </View>
       )}

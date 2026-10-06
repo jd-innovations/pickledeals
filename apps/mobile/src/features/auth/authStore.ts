@@ -33,8 +33,7 @@ type AuthState = {
   setProfile: (profile: MyProfile) => void;
 };
 
-const needsPublicName = (intent: AuthIntent, profile: MyProfile | null) =>
-  requiresPublicName(intent) && profile?.nameSource !== 'provided';
+const needsPublicName = (intent: AuthIntent, profile: MyProfile | null) => requiresPublicName(intent) && profile?.nameSource !== 'provided';
 
 function finish(pending: PendingIntent | null) {
   if (router.canGoBack()) router.back();

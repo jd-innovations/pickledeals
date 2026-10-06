@@ -8,6 +8,7 @@ import { fetchProfile, updateDisplayName } from '@/features/profile/api';
 import { requireSupabase } from '@/lib/supabase';
 
 import { useAuth } from './authStore';
+import { forgetGoogle, googleCredential, googleSignInConfigured } from './google';
 
 export class AuthCanceled extends Error {}
 
@@ -48,6 +49,21 @@ export async function signInWithApple(): Promise<void> {
   useAuth.getState().setProfile(profile);
 }
 
+export const isGoogleSignInAvailable = () => googleSignInConfigured;
+
+/** Native Sign in with Google → Supabase session. Google's name becomes the public name if none was chosen. */
+export async function signInWithGoogle(): Promise<void> {
+  const credential = await googleCredential();
+  if (!credential) throw new AuthCanceled();
+  const { data, error } = await requireSupabase().auth.signInWithIdToken({ provider: 'google', token: credential.idToken });
+  if (error) throw error;
+
+  const googleName = publicNameFromParts(credential.givenName, credential.familyName);
+  let profile = await fetchProfile(data.user.id);
+  if (googleName && profile.nameSource === 'generated') profile = await updateDisplayName(data.user.id, googleName);
+  useAuth.getState().setProfile(profile);
+}
+
 export async function sendEmailCode(email: string): Promise<void> {
   const { error } = await requireSupabase().auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: true } });
   if (error) throw error;
@@ -62,11 +78,12 @@ export async function verifyEmailCode(email: string, code: string): Promise<void
 export async function signOut(): Promise<void> {
   const { error } = await requireSupabase().auth.signOut();
   if (error) throw error;
+  await forgetGoogle();
 }
 
 /**
  * Permanently deletes the account (§5). Apple accounts re-authenticate first so the server can
- * revoke the Apple token, as App Store review requires.
+ * revoke the Apple token, as App Store review requires. Google access is revoked on the device.
  */
 export async function deleteAccount(): Promise<void> {
   const client = requireSupabase();
@@ -85,8 +102,9 @@ export async function deleteAccount(): Promise<void> {
     const code = error instanceof FunctionsHttpError ? ((await error.context.json().catch(() => ({}))) as { error?: string }).error : undefined;
     throw new Error(DELETE_ERRORS[code ?? ''] ?? 'We couldn’t delete your account. Nothing was removed — please try again.');
   }
-  // The server session is gone; clear the local one.
+  // The server session is gone; clear the local one, and the app's Google grant if it had one.
   await client.auth.signOut({ scope: 'local' });
+  await forgetGoogle(true);
 }
 
 const DELETE_ERRORS: Record<string, string> = {

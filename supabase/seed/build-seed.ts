@@ -249,14 +249,27 @@ end;
 $admin$;
 `;
 
-const target = join(here, '..', 'seed.sql');
+// Hosted projects (production) get the catalog only: no fictional retailers, prices, sellers,
+// listings, dev admin or local dispatch settings.
+const productionSql =
+  sql.slice(0, sql.indexOf('-- DEVELOPMENT RETAIL DATA')).replace(
+    '-- Development catalog: real brands and models;',
+    '-- Production catalog (catalog only; run once on a new hosted project): real brands and models;',
+  ).trimEnd() + '\n';
+
+const outputs = [
+  { target: join(here, '..', 'seed.sql'), sql },
+  { target: join(here, 'production.sql'), sql: productionSql },
+];
 if (process.argv.includes('--check')) {
-  if (readFileSync(target, 'utf8') !== sql) {
-    console.error('supabase/seed.sql is stale. Run `npm run catalog:seed`.');
-    process.exit(1);
+  for (const o of outputs) {
+    if (readFileSync(o.target, 'utf8') !== o.sql) {
+      console.error(`${o.target} is stale. Run \`npm run catalog:seed\`.`);
+      process.exit(1);
+    }
   }
-  console.log('seed.sql is up to date');
+  console.log('seed.sql and seed/production.sql are up to date');
 } else {
-  writeFileSync(target, sql);
-  console.log(`wrote seed.sql: ${payload.products.length} products, ${payload.brands.length} brands, ${payload.categories.length} categories`);
+  for (const o of outputs) writeFileSync(o.target, o.sql);
+  console.log(`wrote seed.sql and seed/production.sql: ${payload.products.length} products, ${payload.brands.length} brands, ${payload.categories.length} categories`);
 }

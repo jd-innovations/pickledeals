@@ -17,7 +17,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
 ## Working agreement with the user
 - Work one phase at a time. Implement, validate, commit and push, then **report and wait for a go-ahead** before starting the next phase.
-- **Never call Supabase `create_project`**; projects cost money and the user doesn't want to pay. Everything runs on local Docker.
+- **Hosted Supabase project `pickledeals`** (ref `tadxbjlhknukpyxbqrpt`, us-east-1) was created on Oct 6, 2026 with the user's explicit approval ($10/month on their Pro org). Setup steps and secrets checklist: `docs/HOSTED_SETUP.md`. Don't create further projects or branches without asking; local Docker remains the dev environment.
 - Commits are made from Bash with a heredoc (`git commit -F -`); PowerShell mangles quotes.
 - Before calling work done:
   - `npm run typecheck && npm run lint && npm test`

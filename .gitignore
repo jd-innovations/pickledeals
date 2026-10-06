@@ -16,3 +16,6 @@ supabase/.branches
 supabase/.temp
 # claude local settings
 .claude/settings.local.json
+
+# Hosted Supabase database password (docs/HOSTED_SETUP.md)
+.env.hosted

@@ -109,7 +109,7 @@ export function PriceDropRow({ row, onPress, last }: { row: PriceDropRowData; on
           <Text variant="caption" weight="600" tone="secondary" numberOfLines={1}>
             {row.brand}
           </Text>
-          <Text variant="subhead" weight="700" numberOfLines={1}>
+          <Text variant="subhead" weight="700" numberOfLines={2}>
             {row.name}
           </Text>
           <Text variant="caption" weight="400" tone="secondary" numberOfLines={1}>

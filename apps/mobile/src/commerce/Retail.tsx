@@ -187,7 +187,7 @@ export function StickyDealBar({
   const insets = useSafeAreaInsets();
   return (
     <View style={[styles.bar, { backgroundColor: colors.glass, borderTopColor: colors.separator, paddingBottom: Math.max(insets.bottom, 12) }]}>
-      <View accessible style={{ flex: 1, gap: 1 }}>
+      <View accessible style={{ flex: 1, gap: 1, minWidth: 96 }}>
         {typeof title === 'string' ? (
           <Text variant="headline" weight="700" numeric>
             {title}
@@ -196,7 +196,7 @@ export function StickyDealBar({
           title
         )}
         {subtitle ? (
-          <Text variant="caption" weight="400" tone="secondary" numberOfLines={1}>
+          <Text variant="caption" weight="400" tone="secondary" numberOfLines={2}>
             {subtitle}
           </Text>
         ) : null}

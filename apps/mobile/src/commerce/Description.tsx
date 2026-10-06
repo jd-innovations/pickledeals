@@ -34,7 +34,7 @@ export function ProductDescription({ blocks, title = 'About' }: { blocks: Descri
   const shown = long && !open ? blocks.slice(0, PREVIEW_BLOCKS) : blocks;
   return (
     <View style={{ gap: 10 }}>
-      <Text variant="headline" weight="700" accessibilityRole="header">
+      <Text variant="title2" accessibilityRole="header">
         {title}
       </Text>
       {shown.map((b, i) =>

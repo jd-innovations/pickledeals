@@ -8,6 +8,7 @@ import {
   detectDelimiter,
   discountLinkUrl,
   feedRecords,
+  imageHasAlpha,
   fromPublicJson,
   fromStorefront,
   shopifyRecords,
@@ -417,5 +418,29 @@ describe('shopifyRecords, store content', () => {
         { url: 'https://cdn.shopify.com/b.jpg', width: null, height: null, alt: null },
       ],
     });
+  });
+});
+
+describe('imageHasAlpha', () => {
+  const png = (colorType: number) => {
+    const b = new Uint8Array(33);
+    b.set([0x89, 0x50, 0x4e, 0x47], 0);
+    b[25] = colorType;
+    return b;
+  };
+  it('detects PNGs with an alpha channel', () => {
+    expect(imageHasAlpha(png(6))).toBe(true);
+    expect(imageHasAlpha(png(4))).toBe(true);
+    expect(imageHasAlpha(png(2))).toBe(false);
+  });
+  it('reads the WebP alpha flag and never flags JPEG', () => {
+    const webp = new Uint8Array(40);
+    webp.set([...'RIFF'].map((c) => c.charCodeAt(0)), 0);
+    webp.set([...'WEBPVP8X'].map((c) => c.charCodeAt(0)), 8);
+    webp[20] = 0x10;
+    expect(imageHasAlpha(webp)).toBe(true);
+    webp[20] = 0;
+    expect(imageHasAlpha(webp)).toBe(false);
+    expect(imageHasAlpha(new Uint8Array([0xff, 0xd8, 0xff, 0xe0, ...new Array(40).fill(0)]))).toBe(false);
   });
 });

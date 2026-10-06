@@ -12,7 +12,7 @@ import { AreaMap } from '@/features/map';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { openProduct } from '@/features/catalog/components';
-import { Button, ErrorState, Icon, IconButton, Skeleton, Text } from '@/ui';
+import { Button, DetailTable, ErrorState, Icon, IconButton, Skeleton, Text } from '@/ui';
 
 import { listingImageUrl, type ListingDetail } from '../api';
 import { conditionLabel, formatDistance, useMarketNav } from '../components';
@@ -200,21 +200,15 @@ export default function ListingScreen() {
             )}
 
             <View>
-              {[
-                ['Product', l.product ? `${l.product.brand} ${l.product.name}` : 'Not in the catalog'],
-                ...(variantLabel ? [['Version', variantLabel]] : []),
-                ['Category', l.category.name],
-                ...specs.map(([k, v]) => [humanize(k), String(v)]),
-              ].map(([k, v]) => (
-                <View key={k} style={[styles.detail, { borderBottomColor: colors.separator }]}>
-                  <Text variant="subhead" weight="400" tone="secondary">
-                    {k}
-                  </Text>
-                  <Text variant="subhead" weight="600" style={{ flexShrink: 1, textAlign: 'right' }}>
-                    {v}
-                  </Text>
-                </View>
-              ))}
+              <DetailTable
+                rows={[
+                  { label: 'Product', value: l.product ? `${l.product.brand} ${l.product.name}` : 'Not in the catalog' },
+                  ...(variantLabel ? [{ label: 'Version', value: variantLabel }] : []),
+                  { label: 'Category', value: l.category.name },
+                  ...specs.map(([k, v]) => ({ label: humanize(k), value: String(v) })),
+                ]}
+              />
+              <View style={{ height: 1, backgroundColor: colors.separator }} />
               <Text variant="footnote" tone="secondary" style={{ paddingTop: 10, lineHeight: 19 }}>
                 {cond?.label}: {cond?.description} PickleDeals doesn’t process payment — agree on price here, then pay and hand over however you both prefer.
               </Text>
@@ -278,6 +272,5 @@ const styles = StyleSheet.create({
   topBar: { position: 'absolute', left: 16, right: 16, flexDirection: 'row', justifyContent: 'space-between' },
   bottom: { paddingTop: 12, paddingHorizontal: 16, flexDirection: 'row', gap: 10, borderTopWidth: StyleSheet.hairlineWidth },
   avatar: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
-  detail: { flexDirection: 'row', justifyContent: 'space-between', gap: 16, paddingVertical: 11, borderBottomWidth: 1 },
   delivery: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 16 },
 });

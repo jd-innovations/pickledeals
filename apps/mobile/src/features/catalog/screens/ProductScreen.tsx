@@ -37,7 +37,7 @@ import {
   shipsFromLabel,
 } from '@/features/offers/format';
 import { openDeal, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
-import { Button, Chip, ChipRow, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
+import { Button, Chip, ChipRow, DetailTable, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
 
 import { LoadError, openBrand, openCategory, openProduct, useGridCardWidth } from '../components';
 import { galleryImages, productImage, useCategory, useProduct } from '../hooks';
@@ -304,12 +304,11 @@ export default function ProductScreen() {
             )}
 
             {specs.length > 0 && (
-              <View style={{ paddingHorizontal: 16 }}>
-                <Group label="Specs">
-                  {specs.map(([k, v], i) => (
-                    <ListRow key={k} title={humanize(k)} value={v} last={i === specs.length - 1} />
-                  ))}
-                </Group>
+              <View style={{ paddingHorizontal: 16, gap: 4 }}>
+                <Text variant="title2" accessibilityRole="header">
+                  Specs
+                </Text>
+                <DetailTable rows={specs.map(([k, v]) => ({ label: humanize(k), value: String(v) }))} />
               </View>
             )}
 

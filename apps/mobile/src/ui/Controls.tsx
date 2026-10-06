@@ -196,7 +196,7 @@ export function ListRow({
           {title}
         </Text>
         {value ? (
-          <Text variant="subhead" tone="secondary" weight="400" numeric>
+          <Text variant="subhead" tone="secondary" weight="400" numeric numberOfLines={2} style={{ flexShrink: 1, maxWidth: '60%', textAlign: 'right' }}>
             {value}
           </Text>
         ) : null}

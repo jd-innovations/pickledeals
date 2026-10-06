@@ -125,12 +125,12 @@ export function DealQualityMeter({ quality, detail }: { quality: DealQuality; de
   const level = DEAL_QUALITY.indexOf(quality);
   return (
     <View accessible accessibilityLabel={spoken(QUALITY_LABEL[quality], detail && speakable(detail), `level ${level + 1} of 5`)} style={{ gap: 8 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Text variant="headline" weight="700">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline', columnGap: 12, rowGap: 2 }}>
+        <Text variant="headline" weight="700" style={{ flexShrink: 0 }}>
           {QUALITY_LABEL[quality]}
         </Text>
         {detail && (
-          <Text variant="footnote" tone="secondary" numeric>
+          <Text variant="footnote" tone="secondary" numeric style={{ flexShrink: 1 }}>
             {detail}
           </Text>
         )}

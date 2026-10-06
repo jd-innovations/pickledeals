@@ -22,6 +22,7 @@ import {
   batches,
   feedRecords,
   fromPublicJson,
+  imageHasAlpha,
   fromStorefront,
   SHOPIFY_PRODUCTS_QUERY,
   shopifyRecords,
@@ -253,7 +254,8 @@ async function syncStoreContent(db: SupabaseClient, source: Source, sourceId: st
     const c = contents.get(p.content_ref);
     if (!c) continue; // not in this run (e.g. sold out): keep the last synced content
     const images = c.images ?? [];
-    const hash = await sha256(JSON.stringify([c.description ?? [], c.specs ?? {}, images.map((i) => i.url)]));
+    // "v2": cutout detection; bumping it re-syncs every linked product once.
+    const hash = await sha256(JSON.stringify(['v2', c.description ?? [], c.specs ?? {}, images.map((i) => i.url)]));
     if (hash === p.content_hash) continue;
     try {
       const { data: existing } = await db
@@ -267,7 +269,10 @@ async function syncStoreContent(db: SupabaseClient, source: Source, sourceId: st
         const sort = 100 + index; // after any curated images
         const kept = have.get(img.url);
         if (kept) {
-          await db.from('product_images').update({ sort }).eq('id', kept.id);
+          // Re-read our stored copy so earlier imports get the cutout decision too.
+          const { data: file } = await db.storage.from('catalog').download(kept.storage_path as string);
+          const update = file ? { sort, is_cutout: imageHasAlpha(new Uint8Array(await file.arrayBuffer())) } : { sort };
+          await db.from('product_images').update(update).eq('id', kept.id);
           continue;
         }
         const res = await fetch(`${img.url}${img.url.includes('?') ? '&' : '?'}width=${IMAGE_WIDTH}`);
@@ -288,7 +293,8 @@ async function syncStoreContent(db: SupabaseClient, source: Source, sourceId: st
           sort,
           width: img.width ? Math.round(img.width * scale) : null,
           height: img.height ? Math.round(img.height * scale) : null,
-          is_cutout: false,
+          // Transparent product shots sit whole on the tinted tile; opaque photos fill it (D8).
+          is_cutout: imageHasAlpha(body),
           source: 'retailer_feed',
           source_url: img.url,
           license_note: `Store content synced from ${source.name}; the store owner holds the rights.`,

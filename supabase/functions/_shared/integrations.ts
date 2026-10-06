@@ -701,6 +701,22 @@ export function specsFromDescription(blocks: DescriptionBlock[]): Record<string,
   return specs;
 }
 
+/**
+ * Whether an image file can have transparent pixels (PNG with an alpha channel, WebP with alpha).
+ * Store product shots on a transparent background are shown as cutouts (whole item on the tinted
+ * tile), not cropped to fill it. JPEG never has alpha.
+ */
+export function imageHasAlpha(bytes: Uint8Array): boolean {
+  const ascii = (from: number, to: number) => String.fromCharCode(...bytes.subarray(from, to));
+  if (bytes.length > 25 && ascii(1, 4) === 'PNG') return bytes[25] === 4 || bytes[25] === 6; // grey+alpha, RGBA
+  if (bytes.length > 30 && ascii(0, 4) === 'RIFF' && ascii(8, 12) === 'WEBP') {
+    const chunk = ascii(12, 16);
+    if (chunk === 'VP8X') return (bytes[20]! & 0x10) !== 0;
+    if (chunk === 'VP8L') return (bytes[24]! & 0x10) !== 0; // alpha_is_used bit of the VP8L header
+  }
+  return false;
+}
+
 // --- Discount links (go function) ---------------------------------------------------------------------
 
 /**

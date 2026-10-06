@@ -5,3 +5,4 @@ export { Chip, ChipRow, Group, IconButton, ListRow, SearchField, SegmentedContro
 export { CardSkeleton, EmptyState, ErrorState, Skeleton } from './States';
 export { TextField } from './TextField';
 export { SectionHeader } from './SectionHeader';
+export { DetailTable } from './DetailTable';

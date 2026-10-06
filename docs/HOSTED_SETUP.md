@@ -43,9 +43,18 @@ select vault.create_secret('<service role key>', 'dispatch_key');
 ```
 
 ## 4. Before testers sign in
-- **Email delivery:** Supabase's built-in email only sends a few messages per hour and is meant for
-  testing. Set up custom SMTP (e.g. Resend, Postmark) under Authentication → Emails → SMTP before
-  TestFlight, or sign-in codes will stop arriving.
+- **Email delivery (Resend; the user has a paid plan):** Supabase's built-in email only sends a few
+  messages per hour, so sign-in codes go through Resend.
+  1. Resend → Domains → add the sending domain (e.g. `mail.<your domain>`) and add its DNS records
+     at your registrar until Resend shows it verified.
+  2. Resend → API Keys → create a key with **sending access** for that domain (keep it out of chat).
+  3. Supabase → Authentication → Emails → **SMTP Settings** → enable custom SMTP:
+     host `smtp.resend.com`, port `465`, username `resend`, password = the API key,
+     sender email `no-reply@<sending domain>`, sender name `PickleDeals`.
+  4. Supabase → Authentication → **Rate Limits**: raise "emails sent per hour" (the low default only
+     applies to the built-in sender).
+  5. Send yourself a code from the app to confirm; the email uses the project's OTP template, pushed
+     with `supabase config push`.
 - **Sign in with Apple:** Authentication → Providers → Apple: the app's bundle id `app.pickledeals` as
   client id (still blocked by Apple's "Sign Up Not Complete" issue; see the handoff).
 - **First admin:** sign in once in the app or admin, then grant the role in the SQL editor:

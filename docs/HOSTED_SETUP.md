@@ -53,7 +53,9 @@ select vault.create_secret('<service role key>', 'dispatch_key');
 - **Shopify source:** admin → Integrations → Pickleball Grip Doctor → set shipping, turn on.
 
 ## 5. App builds
-- `apps/mobile` gets the hosted URL and publishable key for `preview`/`production` EAS profiles
-  (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY` as EAS environment variables).
-- iOS simulator build (`simulator` profile) for cloud UI checks (Appetize) uses the hosted project,
-  so no tunnels are needed.
+- `apps/mobile/eas.json`: the `preview` and `production` profiles point at the hosted project
+  (`EXPO_PUBLIC_SUPABASE_URL` and the publishable key, both public values). The `development`
+  profile keeps using the PC's local stack via `apps/mobile/.env.local`.
+- `simulator` profile: an iOS Simulator build of the preview app (for cloud simulators such as
+  Appetize), on the `preview` channel, so UI fixes can ship with `eas update --channel preview`
+  without rebuilding.

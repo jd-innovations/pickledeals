@@ -40,6 +40,21 @@
         "--strictPort"
       ],
       "port": 5174
+    },
+    {
+      "name": "admin-hosted",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev:hosted",
+        "-w",
+        "@pickledeals/admin",
+        "--",
+        "--port",
+        "5175",
+        "--strictPort"
+      ],
+      "port": 5175
     }
   ]
 }

@@ -11,6 +11,9 @@ for (const [name, value] of Object.entries(palette.light)) {
   root.style.setProperty(`--${name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`, value);
 }
 
+// `npm run admin:hosted` edits live data: say so in the tab.
+if (import.meta.env.MODE === 'hosted') document.title = `HOSTED · ${document.title}`;
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

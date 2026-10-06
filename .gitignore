@@ -19,3 +19,4 @@ supabase/.temp
 
 # Hosted Supabase database password (docs/HOSTED_SETUP.md)
 .env.hosted
+!apps/admin/.env.hosted

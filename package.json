@@ -9,6 +9,7 @@
   "scripts": {
     "mobile": "npm run start --workspace @pickledeals/mobile",
     "admin": "npm run dev --workspace @pickledeals/admin",
+    "admin:hosted": "npm run dev:hosted --workspace @pickledeals/admin",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",

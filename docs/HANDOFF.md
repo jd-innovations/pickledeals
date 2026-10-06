@@ -42,8 +42,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 3. **Preview build** for the iPhone: `eas build --profile preview --platform ios` (from `apps/mobile`; internal
    distribution, hosted backend). The user signs in with an email code; then grant admin on hosted:
    `insert into public.user_roles (user_id, role) select id, 'admin' from auth.users where email = '<their email>';`
-4. **Admin on hosted:** `apps/admin` runs against local by default; to manage hosted data, point it at the
-   hosted URL + publishable key (e.g. a git-ignored `apps/admin/.env.hosted`/Vite mode) — not built yet.
+4. **Admin on hosted:** done. `npm run admin:hosted` (or launch config `admin-hosted`, :5175) runs the admin
+   against hosted via Vite mode `hosted` (`apps/admin/.env.hosted`, public values, committed); the tab title
+   starts with "HOSTED". Usable once the user has the admin role on hosted (step 3) and email codes send (step 1).
 5. **Sign in with Google:** built, off. Needs the user's two Google Cloud client IDs (iOS `app.pickledeals` +
    Web; public, can be shared in chat) → add to `eas.json` + `apps/mobile/.env.local`, enable the provider
    (hosted dashboard with the secret + Skip nonce check; local `config.toml`), new development + preview builds.

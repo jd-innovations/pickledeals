@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (Phase 13 started, Oct 4, 2026)
+# PickleDeals — session handoff (Oct 6, 2026: hosted backend setup in progress)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -27,6 +27,31 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - In PowerShell use `npm.cmd` / `npx.cmd`, because `npm.ps1` is blocked.
 - Add mobile packages with `npx expo install`, and check the SDK 57 docs before using an Expo/RN API.
 
+## Where things stand (Oct 6, 2026) — start here
+- **Next up: push the hosted backend.** The user runs `npx supabase login` and saves the hosted DB
+  password in `supabase/.env.hosted` (`SUPABASE_DB_PASSWORD=…`, git-ignored). Then Claude, per
+  `docs/HOSTED_SETUP.md` §2: `supabase link --project-ref tadxbjlhknukpyxbqrpt` (password from that
+  file), `supabase db push`, `supabase config push`, load `supabase/seed/production.sql` once (catalog
+  only), `supabase functions deploy`. Then give the user the dashboard checklist (§3–4: Edge Function
+  secrets, Vault `project_url`/`dispatch_key`, Resend SMTP, first admin role). Never put secrets in chat.
+  Don't push migrations through the MCP by pasting files (too error-prone); use the CLI.
+- **Hosted project** `pickledeals` (`tadxbjlhknukpyxbqrpt`, us-east-1, $10/mo on the user's Pro org) exists and
+  is empty. `apps/mobile/eas.json` preview/production point at it (publishable key); `simulator` profile
+  added. An iOS simulator build exists (EAS build 90748ede…, artifact on expo.dev) for Appetize later.
+- **Email:** the user has a **paid Resend plan**; sign-in codes go through Resend SMTP (steps in
+  HOSTED_SETUP §4). Open question: which sending domain.
+- **Sign in with Google is built but off** until the user creates Google Cloud OAuth clients (iOS
+  `app.pickledeals` + Web) and shares the two client IDs (public); the secret goes only in the Supabase
+  dashboard. Then: IDs into `eas.json`/`.env.local`, enable the provider (hosted + local config.toml),
+  new development + preview builds (native module).
+- **Builds:** the user has a **paid Expo plan**; preview builds on the iPhone are the preferred way to test
+  once the hosted DB + sign-in work.
+- **UI audit (Oct 6):** fixes 1–6 shipped (specs DetailTable, store photos as cutouts, quality meter,
+  sticky bar, price-drop names, ListRow). Not yet audited: signed-in screens (inbox, chat, offers, my
+  listings, notification settings) and the map. The user has more cosmetic notes from the phone to share.
+- **Device servers** after a PC restart: Docker Desktop, `npx supabase start`, `npm run device:lan`, then the
+  "PickleDeals Metro" and "PickleDeals Edge Functions" console windows (Start-Process).
+
 ## Status
 - Phases 0–12 are done and pushed. Since Phase 12 (all on `main`):
   - **Price tracking excludes Amazon** (decision, see Open items).
@@ -43,7 +68,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - **Shopify direct-store feed (Oct 5), live locally against the real store**: Pickleball Grip Doctor is the seller of record (PickleDeals never sells). Storefront API token in `supabase/functions/.env` (the "PickleDeals" Headless storefront); source `shopify-gripdoctor` on, mode storefront, every 30 min. Grip Doctor codes apply at checkout via Shopify discount links; Grip Doctor wins exact ties (disclosed); sold-out and pre-order items are hidden. Products show the store's full description (About section), images (swipeable gallery) and auto-read specs, kept in sync. Details, decisions and open questions: `docs/SHOPIFY_PLAN.md`.
   - Local test data the user created: Engage X2 Elongated (offer hidden: pre-order) and Engage Pursuit Pro1 Innovation 12.7mm (published, with store content). They make `02_catalog` test 2 (seed count 149) fail locally until a `db reset`; CI is unaffected.
   - Device servers now run in their own console windows (Start-Process): "PickleDeals Metro" and "PickleDeals Edge Functions", so they don't hit the 2-hour background-task limit. The Terminal panel's shell integration failed after a restart.
-  - Still waiting on the user: the three Phase 13 decisions (hosted Supabase for TestFlight, analytics choice, legal page hosting), the Phase 13 go-ahead for the rest of 13a and 13d/13e, and the questions at the end of `docs/APP_STORE.md`.
+  - Still waiting on the user: analytics choice, legal page hosting, the Phase 13 go-ahead for the rest of 13a and 13d/13e, and the questions at the end of `docs/APP_STORE.md`. (Hosted Supabase: decided Oct 6.)
 - **Agreed order from here** (user, Oct 4):
   1. Finish the remaining on-device checks (list below), including the dark-mode toggle fix.
   2. **Phase 13, hardening and launch** (accessibility, performance, offline cache, analytics, App Store review prep, TestFlight). Propose the plan first and wait for a go-ahead.

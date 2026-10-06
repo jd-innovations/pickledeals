@@ -1,4 +1,4 @@
-# PickleDeals — session handoff (Oct 6, 2026: hosted backend setup in progress)
+# PickleDeals — session handoff (Oct 6, 2026: hosted backend live, preview build next)
 
 Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
@@ -28,32 +28,51 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - Add mobile packages with `npx expo install`, and check the SDK 57 docs before using an Expo/RN API.
 
 ## Where things stand (Oct 6, 2026) — start here
-- **Hosted backend pushed (Oct 6):** CLI linked (`supabase/.temp`, password in git-ignored
-  `supabase/.env.hosted`); all 24 migrations applied; `config push` (6-digit OTP, templates, access-token
-  hook, Apple on, redirect URLs); `supabase/seed/production.sql` loaded (149 products, 32 brands, 12
-  categories; 1 retailer: Grip Doctor); 4 functions deployed; Vault `project_url` set. Smoke tests pass.
-  Security advisor: definer views/functions are by design; follow-up: `pg_net` lives in `public`.
-  To run SQL against hosted: `docker exec -i -e PGPASSWORD=… supabase_db_pickledeals psql
-  "postgresql://postgres.tadxbjlhknukpyxbqrpt@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require"`.
-- **Waiting on the user (dashboard):** Edge Function secrets (Shopify domain + token, later Apple .p8),
-  Vault `dispatch_key` (service role key), Resend SMTP + rate limit, then sign in once and grant admin.
-  After that: first **preview build** on the iPhone.
-- **Hosted project** `pickledeals` (`tadxbjlhknukpyxbqrpt`, us-east-1, $10/mo on the user's Pro org) exists and
-  is empty. `apps/mobile/eas.json` preview/production point at it (publishable key); `simulator` profile
-  added. An iOS simulator build exists (EAS build 90748ede…, artifact on expo.dev) for Appetize later.
-- **Email:** the user has a **paid Resend plan**; sign-in codes go through Resend SMTP (steps in
-  HOSTED_SETUP §4). Open question: which sending domain.
-- **Sign in with Google is built but off** until the user creates Google Cloud OAuth clients (iOS
-  `app.pickledeals` + Web) and shares the two client IDs (public); the secret goes only in the Supabase
-  dashboard. Then: IDs into `eas.json`/`.env.local`, enable the provider (hosted + local config.toml),
-  new development + preview builds (native module).
-- **Builds:** the user has a **paid Expo plan**; preview builds on the iPhone are the preferred way to test
-  once the hosted DB + sign-in work.
-- **UI audit (Oct 6):** fixes 1–6 shipped (specs DetailTable, store photos as cutouts, quality meter,
-  sticky bar, price-drop names, ListRow). Not yet audited: signed-in screens (inbox, chat, offers, my
-  listings, notification settings) and the map. The user has more cosmetic notes from the phone to share.
-- **Device servers** after a PC restart: Docker Desktop, `npx supabase start`, `npm run device:lan`, then the
-  "PickleDeals Metro" and "PickleDeals Edge Functions" console windows (Start-Process).
+
+### Next steps, in order
+1. **User, in the Supabase dashboard** (project `pickledeals`; secrets never go in chat):
+   - Edge Functions → Secrets: `SHOPIFY_GRIPDOCTOR_DOMAIN`, `SHOPIFY_GRIPDOCTOR_TOKEN` (copied from local
+     `supabase/functions/.env`; the domain may include `https://`, the function strips it).
+   - SQL Editor: `select vault.create_secret('<service role key>', 'dispatch_key');` (`project_url` is already set).
+   - Authentication → Emails → SMTP: Resend (`smtp.resend.com`, 465, user `resend`, password = Resend API
+     key, sender `no-reply@<verified domain>`, name PickleDeals); Authentication → Rate Limits: raise emails/hour.
+2. **Claude, when the user says done:** on the hosted DB, turn the `shopify-gripdoctor` source on (mode
+   `storefront`, shipping per the user) and run one import (`request_ingestion_run` or POST `ingest` with the
+   service key); check the review queue fills. Confirm cron jobs exist (`cron.job`).
+3. **Preview build** for the iPhone: `eas build --profile preview --platform ios` (from `apps/mobile`; internal
+   distribution, hosted backend). The user signs in with an email code; then grant admin on hosted:
+   `insert into public.user_roles (user_id, role) select id, 'admin' from auth.users where email = '<their email>';`
+4. **Admin on hosted:** `apps/admin` runs against local by default; to manage hosted data, point it at the
+   hosted URL + publishable key (e.g. a git-ignored `apps/admin/.env.hosted`/Vite mode) — not built yet.
+5. **Sign in with Google:** built, off. Needs the user's two Google Cloud client IDs (iOS `app.pickledeals` +
+   Web; public, can be shared in chat) → add to `eas.json` + `apps/mobile/.env.local`, enable the provider
+   (hosted dashboard with the secret + Skip nonce check; local `config.toml`), new development + preview builds.
+6. **UI:** audit fixes 1–6 shipped Oct 6. Not yet audited: signed-in screens (inbox, chat, offers, my
+   listings, notification settings) and the map. The user has more cosmetic notes from the phone.
+
+### Facts to know
+- **Hosted project** `pickledeals` (ref `tadxbjlhknukpyxbqrpt`, us-east-1, $10/mo on the user's Pro org;
+  created with explicit approval). Live: 24 migrations, `config push` applied (6-digit OTP, templates,
+  access-token hook, Apple on, redirect URLs), production catalog loaded (149 products, 32 brands, 12
+  categories; 1 retailer: Grip Doctor; no listings/users), 4 functions deployed, Vault `project_url` set.
+  Security advisor: definer views/functions are by design; tidy-up later: `pg_net` sits in `public`.
+- **CLI** is logged in and linked (`supabase/.temp`). The DB password is in git-ignored `supabase/.env.hosted`
+  (`SUPABASE_DB_PASSWORD=…`); export it for `db push`/`link`, never print it. SQL against hosted:
+  `docker exec -i -e PGPASSWORD=… supabase_db_pickledeals psql "postgresql://postgres.tadxbjlhknukpyxbqrpt@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require"`.
+  Push schema changes with the CLI (`db push`), never by pasting migration files into the MCP.
+- **Builds:** paid Expo plan; preview builds are the preferred way to test. `eas.json`: preview/production use
+  the hosted URL + publishable key; `development` uses the PC (`.env.local`); `simulator` = iOS Simulator build
+  of preview (EAS build 90748ede…, for Appetize; UI fixes via `eas update --channel preview`).
+- **Email:** paid Resend plan; open question: which sending domain.
+- **CI:** check the GitHub run after each push (public API:
+  `https://api.github.com/repos/jd-innovations/pickledeals/actions/runs?head_sha=<sha>`); `gh` isn't installed.
+- **Local data** differs from a fresh seed (two Engage products created during Shopify testing), so
+  `02_catalog` test 2 (seed count 149) fails locally until a `db reset`; CI is unaffected.
+- **Device servers** after a PC restart: start Docker Desktop
+  (`C:UsersdhjesAppDataLocalProgramsDockerDesktopDocker Desktop.exe`), `npx supabase start`,
+  `npm run device:lan`, then open the "PickleDeals Metro" (`apps/mobile`: `npx.cmd expo start --dev-client`) and
+  "PickleDeals Edge Functions" (`npx.cmd supabase functions serve --env-file supabase/functions/.env`) console
+  windows with Start-Process (background tasks die after 2 h; the Terminal panel failed after a restart).
 
 ## Status
 - Phases 0–12 are done and pushed. Since Phase 12 (all on `main`):

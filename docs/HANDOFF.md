@@ -40,7 +40,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Accessibility: `packages/shared/src/a11y.ts` (`spoken`, `speakable`, `spokenPrice`, `spokenBadge`). Cards and rows now carry full VoiceOver labels (before, name-only labels hid prices). Controls use `minHeight` so Dynamic Type grows them.
   - `delete-account` now removes `listing-images/{uid}/` and the photos in the user's seller threads.
   - Drafts for review: `docs/legal/PRIVACY_POLICY_DRAFT.md`, `docs/legal/TERMS_DRAFT.md`, plus the checklist `docs/APP_STORE.md` (guidelines, privacy labels, metadata, open questions).
-  - **Shopify direct-store feed built (Oct 5)**: Pickleball Grip Doctor source (off until the user adds the Storefront token), Create product in review, vendor names, Ships from, ownership note, neutral ranking tie-break. Status, dry-run results and open questions: `docs/SHOPIFY_PLAN.md`.
+  - **Shopify direct-store feed (Oct 5), live locally against the real store**: Pickleball Grip Doctor is the seller of record (PickleDeals never sells). Storefront API token in `supabase/functions/.env` (the "PickleDeals" Headless storefront); source `shopify-gripdoctor` on, mode storefront, every 30 min. Grip Doctor codes apply at checkout via Shopify discount links; Grip Doctor wins exact ties (disclosed); sold-out and pre-order items are hidden. Products show the store's full description (About section), images (swipeable gallery) and auto-read specs, kept in sync. Details, decisions and open questions: `docs/SHOPIFY_PLAN.md`.
+  - Local test data the user created: Engage X2 Elongated (offer hidden: pre-order) and Engage Pursuit Pro1 Innovation 12.7mm (published, with store content). They make `02_catalog` test 2 (seed count 149) fail locally until a `db reset`; CI is unaffected.
+  - Device servers now run in their own console windows (Start-Process): "PickleDeals Metro" and "PickleDeals Edge Functions", so they don't hit the 2-hour background-task limit. The Terminal panel's shell integration failed after a restart.
   - Still waiting on the user: the three Phase 13 decisions (hosted Supabase for TestFlight, analytics choice, legal page hosting), the Phase 13 go-ahead for the rest of 13a and 13d/13e, and the questions at the end of `docs/APP_STORE.md`.
 - **Agreed order from here** (user, Oct 4):
   1. Finish the remaining on-device checks (list below), including the dark-mode toggle fix.
@@ -176,6 +178,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - **React Compiler lint:** no `setState` in effects (adjust state during render instead), and use Reanimated `.get()`/`.set()`.
 
 ## Open items
+- **Cosmetic fixes noticed by the user on the phone (Oct 5)**, to tackle later: product page with store images and description. Ask the user for the specifics.
 - **Remaining on-device checks** (checklist in `docs/DEVICE_SETUP.md`):
   - Dark-mode toggles after the `ui/Toggle` fix (knob turns dark when on). The web preview can't show it.
   - The Phase 7 exit criterion: a smooth 500-pin map on the phone (the pin rendering itself is verified).

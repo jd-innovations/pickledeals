@@ -12,7 +12,7 @@ import {
   PriceChart,
   ProductCard,
   ProductDescription,
-  ProductImage,
+  ProductGallery,
   RetailerRow,
   retailerMonogram,
   StickyDealBar,
@@ -40,7 +40,7 @@ import { openDeal, usePriceHistory, useProductOffers } from '@/features/offers/h
 import { Button, Chip, ChipRow, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
 
 import { LoadError, openBrand, openCategory, openProduct, useGridCardWidth } from '../components';
-import { productImage, useCategory, useProduct } from '../hooks';
+import { galleryImages, productImage, useCategory, useProduct } from '../hooks';
 
 const humanize = (key: string) => key.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
 
@@ -112,7 +112,7 @@ export default function ProductScreen() {
         ) : (
           <>
             <View style={{ paddingHorizontal: 16 }}>
-              <ProductImage source={productImage(p)} round={radius.hero} padding={36} />
+              <ProductGallery images={galleryImages(p)} />
             </View>
 
             <View style={{ paddingHorizontal: 16, gap: 6 }}>

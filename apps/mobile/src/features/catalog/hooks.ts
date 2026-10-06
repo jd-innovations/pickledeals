@@ -7,7 +7,18 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { productArt } from '@/commerce/catalogArt';
 import type { ImageSource } from '@/commerce';
 
-import { fetchBrand, fetchBrands, fetchCategories, fetchCategory, fetchProduct, fetchProductSlug, imageUrl, searchCatalog, type ProductSummary } from './api';
+import {
+  fetchBrand,
+  fetchBrands,
+  fetchCategories,
+  fetchCategory,
+  fetchProduct,
+  fetchProductSlug,
+  imageUrl,
+  searchCatalog,
+  type ProductDetail,
+  type ProductSummary,
+} from './api';
 
 const CATALOG_STALE = 5 * 60_000;
 
@@ -54,6 +65,19 @@ export const useProductSlug = (productId: string | undefined) =>
   useQuery({ queryKey: ['catalog', 'slug', productId ?? ''], queryFn: () => fetchProductSlug(productId!), enabled: !!productId, staleTime: Infinity });
 
 /** Licensed catalog image when one exists (D8), otherwise the design's placeholder art. */
+/** Every active image of a product, in order, for the product page gallery (placeholder art when none). */
+export function galleryImages(p: Pick<ProductDetail, 'slug' | 'name' | 'brand' | 'category' | 'image' | 'images'>): ImageSource[] {
+  const alt = `${p.brand.name} ${p.name}`;
+  if (!p.images.length) return [productImage(p)];
+  return p.images.map((img, i) => ({
+    kind: 'remote',
+    uri: imageUrl(img),
+    isCutout: img.isCutout,
+    blurhash: img.blurhash ?? undefined,
+    alt: `${alt}, photo ${i + 1}`,
+  }));
+}
+
 export function productImage(p: Pick<ProductSummary, 'slug' | 'name' | 'brand' | 'category' | 'image'>): ImageSource {
   const alt = `${p.brand.name} ${p.name}`;
   return p.image

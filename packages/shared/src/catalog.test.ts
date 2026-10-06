@@ -9,8 +9,7 @@ describe('parseCsv', () => {
       ['a', 'b'],
       ['x, y', 'say "hi"'],
     ]));
-  it('keeps newlines inside quotes and skips blank lines', () =>
-    expect(parseCsv('a\n"1\n2"\n\n')).toEqual([['a'], ['1\n2']]));
+  it('keeps newlines inside quotes and skips blank lines', () => expect(parseCsv('a\n"1\n2"\n\n')).toEqual([['a'], ['1\n2']]));
 });
 
 describe('dollarsToCents', () => {
@@ -76,6 +75,12 @@ describe('suggestProductName', () => {
       variant: 'Fusion-Sunset / 14 mm',
     });
     expect(suggestProductName('Pickleball Grip Doctor Pro Towel', 'Pickleball Grip Doctor')).toEqual({ name: 'Pro Towel', variant: null });
+    // Grip Doctor's own stock carries a "PGD" tag in the store title.
+    expect(suggestProductName('Agassi Pro V Pickleball Paddle - 16MM PGD', 'JOOLA')).toEqual({ name: 'Agassi Pro V', variant: '16mm' });
+    expect(suggestProductName('Selkirk LABS Project Boomstik® 1776 - Elongated - 16MM PGD', 'Selkirk')).toEqual({
+      name: 'LABS Project Boomstik® 1776 - Elongated',
+      variant: '16mm',
+    });
   });
 
   it('falls back to the title when nothing is left', () => {

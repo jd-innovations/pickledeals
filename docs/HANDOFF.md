@@ -48,6 +48,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   1. Finish the remaining on-device checks (list below), including the dark-mode toggle fix.
   2. **Phase 13, hardening and launch** (accessibility, performance, offline cache, analytics, App Store review prep, TestFlight). Propose the plan first and wait for a go-ahead.
   3. After launch: Amazon (Associates registration of the live app, tagged links, promo-code deals, Creators API once 10 sales/30 days).
+- **Strategy (user, Oct 5):** the initial supply strategy shifts from Amazon to **Shopify Collective through Pickleball Grip Doctor** (its own stock plus curated Collective suppliers), proven working end to end locally. Amazon stays as a fallback and the door stays open: check-price offers today, the Associates tag and Creators API after launch. Affiliate retailers (AvantLink etc.) remain the second tier. Deals on Collective items come from Grip Doctor discount codes.
 - D2 still applies: clients only ever get the snapped geohash-6 (~1 km) cell centre. The one exception is a meet-up spot, which is an exact point but lives only in a private `location_share` message.
 
 ## Local environment

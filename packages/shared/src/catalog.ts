@@ -29,16 +29,24 @@ export function slugify(text: string): string {
 /**
  * A store's product title → a catalog-style name to start from (staff edit it): drops "NEW." /
  * "NEW GRAPHIC." prefixes, the brand, marketing after "|", the variant after " – " and the generic
- * "pickleball paddle" words. "Engage X2 Elongated Pickleball Paddle" → "X2 Elongated".
+ * "pickleball paddle" words and a "PGD" store tag; a trailing thickness becomes the variant.
+ * "Engage X2 Elongated Pickleball Paddle" → "X2 Elongated"; "Agassi Pro V … - 16MM PGD" → "Agassi Pro V", 16mm.
  */
 export function suggestProductName(title: string, brandName?: string | null): { name: string; variant: string | null } {
-  let t = title.replace(/^\s*(new(\s+graphic)?\s*[.!:]\s*)+/i, '');
+  // Pickleball Grip Doctor tags its own stock "PGD" to tell it apart in the store; it isn't part of the product.
+  let t = title.replace(/^\s*(new(\s+graphic)?\s*[.!:]\s*)+/i, '').replace(/[\s-]+PGD\s*$/, '');
   const dash = t.split(/\s+[–—]\s+/);
-  const variant = dash.length > 1 ? dash.pop()!.trim() : null;
+  let variant = dash.length > 1 ? dash.pop()!.trim() : null;
   t = dash.join(' – ').split('|')[0]!;
   if (brandName) t = t.replace(new RegExp(`^\\s*${brandName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i'), '');
+  t = t.replace(/\bpickleball\s+paddle\b/gi, '').replace(/[\s.,-]+$/, '');
+  // A trailing core thickness ("- 16MM", "14.5 mm") is the catalog variant.
+  const thickness = t.match(/[\s-]+(\d{2}(?:\.\d)?)\s?mm$/i);
+  if (thickness && !variant) {
+    variant = `${thickness[1]}mm`;
+    t = t.slice(0, thickness.index);
+  }
   t = t
-    .replace(/\bpickleball\s+paddle\b/gi, '')
     .replace(/[\s.,-]+$/, '')
     .replace(/\s{2,}/g, ' ')
     .trim();

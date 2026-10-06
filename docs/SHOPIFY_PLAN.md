@@ -83,15 +83,20 @@ Status: **Part B built (Oct 5, 2026); waiting for the user's Part A (Shopify tok
 - **Barcodes:** every active Engage item has one (UPC 810957…). Thrive items and most of Grip Doctor's
   own products have none (WrapCore does). Items without barcodes go through review once, then match by SKU/previous match.
 
-## Questions for the user (from the dry run)
-1. Items ending in **"PGD"** (e.g. *Agassi Pro V … 16MM PGD* $249, *Engage X2 … PGD* $219 vs $199.99
-   plain): are these paddles modified by Grip Doctor? If so they're separate products, not the brand's paddle.
-2. **Joola, Selkirk, Holbrook** items and one Engage item have no *Shopify Collective* tag: does Grip
-   Doctor stock and ship these itself? If they're Collective too, the tag is missing in Shopify.
-3. Several items list vendor "Pickleball Grip Doctor" but are other brands (Scorpeus Pro V is JOOLA,
-   Luzz, HEXXO). Fixing the vendor in Shopify makes brand mapping automatic.
-4. The ownership wording "PickleDeals’ owner also owns this store; it’s listed first when prices tie" (lawyer to confirm).
-5. Your shipping rule (Integrations → Settings), e.g. free over $50, otherwise $6.95.
+## Answers (user, Oct 5, 2026)
+1. **"PGD" items are Grip Doctor's own inventory** of regular brand paddles (not modified); "PGD" only
+   tells them apart in the store. Create product drops the tag and turns a trailing thickness into the
+   variant ("Agassi Pro V … - 16MM PGD" → JOOLA "Agassi Pro V", 16mm).
+2. **Joola, Selkirk and Holbrook items are Grip Doctor's own one-offs** (not Collective), so no
+   "Ships from" line, which is how they import today.
+3. **Thrive Pickleball** will be listed once its offering is curated (its items are unlisted/draft now,
+   so nothing reaches the app until then).
+
+## Still open
+1. Several items list vendor "Pickleball Grip Doctor" but are other brands (Scorpeus Pro V is JOOLA,
+   Luzz, HEXXO). Fixing the vendor in Shopify makes brand mapping automatic; otherwise pick the brand in review.
+2. The ownership wording "PickleDeals’ owner also owns this store; it’s listed first when prices tie" (lawyer to confirm).
+3. The shipping rule (Integrations → Settings), currently free.
 
 ## To go live (after Part A)
 1. Put `SHOPIFY_GRIPDOCTOR_DOMAIN` (the .myshopify.com domain) and `SHOPIFY_GRIPDOCTOR_TOKEN` in `supabase/functions/.env`.

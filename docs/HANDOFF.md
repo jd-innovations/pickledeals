@@ -66,6 +66,14 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    overlapping sticky bars; not yet audited: signed-in screens and the map.
 
 ### Facts to know
+- **Auto-create (Oct 7, user decision):** `shopify-gripdoctor` has `config.auto_create = true`. New in-stock store
+  items become published products by themselves (migrations 20261023/24): brand from the vendor (new vendors →
+  new brand, " Pickleball" suffix dropped), category from Shopify Product type else title keywords
+  (`store_category_slug`), tidied name (`store_product_name`), store options (swing weights) → variants of the
+  same product via `content_ref`. No category rule → review queue as before. Admins get a "New product added"
+  notification (Alerts › Activity + push) and a staff log entry (`raw_offer.auto_create` / `auto_variant`).
+  Promo codes are never extended automatically. First auto-created: Flick Weight "Lead 7g - Neon 4 Pack".
+  The `ingest` function now sends `store_title` / `store_variant` (deployed).
 - **Grip Doctor catalog on hosted (Oct 7):** 37 live offers. Added Thrive (8 products; FURY Elongated, FURY YoH 2026
   and Ignite with swing weights as variants) and RESET (3). FURY Gold Limited is out of stock (arrives via review
   when restocked; new swing weights also land in review and need a variant). New store products must be in the

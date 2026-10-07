@@ -24,6 +24,9 @@ export type OfferRecord = {
   /** The store's product this offer belongs to ('shopify-product-123'); content sync key. */
   content_ref?: string;
   product_type?: string;
+  /** The store's own product title and this record's option label ("116"), for auto-created products. */
+  store_title?: string;
+  store_variant?: string;
   description?: DescriptionBlock[];
   specs?: Record<string, string>;
   images?: StoreImage[];
@@ -544,6 +547,8 @@ export function shopifyRecords(
       Object.assign(record, barcodeIdentifier(variants.find((v) => v.barcode)?.barcode ?? null));
       if (shipsFrom) record.ships_from = shipsFrom;
       record.content_ref = `shopify-product-${p.id}`;
+      record.store_title = p.title.slice(0, 200);
+      if (label && multi) record.store_variant = label.slice(0, 60);
       if (p.productType.trim()) record.product_type = p.productType.trim().slice(0, 80);
       if (description.length) record.description = description;
       if (Object.keys(specs).length) record.specs = specs;

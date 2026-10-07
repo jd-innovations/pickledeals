@@ -201,6 +201,7 @@ describe('shopifyRecords', () => {
         upc: '810957038755',
         ships_from: 'EngagePickleball',
         content_ref: 'shopify-product-8001',
+        store_title: 'Engage X2 Elongated Pickleball Paddle',
         product_type: 'Paddle',
       },
     ]);
@@ -234,6 +235,7 @@ describe('shopifyRecords', () => {
       ['variant-1', 'Engage X2 Elongated Pickleball Paddle – 14mm', true, '00012345678905'],
     ]);
     expect(records[0]!.url).toContain('variant=1');
+    expect([records[0]!.store_title, records[0]!.store_variant]).toEqual(['Engage X2 Elongated Pickleball Paddle', '14mm']);
     expect(skipped).toEqual([{ ref: 'variant-2', reason: 'out of stock' }]);
   });
 

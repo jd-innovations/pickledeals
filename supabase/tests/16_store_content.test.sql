@@ -1,6 +1,9 @@
 begin;
 select plan(16);
 
+-- Creating from review; auto-create (on for the store) is covered in 18_store_auto_create.
+update public.ingestion_sources set config = config - 'auto_create' where slug = 'shopify-gripdoctor';
+
 create function pg_temp.act_as(uid uuid, app_role text default null) returns void language sql as $$
   select set_config('request.jwt.claims', json_build_object('sub', uid, 'role', 'authenticated', 'app_role', app_role)::text, true);
   set local role authenticated;

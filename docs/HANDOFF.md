@@ -46,6 +46,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    `pgd-trigger-grip-attachment`; 17 live offers, all with store images. Both HEXXO packs share UPC
    850081191216, so that UPC identifier was removed and they match by store SKU only. New store products will
    still land in the review queue (`npm.cmd run admin:hosted`).
+   **Promo NEWCUSTOMER20 (Oct 6, hosted):** Grip Doctor, 20% off, first order only, every category except
+   Paddles (category targets), no end date; terms "First order only. Not valid on paddles." → 10 live deals.
+   Codes hide after 14 days without re-verification (`verified_at`): re-verify in admin → Promos by ~Oct 20.
 4. **Admin on hosted:** done. `npm run admin:hosted` (or launch config `admin-hosted`, :5175) runs the admin
    against hosted via Vite mode `hosted` (`apps/admin/.env.hosted`, public values, committed); the tab title
    starts with "HOSTED". Usable once the user has the admin role on hosted (step 3) and email codes send (step 1).

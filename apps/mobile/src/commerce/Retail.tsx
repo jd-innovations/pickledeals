@@ -192,6 +192,9 @@ export function retailerMonogram(name: string): string {
     .join('');
 }
 
+/** Extra room under the bar so it doesn't sit flush on the floating tab bar (iOS 26). */
+const BAR_GAP = 10;
+
 /** Bottom bar with the best price and the primary action (Product, Deal detail). */
 export function StickyDealBar({
   title,
@@ -209,7 +212,7 @@ export function StickyDealBar({
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.bar, { backgroundColor: colors.glass, borderTopColor: colors.separator, paddingBottom: Math.max(insets.bottom, 12) }]}>
+    <View style={[styles.bar, { backgroundColor: colors.glass, borderTopColor: colors.separator, paddingBottom: Math.max(insets.bottom, 12) + BAR_GAP }]}>
       <View accessible style={{ flex: 1, gap: 1, minWidth: 96 }}>
         {typeof title === 'string' ? (
           <Text variant="headline" weight="700" numeric>

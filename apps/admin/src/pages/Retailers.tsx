@@ -11,11 +11,13 @@ type Retailer = {
   domain: string;
   price_display_default: 'show' | 'check_price';
   tracking_excluded: boolean;
+  /** Shown under prices in the app (shipping itself is settled at the store's checkout). */
+  shipping_policy: string | null;
   is_active: boolean;
 };
 type Affiliate = { retailer_id: string; network: string; tag_template: string | null; link_template: string | null; is_active: boolean };
 
-const EMPTY: Retailer = { id: '', slug: '', name: '', kind: 'retailer', domain: '', price_display_default: 'show', tracking_excluded: false, is_active: true };
+const EMPTY: Retailer = { id: '', slug: '', name: '', kind: 'retailer', domain: '', price_display_default: 'show', tracking_excluded: false, shipping_policy: null, is_active: true };
 
 /**
  * Retailers. "Check price" retailers (D1) never show a number in the app; only an approved API
@@ -29,7 +31,7 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
   const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);
 
   const load = useCallback(async () => {
-    const { data, error } = await supabase.from('retailers').select('id, slug, name, kind, domain, price_display_default, tracking_excluded, is_active').order('name');
+    const { data, error } = await supabase.from('retailers').select('id, slug, name, kind, domain, price_display_default, tracking_excluded, shipping_policy, is_active').order('name');
     if (error) setMessage({ error: true, text: error.message });
     setRows(data ?? []);
     if (role === 'admin') {
@@ -45,8 +47,10 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
     const isNew = !r.id;
     const slug = isNew ? r.slug || slugify(r.name) : r.slug;
     const domain = r.domain.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/.*$/, '');
+    if ((r.shipping_policy?.trim().length ?? 0) > 80) return setMessage({ error: true, text: 'Keep the shipping policy under 80 characters.' });
     if (!r.name.trim() || !SLUG_PATTERN.test(slug) || !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain)) return setMessage({ error: true, text: 'Name, slug and a domain like joola.com are required.' });
-    const values = { name: r.name.trim(), kind: r.kind, domain, price_display_default: r.price_display_default, tracking_excluded: r.tracking_excluded, is_active: r.is_active };
+    const values = { name: r.name.trim(), kind: r.kind, domain, price_display_default: r.price_display_default, tracking_excluded: r.tracking_excluded,
+      shipping_policy: r.shipping_policy?.trim() || null, is_active: r.is_active };
     const { error } = isNew ? await supabase.from('retailers').insert({ ...values, slug }) : await supabase.from('retailers').update(values).eq('id', r.id);
     setMessage(error ? { error: true, text: error.message } : { error: false, text: `Saved ${values.name}.` });
     if (!error) setEditing(null);
@@ -102,6 +106,7 @@ export function RetailersPage({ role }: { role: 'admin' | 'editor' }) {
                 <td>
                   <span className={`pill ${r.price_display_default === 'show' ? 'dark' : ''}`}>{r.price_display_default === 'show' ? 'show' : 'check price'}</span>
                   {r.tracking_excluded && <div className="muted" style={{ fontSize: 12 }}>not price-tracked</div>}
+                  {r.shipping_policy && <div className="muted" style={{ fontSize: 12 }}>{r.shipping_policy}</div>}
                 </td>
                 {role === 'admin' && (
                   <td>
@@ -172,6 +177,15 @@ function RetailerForm({ retailer, onSave, onCancel }: { retailer: Retailer; onSa
             <option value="show">Show prices</option>
             <option value="check_price">Check price (no number, D1)</option>
           </select>
+        </label>
+        <label className="field" title="Shown under prices in the app. Prices never include shipping; the store settles it at checkout.">
+          Shipping policy (shown under prices)
+          <input
+            value={r.shipping_policy ?? ''}
+            maxLength={80}
+            placeholder="Free shipping over $39"
+            onChange={(e) => setR({ ...r, shipping_policy: e.target.value })}
+          />
         </label>
         <label className="row" style={{ alignSelf: 'end' }} title="Amazon’s Associates policies restrict price tracking; amazon.* domains are always excluded.">
           <input

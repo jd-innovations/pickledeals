@@ -156,7 +156,7 @@ export default function DealScreen() {
         <StickyDealBar
           title={checkPrice ? `Check price at ${o.retailer.name}` : formatPrice(o.deliveredCents!)}
           subtitle={checkPrice ? undefined : [o.promo ? 'with code' : o.retailer.name, shippingLabel(o)].join(' · ')}
-          actionLabel={o.promo && !o.codeAutoApplied ? 'Copy code & get deal' : checkPrice ? 'Open' : 'Get deal'}
+          actionLabel={checkPrice ? 'Open' : 'Get deal'}
           onAction={getDeal}
         />
       )}

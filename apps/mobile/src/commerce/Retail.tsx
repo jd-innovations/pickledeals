@@ -202,7 +202,7 @@ export function StickyDealBar({
         ) : null}
       </View>
       {trailing}
-      <Button label={actionLabel} size="md" icon="external" iconPosition="trailing" onPress={onAction} />
+      <Button label={actionLabel} size="md" icon="external" iconPosition="trailing" numberOfLines={1} onPress={onAction} />
     </View>
   );
 }

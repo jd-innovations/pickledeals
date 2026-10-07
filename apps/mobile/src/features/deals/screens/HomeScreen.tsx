@@ -116,7 +116,7 @@ export default function HomeScreen() {
                   ]
                     .filter(Boolean)
                     .join(' · '),
-                  ctaLabel: data.hero.promo ? 'Copy code & get deal' : 'Get deal',
+                  ctaLabel: 'Get deal',
                 }}
                 onPress={() => openDealDetail(data.hero!)}
                 onGetDeal={() => getDeal(data.hero!, 'home_hero')}

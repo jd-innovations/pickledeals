@@ -74,8 +74,8 @@ export function DealHero({ deal, onPress, onGetDeal, onCompare }: { deal: DealHe
         </View>
       </Pressable>
       <View style={{ flexDirection: 'row', gap: 10 }}>
-        <Button label={deal.ctaLabel} icon="external" iconPosition="trailing" size="md" style={{ flex: 1 }} onPress={onGetDeal} />
-        <Button label="Compare" variant="secondary" size="md" style={{ flex: 1 }} onPress={onCompare} />
+        <Button label={deal.ctaLabel} icon="external" iconPosition="trailing" size="md" numberOfLines={1} style={{ flex: 1 }} onPress={onGetDeal} />
+        <Button label="Compare" variant="secondary" size="md" numberOfLines={1} style={{ flex: 1 }} onPress={onCompare} />
       </View>
     </View>
   );

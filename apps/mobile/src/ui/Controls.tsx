@@ -124,7 +124,7 @@ export function SegmentedControl<T extends string>({
               styles.segmentItem,
               on && { backgroundColor: colors.surfaceElevated, shadowColor: '#000', shadowOpacity: scheme === 'dark' ? 0 : 0.12, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
             ]}>
-            <Text variant="subhead" weight="600" tone={on ? 'primary' : 'secondary'}>
+            <Text variant="subhead" weight="600" tone={on ? 'primary' : 'secondary'} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} style={{ paddingHorizontal: 6 }}>
               {o.label}
             </Text>
           </Pressable>

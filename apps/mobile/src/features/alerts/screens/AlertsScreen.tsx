@@ -46,8 +46,8 @@ export default function AlertsScreen() {
             value: 'activity',
             label: unread ? `Activity · ${unread}` : 'Activity',
           },
-          { value: 'alerts', label: 'Price alerts' },
-          { value: 'searches', label: 'Saved searches' },
+          { value: 'alerts', label: 'Alerts' },
+          { value: 'searches', label: 'Searches' },
         ]}
         value={section}
         onChange={setSection}

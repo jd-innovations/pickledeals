@@ -9,7 +9,7 @@ import { useTheme } from '@/design/theme';
 import { productImage, useProduct, useProductSlug } from '@/features/catalog/hooks';
 import { Chip, ErrorState, Group, Icon, ListRow, Skeleton, Text } from '@/ui';
 
-import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, ownershipDisclosure, priceAsOf, shippingLabel, shipsFromLabel } from '../format';
+import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, ownershipDisclosure, priceAsOf, promoDetail, shippingLabel, shipsFromLabel } from '../format';
 import { openDeal, useLivePromos, useOffer } from '../hooks';
 
 /** Deal detail (design: "Deal detail (promo code)"): one offer, its code and what you pay. */
@@ -105,7 +105,7 @@ export default function DealScreen() {
               <View style={{ paddingHorizontal: 16 }}>
                 <PromoCodeRow
                   title={promo?.title ?? `Code ${o.promo.code}`}
-                  detail={[o.retailer.name, promo ? `verified ${formatAgo(promo.verifiedAt)}` : null, promo?.isExclusive ? 'PickleDeals exclusive' : null]
+                  detail={[promoDetail(o, promo), promo ? `verified ${formatAgo(promo.verifiedAt)}` : null, promo?.isExclusive ? 'PickleDeals exclusive' : null]
                     .filter(Boolean)
                     .join(' · ')}
                   code={o.promo.code}
@@ -155,8 +155,8 @@ export default function DealScreen() {
       {o && product && (
         <StickyDealBar
           title={checkPrice ? `Check price at ${o.retailer.name}` : formatPrice(o.deliveredCents!)}
-          subtitle={checkPrice ? undefined : [o.retailer.name, shippingLabel(o)].join(' · ')}
-          actionLabel={o.promo ? (o.codeAutoApplied ? 'Get deal, code applied' : 'Copy code & get deal') : checkPrice ? 'Open' : 'Get deal'}
+          subtitle={checkPrice ? undefined : [o.promo ? 'with code' : o.retailer.name, shippingLabel(o)].join(' · ')}
+          actionLabel={o.promo && !o.codeAutoApplied ? 'Copy code & get deal' : checkPrice ? 'Open' : 'Get deal'}
           onAction={getDeal}
         />
       )}

@@ -106,7 +106,7 @@ export default function BrandScreen() {
                   <PromoCodeRow
                     key={p.id}
                     title={p.title}
-                    detail={[p.retailerName, p.endsAt ? formatEndsIn(p.endsAt).replace('Ends in', 'ends in') : null, p.isExclusive ? 'exclusive' : null].filter(Boolean).join(' · ')}
+                    detail={[p.retailerName, p.endsAt ? formatEndsIn(p.endsAt).replace('Ends in', 'ends in') : null, p.isExclusive ? 'exclusive' : null, p.terms].filter(Boolean).join(' · ')}
                     code={p.code}
                   />
                 ))}

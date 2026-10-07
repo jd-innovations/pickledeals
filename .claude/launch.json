@@ -55,6 +55,23 @@
         "--strictPort"
       ],
       "port": 5175
+    },
+    {
+      "name": "mobile-web-hosted",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "expo",
+        "start",
+        "--web",
+        "--port",
+        "8082"
+      ],
+      "cwd": "apps/mobile",
+      "port": 8082,
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://tadxbjlhknukpyxbqrpt.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_gTRmKe2DsjR3g7xmj4XsEA_2EcRyVIw"
+      }
     }
   ]
 }

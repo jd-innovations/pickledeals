@@ -1,6 +1,6 @@
 import { formatChatSeparator, formatPrice } from '@pickledeals/shared';
 
-import type { RankedOffer, VariantStats } from './api';
+import type { LivePromo, RankedOffer, VariantStats } from './api';
 
 /** Copy for offers, shared by Product, All offers and Deal detail so they always agree. */
 
@@ -28,9 +28,16 @@ export function ownershipDisclosure(offers: (RankedOffer | null | undefined)[]):
   return seen.size ? [...seen].map(([name, note]) => `${name}: ${note}.`).join(' ') : null;
 }
 
-/** Button copy for an offer with a code: applied by the store at checkout, or copied for the shopper to paste. */
-export const codeDealLabel = (o: RankedOffer) =>
-  o.promo ? (o.codeAutoApplied ? `Get deal · ${o.promo.code} applied` : `Copy ${o.promo.code} & get deal`) : null;
+/**
+ * Main button copy. The code itself lives in the promo row, never in the button. A long store name is
+ * dropped rather than wrapping the button (the eyebrow above already names the store).
+ */
+export const dealButtonLabel = (o: RankedOffer) =>
+  o.promo && !o.codeAutoApplied ? 'Copy code & get deal' : o.retailer.name.length <= 16 ? `Get deal at ${o.retailer.name}` : 'Get deal';
+
+/** Promo row detail: how the code reaches checkout, then the store's terms ("First order only. …"). */
+export const promoDetail = (o: RankedOffer, promo: LivePromo | undefined) =>
+  [o.codeAutoApplied ? 'Applied at checkout' : 'Copied when you tap Get deal', promo?.terms].filter(Boolean).join(' · ');
 
 export function stockLabel(o: RankedOffer): string {
   return o.inStock ? 'In stock' : 'Out of stock';

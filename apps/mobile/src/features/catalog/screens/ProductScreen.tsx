@@ -13,6 +13,7 @@ import {
   ProductCard,
   ProductDescription,
   ProductGallery,
+  PromoCodeRow,
   RetailerRow,
   retailerMonogram,
   StickyDealBar,
@@ -24,19 +25,20 @@ import { PreOwnedSection } from '@/features/market/PreOwned';
 import type { RankedOffer } from '@/features/offers/api';
 import {
   AFFILIATE_DISCLOSURE,
-  codeDealLabel,
   UNTRACKED_NOTE,
   apiPriceDisclaimer,
+  dealButtonLabel,
   deltaLabel,
   isApiPrice,
   offerBreakdown,
   ownershipDisclosure,
   priceAsOf,
+  promoDetail,
   qualityDetail,
   shippingLabel,
   shipsFromLabel,
 } from '@/features/offers/format';
-import { openDeal, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
+import { openDeal, useLivePromos, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
 import { Button, Chip, ChipRow, DetailTable, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
 
 import { LoadError, openBrand, openCategory, openProduct, useGridCardWidth } from '../components';
@@ -57,6 +59,8 @@ export default function ProductScreen() {
   const offers = useMemo(() => (offersQuery.data?.offers ?? []).filter((o) => o.variantId === variant?.id), [offersQuery.data, variant?.id]);
   const stats = offersQuery.data?.stats.find((s) => s.variantId === variant?.id);
   const best = offers.find((o) => o.rank === 1) ?? null;
+  const promos = useLivePromos(best?.promo ? [best.retailer.slug] : []);
+  const bestPromo = promos.data?.find((x) => x.id === best?.promo?.id);
   const checkPriceOnly = !best ? offers.find((o) => o.priceDisplay === 'check_price') : undefined;
   // The hero card already shows the best offer (or the check-price retailer when nothing is priced).
   const others = offers.filter((o) => o !== best && o !== checkPriceOnly).slice(0, 3);
@@ -176,10 +180,14 @@ export default function ProductScreen() {
                       <DealQualityMeter quality={stats.quality} detail={qualityDetail(stats)} />
                     </View>
                   )}
+                  {best.promo && (
+                    <PromoCodeRow title={bestPromo?.title ?? `Code ${best.promo.code}`} detail={promoDetail(best, bestPromo)} code={best.promo.code} />
+                  )}
                   <Button
-                    label={codeDealLabel(best) ?? `Get deal at ${best.retailer.name}`}
+                    label={dealButtonLabel(best)}
                     icon="external"
                     iconPosition="trailing"
+                    numberOfLines={1}
                     fullWidth
                     onPress={() => getDeal(best, 'product_best')}
                   />
@@ -334,7 +342,7 @@ export default function ProductScreen() {
               {msrp && percentOff(best.deliveredCents, msrp) ? <DiscountPill pct={percentOff(best.deliveredCents, msrp)!} /> : null}
             </View>
           }
-          subtitle={`${best.retailer.name} · lowest of ${offers.filter((o) => o.priceDisplay === 'show').length} ${offers.filter((o) => o.priceDisplay === 'show').length === 1 ? 'offer' : 'offers'}`}
+          subtitle={`${best.promo ? 'with code' : best.retailer.name} · lowest of ${offers.filter((o) => o.priceDisplay === 'show').length} ${offers.filter((o) => o.priceDisplay === 'show').length === 1 ? 'offer' : 'offers'}`}
           actionLabel="Get deal"
           onAction={() => getDeal(best, 'product_sticky')}
         />

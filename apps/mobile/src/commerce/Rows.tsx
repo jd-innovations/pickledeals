@@ -91,8 +91,9 @@ export function PromoCodeRow({ title, detail, code }: { title: string; detail: s
   const { colors } = useTheme();
   const [copied, setCopied] = useState(false);
   return (
-    <View style={[styles.promo, { borderColor: colors.border }]}>
-      <View style={{ flex: 1, gap: 2 }}>
+    <View style={[styles.promo, { borderColor: colors.border, backgroundColor: colors.background }]}>
+      {/* A long code wraps below the text instead of squeezing it. */}
+      <View style={{ flexGrow: 1, flexBasis: 0, minWidth: 170, gap: 2 }}>
         <Text variant="subhead" weight="600">
           {title}
         </Text>
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
   retailer: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingHorizontal: 16 },
   mono: { width: 36, height: 36, borderRadius: radius.control, alignItems: 'center', justifyContent: 'center' },
   tag: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 5 },
-  promo: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.card, borderWidth: 1.5, borderStyle: 'dashed' },
+  promo: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.card, borderWidth: 1.5, borderStyle: 'dashed' },
   code: { minHeight: 36, paddingHorizontal: 10, borderRadius: radius.control, flexDirection: 'row', alignItems: 'center', gap: 6 },
   cond: { alignSelf: 'flex-start', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 7 },
   seller: { flexDirection: 'row', alignItems: 'center', gap: 12 },

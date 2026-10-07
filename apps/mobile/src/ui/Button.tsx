@@ -20,6 +20,8 @@ export type ButtonProps = Omit<PressableProps, 'style' | 'children'> & {
   leading?: ReactNode;
   loading?: boolean;
   fullWidth?: boolean;
+  /** Cap the label (e.g. 1): it truncates instead of wrapping the button to two lines. */
+  numberOfLines?: number;
   style?: ViewStyle;
 };
 
@@ -34,6 +36,7 @@ export function Button({
   leading,
   loading,
   fullWidth,
+  numberOfLines,
   disabled,
   onPress,
   style,
@@ -74,7 +77,11 @@ export function Button({
         <View style={styles.row}>
           {leading}
           {icon && iconPosition === 'leading' && <Icon name={icon} size={size === 'sm' ? 14 : 16} color={fg} weight="semibold" />}
-          <Text variant={size === 'sm' ? 'footnote' : 'headline'} weight="700" style={{ color: fg, textDecorationLine: variant === 'link' ? 'underline' : 'none' }}>
+          <Text
+            variant={size === 'sm' ? 'footnote' : 'headline'}
+            weight="700"
+            numberOfLines={numberOfLines}
+            style={{ color: fg, flexShrink: 1, textDecorationLine: variant === 'link' ? 'underline' : 'none' }}>
             {label}
           </Text>
           {icon && iconPosition === 'trailing' && <Icon name={icon} size={size === 'sm' ? 14 : 16} color={fg} weight="semibold" />}

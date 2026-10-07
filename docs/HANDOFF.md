@@ -55,8 +55,15 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 5. **Sign in with Google:** built, off. Needs the user's two Google Cloud client IDs (iOS `app.pickledeals` +
    Web; public, can be shared in chat) → add to `eas.json` + `apps/mobile/.env.local`, enable the provider
    (hosted dashboard with the secret + Skip nonce check; local `config.toml`), new development + preview builds.
-6. **UI:** audit fixes 1–6 shipped Oct 6. Not yet audited: signed-in screens (inbox, chat, offers, my
-   listings, notification settings) and the map. The user has more cosmetic notes from the phone.
+6. **UI:** audit fixes 1–6 shipped Oct 6. Phone fixes shipped as OTA on Oct 6–7 (user confirmed fine):
+   one-line "Get deal" CTAs (code never in the button; long store names → "Get deal"), PromoCodeRow with
+   terms on product/deal/home/brand, "with code" on sticky bars, segmented labels one line + shrink
+   (Inbox tabs Activity · Alerts · Searches), full-screen PhotoViewer (pinch/double-tap zoom) on product,
+   deal and listing photos, deal page gallery uncropped. Header test A (no solid header background, for the
+   iOS 26 blank large-title band, react-native-screens#3100) is live; if the band persists, option B = no
+   native large title on tab roots, draw the design's 34pt title in content. The user wants
+   review → recommend → approval before cosmetic changes. Still open: the minimized tab-bar button
+   overlapping sticky bars; not yet audited: signed-in screens and the map.
 
 ### Facts to know
 - **Hosted project** `pickledeals` (ref `tadxbjlhknukpyxbqrpt`, us-east-1, $10/mo on the user's Pro org;

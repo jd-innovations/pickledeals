@@ -68,8 +68,12 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 ### Facts to know
 - **Domain `pickledeals.app` (registered Oct 7; DNS at Hostinger, `dns-parking.com`).** Resend domain verified
   (send.* MX/SPF, DKIM, DMARC p=none). Supabase hosted SMTP = Resend (`no-reply@pickledeals.app`, "PickleDeals"),
-  email rate limit 100/h; test code delivered Oct 7. Next for the domain: website with /privacy and /terms (App
-  Store), optional admin.pickledeals.app, later universal links.
+  email rate limit 100/h; test code delivered Oct 7.
+- **Website live (Oct 7):** https://pickledeals.app (+ /privacy, /terms, /support), Vercel team `jdflow`, project
+  `pickledeals-site` (git import, root `site/`, auto-deploys on push). Hostinger DNS: A @ 76.76.21.21, CNAME www →
+  Vercel. The Vercel connector is read-only on jdflow (create project/deploy = 403). Legal v1 published without
+  lawyer review (review before App Store launch). support@pickledeals.app needs a Hostinger forward (user).
+  Still to do in the app: links to Privacy/Terms/Support, and terms acceptance before first post/message (Apple 1.2).
 - **Prices exclude shipping (Oct 7, owner decision; migration 20261025, plan §5 updated):** every price and
   ranking is item price − best code. Shipping shows as the store's policy (`retailers.shipping_policy`, Grip
   Doctor: "Free shipping over $39"; editable in admin › Retailers) and is only a tie-breaker (free first). Free-shipping

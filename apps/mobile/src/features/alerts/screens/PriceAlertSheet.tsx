@@ -56,7 +56,13 @@ export default function PriceAlertSheet() {
 
   const save = async () => {
     if (!product) return;
-    await saveAlert.mutateAsync({ id: existing?.id, productId: product.id, variantId: scoped ? variant!.id : null, targetCents: value, includeUsed });
+    try {
+      await saveAlert.mutateAsync({ id: existing?.id, productId: product.id, variantId: scoped ? variant!.id : null, targetCents: value, includeUsed });
+    } catch {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      Alert.alert('Couldn’t save the alert', 'Check your connection and try again.');
+      return;
+    }
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     router.back();
     // Ask for notification permission in context, right after the first alert.

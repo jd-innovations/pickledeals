@@ -4,6 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { BrandMark, PromoCodeRow } from '@/commerce';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { DealGrid } from '@/features/deals/components';
@@ -77,7 +78,10 @@ export default function BrandScreen() {
                   variant={following ? 'outline' : 'primary'}
                   size="sm"
                   icon={following ? 'check' : undefined}
-                  onPress={() => toggleSave('brand', data.brand.id, following)}
+                  onPress={() => {
+                    if (following) haptic.tap(); // "Follow" is a primary button, which taps already
+                    toggleSave('brand', data.brand.id, following);
+                  }}
                 />
                 <Text variant="caption" weight="400" tone="secondary" style={{ flex: 1 }}>
                   Get notified about new {data.brand.name} deals.

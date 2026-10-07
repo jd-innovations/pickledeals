@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Alert, FlatList, KeyboardAvoidingView, Platform, Pressable, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/design/theme';
 import { useAuth } from '@/features/auth/authStore';
 import { pickPhotos } from '@/features/market/device';
@@ -55,8 +56,14 @@ export default function ConversationScreen() {
     respond.mutate(
       { offerId: o.id, action },
       {
-        onSuccess: () => action === 'accept' && t?.role === 'seller' && afterAccept(t.listingId),
-        onError: (e) => Alert.alert('Couldn’t update the offer', chatErrorText(e)),
+        onSuccess: () => {
+          if (action === 'accept') haptic.success();
+          if (action === 'accept' && t?.role === 'seller') afterAccept(t.listingId);
+        },
+        onError: (e) => {
+          haptic.error();
+          Alert.alert('Couldn’t update the offer', chatErrorText(e));
+        },
       },
     );
   };

@@ -5,9 +5,11 @@ import { router, Stack } from 'expo-router';
 import { useState } from 'react';
 import { RefreshControl, ScrollView, View } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { CollectionBanner, DealCard, DealHero, PriceDropRow, PromoCodeRow } from '@/commerce';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { openSaved } from '@/features/alerts/SaveAlertButtons';
+import { HeaderMessagesButton } from '@/features/chat/HeaderMessagesButton';
 import { productImage } from '@/features/catalog/hooks';
 import { ShopByCategory } from '@/features/catalog/ShopByCategory';
 import { NearbyPreOwned } from '@/features/market/PreOwned';
@@ -45,6 +47,7 @@ export default function HomeScreen() {
   const [pulling, setPulling] = useState(false);
 
   const onRefresh = async () => {
+    haptic.tap();
     setPulling(true);
     await refetch();
     setPulling(false);
@@ -59,6 +62,7 @@ export default function HomeScreen() {
         options={{
           headerRight: () => (
             <View style={{ flexDirection: 'row', gap: 8 }}>
+              <HeaderMessagesButton tab="deals" />
               <IconButton icon="heart" label="Saved" size={34} onPress={() => openSaved('deals')} />
               <IconButton icon="bell" label="Alerts" size={34} onPress={() => router.push('/alerts')} />
             </View>

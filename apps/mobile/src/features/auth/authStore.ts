@@ -139,4 +139,5 @@ export const INTENT_COPY: Record<AuthIntent, string> = {
   manage_listings: 'Sign in to manage your listings.',
   report: 'Sign in to report this, so we can follow up.',
   view_saved: 'Sign in to see the deals, products and listings you’ve saved.',
+  view_messages: 'Sign in to see your messages with buyers and sellers.',
 };

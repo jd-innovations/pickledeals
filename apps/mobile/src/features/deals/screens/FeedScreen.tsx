@@ -2,6 +2,7 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, RefreshControl, ScrollView, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { GridSkeleton, LoadError, ProductGrid } from '@/features/catalog/components';
 import { useProductsUnder } from '@/features/catalog/hooks';
 import { Chip, ChipRow, SectionHeader, Text } from '@/ui';
@@ -85,6 +86,7 @@ export function DealList({
         <RefreshControl
           refreshing={pulling}
           onRefresh={async () => {
+            haptic.tap();
             setPulling(true);
             await refetch();
             setPulling(false);

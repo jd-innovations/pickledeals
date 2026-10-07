@@ -4,6 +4,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/design/theme';
 import {
   AuthCanceled,
@@ -70,7 +71,19 @@ export default function SignInSheet() {
       () => sendEmailCode(email),
       () => setStep('code'),
     );
-  const onVerify = (value = code) => run(() => verifyEmailCode(email, value), resumeAfterSignIn);
+  const onVerify = (value = code) =>
+    run(
+      async () => {
+        try {
+          await verifyEmailCode(email, value);
+          haptic.success();
+        } catch (e) {
+          haptic.error();
+          throw e;
+        }
+      },
+      resumeAfterSignIn,
+    );
 
   const onCodeChange = (value: string) => {
     const digits = value.replace(/\D/g, '').slice(0, CODE_LENGTH);

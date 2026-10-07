@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, RefreshControl, SectionList, View } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { ProductImage } from '@/commerce';
 import { useTheme } from '@/design/theme';
 import { CardSkeleton, Chip, ChipRow, EmptyState, ErrorState, Text } from '@/ui';
@@ -45,6 +46,7 @@ export default function OffersScreen() {
         <RefreshControl
           refreshing={pulling}
           onRefresh={async () => {
+            haptic.tap();
             setPulling(true);
             await offers.refetch();
             setPulling(false);

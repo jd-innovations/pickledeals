@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { Alert } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/authStore';
 
 import {
@@ -73,6 +74,7 @@ export function useToggleSave() {
     },
     onError: (_e, _v, ctx) => {
       if (ctx) qc.setQueryData(ctx.key, ctx.prev);
+      haptic.error();
       Alert.alert('Couldn’t update', 'Check your connection and try again.');
     },
     onSettled: (_d, _e, { uid }) => {
@@ -163,7 +165,10 @@ export function useNotificationSettingsMutations() {
     if (prev) qc.setQueryData(key, patch(prev));
     return { prev };
   };
-  const rollback = (_e: unknown, _v: unknown, ctx?: { prev?: NotificationSettings }) => ctx?.prev && qc.setQueryData(key, ctx.prev);
+  const rollback = (_e: unknown, _v: unknown, ctx?: { prev?: NotificationSettings }) => {
+    haptic.error();
+    if (ctx?.prev) qc.setQueryData(key, ctx.prev);
+  };
   const settle = () => qc.invalidateQueries({ queryKey: key });
   return {
     setCategory: useMutation({

@@ -3,6 +3,7 @@ import { router, Stack, type Href } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { ProductImage } from '@/commerce';
 import { useTheme } from '@/design/theme';
 import { useAuth } from '@/features/auth/authStore';
@@ -33,7 +34,10 @@ export default function AlertsScreen() {
         paddingBottom: 120,
         gap: 16,
       }}
-      refreshControl={user ? <RefreshControl refreshing={notifications.isRefetching} onRefresh={() => notifications.refetch()} /> : undefined}>
+      refreshControl={user ? <RefreshControl refreshing={notifications.isRefetching} onRefresh={() => {
+            haptic.tap();
+            notifications.refetch();
+          }} /> : undefined}>
       <Stack.Screen
         options={{
           headerRight: () =>

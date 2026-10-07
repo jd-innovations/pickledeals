@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/design/theme';
 import { IconButton, Text } from '@/ui';
 import type { ImageSource } from './ProductImage';
@@ -118,6 +119,7 @@ function ZoomablePhoto({
       return;
     }
     lastTap.current = 0;
+    haptic.tap();
     if (scale.current > 1.01) {
       ref.current?.scrollResponderZoomTo({ x: 0, y: 0, width, height, animated: true });
     } else {
@@ -144,7 +146,10 @@ function ZoomablePhoto({
       scrollEventThrottle={16}
       onScroll={onScroll}
       onScrollEndDrag={(e) => {
-        if (scale.current <= 1.01 && e.nativeEvent.contentOffset.y < -PULL_TO_CLOSE) onPullClose();
+        if (scale.current <= 1.01 && e.nativeEvent.contentOffset.y < -PULL_TO_CLOSE) {
+          haptic.tap();
+          onPullClose();
+        }
       }}>
       <Pressable onPress={onTap} accessibilityRole="image" accessibilityLabel={source.alt} accessibilityHint="Pinch or double-tap to zoom">
         <Image source={{ uri: source.uri }} placeholder={source.blurhash ? { blurhash: source.blurhash } : undefined} contentFit="contain" style={{ width, height }} />

@@ -1,6 +1,7 @@
 import { router } from 'expo-router';
 import { View } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/design/theme';
 import { useAuth } from '@/features/auth/authStore';
 import { Button } from '@/ui';
@@ -45,7 +46,10 @@ export function SaveAlertButtons({
         iconFilled={isSaved}
         iconColor={isSaved ? colors.saved : undefined}
         style={{ flex: 1 }}
-        onPress={() => toggleSave(save.kind, save.id, isSaved)}
+        onPress={() => {
+          haptic.tap();
+          toggleSave(save.kind, save.id, isSaved);
+        }}
       />
       {showAlert && (
         <Button

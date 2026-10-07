@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { FlatList, Pressable, RefreshControl, View } from 'react-native';
 import ReanimatedSwipeable, { type SwipeableMethods } from 'react-native-gesture-handler/ReanimatedSwipeable';
 
+import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/design/theme';
 import { chooseAction } from '@/lib/dialog';
 import { CardSkeleton, Chip, ChipRow, EmptyState, ErrorState, Text } from '@/ui';
@@ -43,6 +44,7 @@ export default function InboxScreen() {
         <RefreshControl
           refreshing={pulling}
           onRefresh={async () => {
+            haptic.tap();
             setPulling(true);
             await inbox.refetch();
             setPulling(false);

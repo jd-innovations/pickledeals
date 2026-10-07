@@ -4,6 +4,7 @@ import * as Crypto from 'expo-crypto';
 import { useEffect, useRef, useState } from 'react';
 import { AppState } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { useAuth } from '@/features/auth/authStore';
 import { setViewing } from '@/features/alerts/api';
 import { uploadChatPhoto, type PickedPhoto } from '@/features/market/device';
@@ -155,9 +156,11 @@ export function useSendMessage(id: string) {
         payload = m as NewMessage;
       }
       const saved = await sendMessage(id, clientId, payload);
+      haptic.tap();
       appendMessages(qc, uid, id, [saved]);
       qc.invalidateQueries({ queryKey: chatKeys.inbox(uid) });
     } catch (e) {
+      haptic.error();
       appendMessages(qc, uid, id, [{ ...base, status: 'failed', error: chatErrorText(e) }]);
     }
   };
@@ -218,6 +221,8 @@ export function useConversationChannel(id: string) {
           appendMessages(qc, uid, id, [m]);
           // Status and offer lines change the listing strip and the offer cards.
           if (m.kind === 'status_event' || m.kind === 'offer_event') {
+            // The other person accepted while this chat is open.
+            if (m.kind === 'offer_event' && m.meta.action === 'accepted' && m.senderId !== uid) haptic.success();
             qc.invalidateQueries({ queryKey: chatKeys.thread(uid, id) });
             qc.invalidateQueries({ queryKey: chatKeys.offers(uid, id) });
           }

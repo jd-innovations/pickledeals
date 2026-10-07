@@ -3,11 +3,13 @@ import { router, Stack } from 'expo-router';
 import { useDeferredValue, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 
+import { haptic } from '@/lib/haptics';
 import { useTheme } from '@/design/theme';
 import { ChipRow, EmptyState, Icon, IconButton, SearchField, SectionHeader, SegmentedControl, Text } from '@/ui';
 
 import { useMeMutations } from '@/features/alerts/hooks';
 import { openSaved } from '@/features/alerts/SaveAlertButtons';
+import { HeaderMessagesButton } from '@/features/chat/HeaderMessagesButton';
 import { useAuth } from '@/features/auth/authStore';
 
 import { filterSummary, ListingGrid, ListingGridSkeleton, ListingRail, MarketLoadError, MarketQuickChips, radiusLabel } from '../components';
@@ -45,6 +47,7 @@ export default function MarketHomeScreen() {
   const filtered = JSON.stringify(f) !== JSON.stringify(DEFAULT_MARKET_FILTERS);
 
   const onRefresh = async () => {
+    haptic.tap();
     setPulling(true);
     await feed.refetch();
     setPulling(false);
@@ -60,6 +63,7 @@ export default function MarketHomeScreen() {
         options={{
           headerRight: () => (
             <View style={{ flexDirection: 'row', gap: 8 }}>
+              <HeaderMessagesButton tab="market" />
               <IconButton icon="heart" label="Saved" size={34} onPress={() => openSaved('market')} />
               <IconButton icon="plus" label="Sell an item" size={34} tone="solid" onPress={() => router.push('/sell')} />
             </View>

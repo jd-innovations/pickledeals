@@ -12,7 +12,19 @@ import { ProductImage, type ImageSource } from './ProductImage';
  * listing's photo gallery. The tile keeps the design's rounded hero shape and side margins.
  * Tapping a photo opens it full screen (PhotoViewer).
  */
-export function ProductGallery({ images, inset = 16 }: { images: ImageSource[]; inset?: number }) {
+export function ProductGallery({
+  images,
+  inset = 16,
+  aspectRatio = 1,
+  padding = 36,
+  fit,
+}: {
+  images: ImageSource[];
+  inset?: number;
+  aspectRatio?: number;
+  padding?: number;
+  fit?: 'cover' | 'contain';
+}) {
   const { colors } = useTheme();
   const { width: screen } = useWindowDimensions();
   const [page, setPage] = useState(0);
@@ -35,12 +47,12 @@ export function ProductGallery({ images, inset = 16 }: { images: ImageSource[]; 
   if (count <= 1)
     return (
       <>
-        {tile(images[0]!, 0, <ProductImage source={images[0]!} round={radius.hero} padding={36} />)}
+        {tile(images[0]!, 0, <ProductImage source={images[0]!} round={radius.hero} aspectRatio={aspectRatio} padding={padding} fit={fit} />)}
         {viewer}
       </>
     );
   return (
-    <View style={{ width, aspectRatio: 1, borderRadius: radius.hero, overflow: 'hidden' }}>
+    <View style={{ width, aspectRatio, borderRadius: radius.hero, overflow: 'hidden' }}>
       <ScrollView
         horizontal
         pagingEnabled
@@ -48,7 +60,7 @@ export function ProductGallery({ images, inset = 16 }: { images: ImageSource[]; 
         onMomentumScrollEnd={onScroll}
         scrollEventThrottle={16}
         accessibilityLabel={`Photos, ${page + 1} of ${count}`}>
-        {images.map((src, i) => tile(src, i, <ProductImage source={src} width={width} round={0} padding={36} />))}
+        {images.map((src, i) => tile(src, i, <ProductImage source={src} width={width} aspectRatio={aspectRatio} round={0} padding={padding} fit={fit} />))}
       </ScrollView>
       <View style={[styles.counter, { backgroundColor: colors.background }]} pointerEvents="none">
         <Text variant="caption" weight="700" numeric>

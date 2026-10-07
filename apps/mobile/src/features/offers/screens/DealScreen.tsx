@@ -4,9 +4,9 @@ import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 
-import { PriceBreakdown, ProductImage, PromoCodeRow, StickyDealBar } from '@/commerce';
+import { PriceBreakdown, ProductGallery, PromoCodeRow, StickyDealBar } from '@/commerce';
 import { useTheme } from '@/design/theme';
-import { productImage, useProduct, useProductSlug } from '@/features/catalog/hooks';
+import { galleryImages, useProduct, useProductSlug } from '@/features/catalog/hooks';
 import { Chip, ErrorState, Group, Icon, ListRow, Skeleton, Text } from '@/ui';
 
 import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, ownershipDisclosure, priceAsOf, promoDetail, shippingLabel, shipsFromLabel } from '../format';
@@ -56,7 +56,8 @@ export default function DealScreen() {
         ) : (
           <>
             <View style={{ paddingHorizontal: 16 }}>
-              <ProductImage source={productImage(product)} round={radius.hero} aspectRatio={1.4} padding={28} />
+              {/* Design's wide hero; photos shown whole (not cropped), swipeable, tap for full screen. */}
+              <ProductGallery images={galleryImages(product)} aspectRatio={1.4} padding={28} fit="contain" />
             </View>
             <View style={{ paddingHorizontal: 16, gap: 6 }}>
               <Text variant="footnote" weight="700" tone="secondary">

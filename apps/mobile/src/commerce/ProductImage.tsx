@@ -21,6 +21,7 @@ export function ProductImage({
   aspectRatio = 1,
   round = radius.tile,
   padding,
+  fit,
   children,
   style,
 }: {
@@ -29,6 +30,8 @@ export function ProductImage({
   aspectRatio?: number;
   round?: number;
   padding?: number;
+  /** Override D8's per-image choice, e.g. 'contain' to show a square photo whole in a wide frame. */
+  fit?: 'cover' | 'contain';
   children?: ReactNode;
   style?: ViewStyle;
 }) {
@@ -49,7 +52,7 @@ export function ProductImage({
           <Image
             source={{ uri: source.uri }}
             placeholder={source.blurhash ? { blurhash: source.blurhash } : undefined}
-            contentFit={cutout ? 'contain' : 'cover'}
+            contentFit={fit ?? (cutout ? 'contain' : 'cover')}
             transition={150}
             style={{ flex: 1 }}
           />

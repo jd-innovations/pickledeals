@@ -66,6 +66,13 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    overlapping sticky bars; not yet audited: signed-in screens and the map.
 
 ### Facts to know
+- **Grip Doctor catalog on hosted (Oct 7):** 37 live offers. Added Thrive (8 products; FURY Elongated, FURY YoH 2026
+  and Ignite with swing weights as variants) and RESET (3). FURY Gold Limited is out of stock (arrives via review
+  when restocked; new swing weights also land in review and need a variant). New store products must be in the
+  **PickleDeals** sales channel or the Storefront API never sees them. NEWCUSTOMER20 now targets Grip Doctor's own
+  10 non-paddle products by product (not categories): Collective suppliers' items don't take the code, and new own
+  products must be added to the code by hand. Migration 20261022: exact matches prefer store IDs over shared
+  barcodes (HEXXO UPC, Ignite GTIN).
 - **Accent colours (user decision, Oct 7):** the UI stays monochrome except ON states: saved = filled heart
   in `saved` (red), price alert set = filled bell in `alert` (yellow), label "Alert set". Tokens in
   `preview/pd.css` + `packages/shared/src/tokens.ts`; rule noted on `preview/Components.dc.html`.

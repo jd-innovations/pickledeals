@@ -50,7 +50,7 @@ Notes:
 - ⬜ Category: Shopping (primary), Sports (secondary)
 - ⬜ Age rating questionnaire: unrestricted web access (no; the in-app browser opens only retailer
   links), user-generated content and messaging (yes). 👤 Choose the minimum age with your lawyer
-- ⬜ Support URL, marketing URL, privacy policy URL (👤 hosting decision)
+- ✅ Support URL https://pickledeals.app/support · marketing URL https://pickledeals.app · privacy policy URL https://pickledeals.app/privacy (live Oct 7, 2026)
 - ⬜ Screenshots for 6.9" and 6.5" iPhones, in light mode with seeded data: Deals home, Product
   with all offers, Price history, Marketplace grid, Map, Listing detail (used vs new), Chat with
   an offer, Sell flow

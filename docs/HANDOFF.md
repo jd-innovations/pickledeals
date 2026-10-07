@@ -30,15 +30,15 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 ## Where things stand (Oct 6, 2026) — start here
 
 ### Next steps, in order
-1. **User, in the Supabase dashboard** (project `pickledeals`; secrets never go in chat):
-   - Edge Functions → Secrets: `SHOPIFY_GRIPDOCTOR_DOMAIN`, `SHOPIFY_GRIPDOCTOR_TOKEN` (copied from local
-     `supabase/functions/.env`; the domain may include `https://`, the function strips it).
-   - SQL Editor: `select vault.create_secret('<service role key>', 'dispatch_key');` (`project_url` is already set).
-   - Authentication → Emails → SMTP: Resend (`smtp.resend.com`, 465, user `resend`, password = Resend API
-     key, sender `no-reply@<verified domain>`, name PickleDeals); Authentication → Rate Limits: raise emails/hour.
-2. **Claude, when the user says done:** on the hosted DB, turn the `shopify-gripdoctor` source on (mode
-   `storefront`, shipping per the user) and run one import (`request_ingestion_run` or POST `ingest` with the
-   service key); check the review queue fills. Confirm cron jobs exist (`cron.job`).
+1. **Hosted dashboard (Oct 6): done** — Shopify function secrets set; Vault `dispatch_key` = legacy
+   `service_role` JWT (verified by the user). **Resend SMTP skipped**: the user has no sending domain yet, so
+   sign-in codes use Supabase's built-in mailer (project team members only, a few per hour). Later: verify a
+   domain in Resend → Authentication → SMTP (`smtp.resend.com`, 465, user `resend`, password = Resend API
+   key, sender `no-reply@<domain>`, name PickleDeals) → Rate Limits: raise emails/hour.
+2. **Shopify on hosted: on (Oct 6).** `shopify-gripdoctor` active, storefront, shipping $4.99, free from $39
+   (`flat_cents` 499, `free_over_cents` 3900), every 30 min. First run: 32 products, 15 skipped (out of
+   stock), 17 unmatched → review queue; 0 offers until staff link/publish them in the hosted admin. All 7
+   cron jobs exist.
 3. **Preview build** for the iPhone: `eas build --profile preview --platform ios` (from `apps/mobile`; internal
    distribution, hosted backend). The user signs in with an email code; then grant admin on hosted:
    `insert into public.user_roles (user_id, role) select id, 'admin' from auth.users where email = '<their email>';`

@@ -40,8 +40,12 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    stock), 17 unmatched → review queue; 0 offers until staff link/publish them in the hosted admin. All 7
    cron jobs exist.
 3. **Preview build (Oct 6): done.** EAS build 67a1c076… (preview, hosted backend) installed; the user
-   signed in as dhjesus122@gmail.com and has `admin` on hosted. Next for the user: `npm run admin:hosted` →
-   review queue → link/publish the 17 Grip Doctor products, then check offers in the app.
+   signed in as dhjesus122@gmail.com and has `admin` on hosted.
+   **Grip Doctor review queue cleared on hosted (Oct 6, by Claude with the user's go-ahead):** 16 new active
+   products (Engage ×6, Pickleball Grip Doctor ×9, new brand **Luzz** ×1) + Trigger linked to the existing
+   `pgd-trigger-grip-attachment`; 17 live offers, all with store images. Both HEXXO packs share UPC
+   850081191216, so that UPC identifier was removed and they match by store SKU only. New store products will
+   still land in the review queue (`npm.cmd run admin:hosted`).
 4. **Admin on hosted:** done. `npm run admin:hosted` (or launch config `admin-hosted`, :5175) runs the admin
    against hosted via Vite mode `hosted` (`apps/admin/.env.hosted`, public values, committed); the tab title
    starts with "HOSTED". Usable once the user has the admin role on hosted (step 3) and email codes send (step 1).

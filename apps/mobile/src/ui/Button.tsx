@@ -16,6 +16,9 @@ export type ButtonProps = Omit<PressableProps, 'style' | 'children'> & {
   size?: Size;
   icon?: IconName;
   iconPosition?: 'leading' | 'trailing';
+  /** ON state (saved, alert set): filled icon in an accent token. */
+  iconFilled?: boolean;
+  iconColor?: string;
   /** A custom leading mark (e.g. a provider logo), shown before the label. */
   leading?: ReactNode;
   loading?: boolean;
@@ -33,6 +36,8 @@ export function Button({
   size = 'lg',
   icon,
   iconPosition = 'trailing',
+  iconFilled,
+  iconColor,
   leading,
   loading,
   fullWidth,
@@ -76,7 +81,7 @@ export function Button({
       ) : (
         <View style={styles.row}>
           {leading}
-          {icon && iconPosition === 'leading' && <Icon name={icon} size={size === 'sm' ? 14 : 16} color={fg} weight="semibold" />}
+          {icon && iconPosition === 'leading' && <Icon name={icon} size={size === 'sm' ? 14 : 16} color={iconColor ?? fg} filled={iconFilled} weight="semibold" />}
           <Text
             variant={size === 'sm' ? 'footnote' : 'headline'}
             weight="700"
@@ -84,7 +89,7 @@ export function Button({
             style={{ color: fg, flexShrink: 1, textDecorationLine: variant === 'link' ? 'underline' : 'none' }}>
             {label}
           </Text>
-          {icon && iconPosition === 'trailing' && <Icon name={icon} size={size === 'sm' ? 14 : 16} color={fg} weight="semibold" />}
+          {icon && iconPosition === 'trailing' && <Icon name={icon} size={size === 'sm' ? 14 : 16} color={iconColor ?? fg} filled={iconFilled} weight="semibold" />}
         </View>
       )}
     </Pressable>

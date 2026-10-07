@@ -16,6 +16,9 @@
   --overlay:rgba(10,10,10,.38);
   --glass:rgba(255,255,255,.80);
   --chip:#F1F1F0;
+  /* The only accents: colour marks an ON state. Saved = red heart; price alert set = yellow bell. */
+  --saved:#FF3B30;
+  --alert:#F5B400;
   --bubble-in:#EDEDEC;
   --bubble-out:#0A0A0A;
   --on-bubble-out:#FFFFFF;
@@ -51,6 +54,8 @@
   --overlay:rgba(0,0,0,.6);
   --glass:rgba(30,30,32,.78);
   --chip:#1F1F21;
+  --saved:#FF453A;
+  --alert:#FFD60A;
   --bubble-in:#232326;
   --bubble-out:#F5F5F4;
   --on-bubble-out:#0B0B0C;

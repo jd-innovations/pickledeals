@@ -66,6 +66,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    overlapping sticky bars; not yet audited: signed-in screens and the map.
 
 ### Facts to know
+- **Accent colours (user decision, Oct 7):** the UI stays monochrome except ON states: saved = filled heart
+  in `saved` (red), price alert set = filled bell in `alert` (yellow), label "Alert set". Tokens in
+  `preview/pd.css` + `packages/shared/src/tokens.ts`; rule noted on `preview/Components.dc.html`.
 - **Hosted project** `pickledeals` (ref `tadxbjlhknukpyxbqrpt`, us-east-1, $10/mo on the user's Pro org;
   created with explicit approval). Live: 24 migrations, `config push` applied (6-digit OTP, templates,
   access-token hook, Apple on, redirect URLs), production catalog loaded (149 products, 32 brands, 12

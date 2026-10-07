@@ -35,7 +35,7 @@ export function FavoriteButton({ saved, onToggle, size = 34, label = 'Save' }: {
       }}
       style={[styles.fav, { width: size, height: size, borderRadius: size / 2, backgroundColor: colors.glass }]}>
       <Animated.View style={anim}>
-        <Icon name="heart" filled={saved} size={size * 0.5} color={colors.textPrimary} />
+        <Icon name="heart" filled={saved} size={size * 0.5} color={saved ? colors.saved : colors.textPrimary} />
       </Animated.View>
     </Pressable>
   );

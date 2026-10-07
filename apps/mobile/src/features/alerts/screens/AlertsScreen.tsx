@@ -203,10 +203,13 @@ function AlertCard({ alert: a, nowCents }: { alert: PriceAlert; nowCents: number
               {a.product.brand} {a.product.name}
               {a.variant ? ` ${a.variant.label}` : ''}
             </Text>
-            <Text variant="caption" weight="400" tone="secondary">
-              {paused ? 'Paused' : 'New offers'}
-              {a.lastNotifiedCents ? ` · last alerted at ${formatPrice(a.lastNotifiedCents)}` : ''}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <Icon name="bell" size={12} filled={!paused} color={paused ? colors.textTertiary : colors.alert} />
+              <Text variant="caption" weight="400" tone="secondary" style={{ flexShrink: 1 }}>
+                {paused ? 'Paused' : 'New offers'}
+                {a.lastNotifiedCents ? ` · last alerted at ${formatPrice(a.lastNotifiedCents)}` : ''}
+              </Text>
+            </View>
           </View>
         </Pressable>
         <IconButton

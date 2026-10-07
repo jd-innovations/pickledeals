@@ -19,7 +19,7 @@ import {
   StickyDealBar,
 } from '@/commerce';
 import { useTheme } from '@/design/theme';
-import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
+import { useAlerts, useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { PreOwnedSection } from '@/features/market/PreOwned';
 import type { RankedOffer } from '@/features/offers/api';
@@ -72,6 +72,8 @@ export default function ProductScreen() {
   const toggleSave = useToggleSave();
   const requireAuth = useAuth((st) => st.requireAuth);
   const isSaved = !!p && saved.products.has(p.id);
+  const alerts = useAlerts();
+  const alertSet = !!p && !!alerts.data?.some((a) => a.product.id === p.id && a.status === 'active');
   const openAlert = () =>
     p && requireAuth('create_price_alert', () => router.push({ pathname: '/deals/price-alert', params: { slug: p.slug, variant: variant?.id ?? '' } }));
   // Alerts never track Amazon, so a product sold only there gets no Price alert button.
@@ -83,10 +85,23 @@ export default function ProductScreen() {
         variant="secondary"
         size="md"
         icon="heart"
+        iconFilled={isSaved}
+        iconColor={isSaved ? colors.saved : undefined}
         style={{ flex: 1 }}
         onPress={() => toggleSave('product', p.id, isSaved)}
       />
-      {!untrackedOnly && <Button label="Price alert" variant="secondary" size="md" icon="bell" style={{ flex: 1 }} onPress={openAlert} />}
+      {!untrackedOnly && (
+        <Button
+          label={alertSet ? 'Alert set' : 'Price alert'}
+          variant="secondary"
+          size="md"
+          icon="bell"
+          iconFilled={alertSet}
+          iconColor={alertSet ? colors.alert : undefined}
+          style={{ flex: 1 }}
+          onPress={openAlert}
+        />
+      )}
     </View>
   ) : null;
 

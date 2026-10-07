@@ -21,6 +21,9 @@ export const palette = {
     overlay: 'rgba(10,10,10,0.38)',
     glass: 'rgba(255,255,255,0.80)',
     chip: '#F1F1F0',
+    /** The only accents, and only for ON states: saved (filled heart) and price alert set (filled bell). */
+    saved: '#FF3B30',
+    alert: '#F5B400',
     bubbleIncoming: '#EDEDEC',
     bubbleOutgoing: '#0A0A0A',
     onBubbleOutgoing: '#FFFFFF',
@@ -50,6 +53,8 @@ export const palette = {
     overlay: 'rgba(0,0,0,0.60)',
     glass: 'rgba(30,30,32,0.78)',
     chip: '#1F1F21',
+    saved: '#FF453A',
+    alert: '#FFD60A',
     bubbleIncoming: '#232326',
     bubbleOutgoing: '#F5F5F4',
     onBubbleOutgoing: '#0B0B0C',

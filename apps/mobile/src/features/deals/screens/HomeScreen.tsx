@@ -7,6 +7,7 @@ import { RefreshControl, ScrollView, View } from 'react-native';
 
 import { CollectionBanner, DealCard, DealHero, PriceDropRow, PromoCodeRow } from '@/commerce';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
+import { openSaved } from '@/features/alerts/SaveAlertButtons';
 import { productImage } from '@/features/catalog/hooks';
 import { ShopByCategory } from '@/features/catalog/ShopByCategory';
 import { NearbyPreOwned } from '@/features/market/PreOwned';
@@ -58,6 +59,7 @@ export default function HomeScreen() {
         options={{
           headerRight: () => (
             <View style={{ flexDirection: 'row', gap: 8 }}>
+              <IconButton icon="heart" label="Saved" size={34} onPress={() => openSaved('deals')} />
               <IconButton icon="bell" label="Alerts" size={34} onPress={() => router.push('/alerts')} />
             </View>
           ),

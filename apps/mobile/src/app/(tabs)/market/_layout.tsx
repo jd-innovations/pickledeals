@@ -7,6 +7,7 @@ export default function MarketplaceStack() {
     <Stack screenOptions={useStackOptions()}>
       <Stack.Screen name="index" options={{ title: 'Pre-owned' }} />
       <Stack.Screen name="map" options={{ headerShown: false, title: 'Map' }} />
+      <Stack.Screen name="saved" options={{ title: 'Saved', headerLargeTitle: false }} />
       <Stack.Screen name="listing/[id]" options={{ headerShown: false }} />
       <Stack.Screen name="seller/[id]" options={{ title: '', headerLargeTitle: false }} />
       <Stack.Screen name="filters" options={sheetOptions([0.75, 1])} />

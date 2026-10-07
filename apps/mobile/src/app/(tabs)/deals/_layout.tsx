@@ -9,6 +9,7 @@ export default function DealsStack() {
       <Stack.Screen name="search" options={{ headerShown: false, animation: 'fade' }} />
       <Stack.Screen name="results" options={{ headerLargeTitle: false }} />
       <Stack.Screen name="browse" options={{ title: 'Browse' }} />
+      <Stack.Screen name="saved" options={{ title: 'Saved', headerLargeTitle: false }} />
       <Stack.Screen name="category/[slug]" options={{ title: '' }} />
       <Stack.Screen name="brand/[slug]" />
       <Stack.Screen name="product/[slug]/index" options={{ title: '', headerLargeTitle: false }} />

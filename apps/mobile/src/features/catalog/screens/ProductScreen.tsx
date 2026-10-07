@@ -19,8 +19,7 @@ import {
   StickyDealBar,
 } from '@/commerce';
 import { useTheme } from '@/design/theme';
-import { useAlerts, useSavedIds, useToggleSave } from '@/features/alerts/hooks';
-import { useAuth } from '@/features/auth/authStore';
+import { SaveAlertButtons } from '@/features/alerts/SaveAlertButtons';
 import { PreOwnedSection } from '@/features/market/PreOwned';
 import type { RankedOffer } from '@/features/offers/api';
 import {
@@ -68,41 +67,10 @@ export default function ProductScreen() {
   const showVariants = (p?.variants.length ?? 0) > 1;
   const specs = Object.entries(p?.specs ?? {});
 
-  const saved = useSavedIds();
-  const toggleSave = useToggleSave();
-  const requireAuth = useAuth((st) => st.requireAuth);
-  const isSaved = !!p && saved.products.has(p.id);
-  const alerts = useAlerts();
-  const alertSet = !!p && !!alerts.data?.some((a) => a.product.id === p.id && a.status === 'active');
-  const openAlert = () =>
-    p && requireAuth('create_price_alert', () => router.push({ pathname: '/deals/price-alert', params: { slug: p.slug, variant: variant?.id ?? '' } }));
   // Alerts never track Amazon, so a product sold only there gets no Price alert button.
   const untrackedOnly = offers.length > 0 && offers.every((o) => o.trackingExcluded);
   const actions = p ? (
-    <View style={{ flexDirection: 'row', gap: 10 }}>
-      <Button
-        label={isSaved ? 'Saved' : 'Save'}
-        variant="secondary"
-        size="md"
-        icon="heart"
-        iconFilled={isSaved}
-        iconColor={isSaved ? colors.saved : undefined}
-        style={{ flex: 1 }}
-        onPress={() => toggleSave('product', p.id, isSaved)}
-      />
-      {!untrackedOnly && (
-        <Button
-          label={alertSet ? 'Alert set' : 'Price alert'}
-          variant="secondary"
-          size="md"
-          icon="bell"
-          iconFilled={alertSet}
-          iconColor={alertSet ? colors.alert : undefined}
-          style={{ flex: 1 }}
-          onPress={openAlert}
-        />
-      )}
-    </View>
+    <SaveAlertButtons save={{ kind: 'product', id: p.id }} product={p} variantId={variant?.id} showAlert={!untrackedOnly} />
   ) : null;
 
   const share = () => p && Share.share({ message: `${p.brand.name} ${p.name} on PickleDeals` }).catch(() => {});

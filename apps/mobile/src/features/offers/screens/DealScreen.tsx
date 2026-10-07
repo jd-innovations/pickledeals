@@ -4,8 +4,10 @@ import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { ScrollView, View } from 'react-native';
 
-import { PriceBreakdown, ProductGallery, PromoCodeRow, StickyDealBar } from '@/commerce';
+import { FavoriteButton, PriceBreakdown, ProductGallery, PromoCodeRow, StickyDealBar } from '@/commerce';
 import { useTheme } from '@/design/theme';
+import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
+import { SaveAlertButtons } from '@/features/alerts/SaveAlertButtons';
 import { galleryImages, useProduct, useProductSlug } from '@/features/catalog/hooks';
 import { Chip, ErrorState, Group, Icon, ListRow, Skeleton, Text } from '@/ui';
 
@@ -14,8 +16,11 @@ import { openDeal, useLivePromos, useOffer } from '../hooks';
 
 /** Deal detail (design: "Deal detail (promo code)"): one offer, its code and what you pay. */
 export default function DealScreen() {
-  const { id = '' } = useLocalSearchParams<{ id: string }>();
+  // `deal` is passed from deal cards, so the heart here is the same save as the card's heart.
+  const { id = '', deal } = useLocalSearchParams<{ id: string; deal?: string }>();
   const { colors } = useTheme();
+  const saved = useSavedIds();
+  const toggleSave = useToggleSave();
   const offer = useOffer(id);
   const slug = useProductSlug(offer.data?.productId);
   const { data: product } = useProduct(slug.data ?? '');
@@ -31,6 +36,9 @@ export default function DealScreen() {
   const msrp = variant?.msrpCents ?? product?.msrpCents ?? null;
   const promo = o?.promo ? promos.data?.find((p) => p.id === o.promo!.id) : undefined;
   const checkPrice = o?.priceDisplay === 'check_price';
+  // Deal pages opened from a deal save the deal; others (e.g. from All offers) save the product.
+  const saveTarget = deal ? { kind: 'deal' as const, id: deal } : product ? { kind: 'product' as const, id: product.id } : null;
+  const isSaved = !!saveTarget && (saveTarget.kind === 'deal' ? saved.deals : saved.products).has(saveTarget.id);
 
   const getDeal = async () => {
     if (!o) return;
@@ -46,7 +54,15 @@ export default function DealScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: '' }} />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerRight: () =>
+            saveTarget ? (
+              <FavoriteButton saved={isSaved} label={isSaved ? 'Saved' : 'Save'} onToggle={() => toggleSave(saveTarget.kind, saveTarget.id, isSaved)} />
+            ) : null,
+        }}
+      />
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 140, gap: 18 }}>
         {!o || !product ? (
           <View style={{ padding: 16, gap: 12 }}>
@@ -111,6 +127,12 @@ export default function DealScreen() {
                     .join(' · ')}
                   code={o.promo.code}
                 />
+              </View>
+            )}
+
+            {saveTarget && (
+              <View style={{ paddingHorizontal: 16 }}>
+                <SaveAlertButtons save={saveTarget} product={product} variantId={o.variantId} showAlert={!o.trackingExcluded} />
               </View>
             )}
 

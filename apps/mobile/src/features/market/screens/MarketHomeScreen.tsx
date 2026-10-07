@@ -7,6 +7,7 @@ import { useTheme } from '@/design/theme';
 import { ChipRow, EmptyState, Icon, IconButton, SearchField, SectionHeader, SegmentedControl, Text } from '@/ui';
 
 import { useMeMutations } from '@/features/alerts/hooks';
+import { openSaved } from '@/features/alerts/SaveAlertButtons';
 import { useAuth } from '@/features/auth/authStore';
 
 import { filterSummary, ListingGrid, ListingGridSkeleton, ListingRail, MarketLoadError, MarketQuickChips, radiusLabel } from '../components';
@@ -55,7 +56,16 @@ export default function MarketHomeScreen() {
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={{ paddingBottom: 120, gap: 24 }}
       refreshControl={<RefreshControl refreshing={pulling && feed.isRefetching} onRefresh={onRefresh} />}>
-      <Stack.Screen options={{ headerRight: () => <IconButton icon="plus" label="Sell an item" size={34} tone="solid" onPress={() => router.push('/sell')} /> }} />
+      <Stack.Screen
+        options={{
+          headerRight: () => (
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              <IconButton icon="heart" label="Saved" size={34} onPress={() => openSaved('market')} />
+              <IconButton icon="plus" label="Sell an item" size={34} tone="solid" onPress={() => router.push('/sell')} />
+            </View>
+          ),
+        }}
+      />
       <View style={{ gap: 12 }}>
         <View style={{ paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
           <Pressable

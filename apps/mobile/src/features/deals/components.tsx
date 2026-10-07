@@ -9,7 +9,7 @@ import { EmptyState } from '@/ui';
 import type { Deal } from './api';
 import { toCard } from './hooks';
 
-export const openDealDetail = (d: Pick<Deal, 'offerId'>) => router.push({ pathname: '/deals/offer/[id]', params: { id: d.offerId } });
+export const openDealDetail = (d: Pick<Deal, 'offerId' | 'id'>) => router.push({ pathname: '/deals/offer/[id]', params: { id: d.offerId, deal: d.id } });
 
 export function DealGrid({ deals }: { deals: Deal[] }) {
   const cardW = useGridCardWidth();

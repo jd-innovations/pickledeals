@@ -57,6 +57,7 @@ export const AUTH_INTENTS = [
   'create_listing',
   'manage_listings',
   'report',
+  'view_saved',
 ] as const;
 export type AuthIntent = (typeof AUTH_INTENTS)[number];
 

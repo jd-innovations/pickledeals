@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView, Share, StyleSheet, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ConditionBadge, FavoriteButton, ProductImage, UsedVsNew, type ImageSource } from '@/commerce';
+import { ConditionBadge, FavoriteButton, PhotoViewer, photoIndex, ProductImage, UsedVsNew, type ImageSource } from '@/commerce';
 import { productArt } from '@/commerce/catalogArt';
 import { useTheme } from '@/design/theme';
 import { startConversation } from '@/features/chat/api';
@@ -40,6 +40,7 @@ export default function ListingScreen() {
   const requireAuth = useAuth((s) => s.requireAuth);
   const { openSeller, openManage, openConversation } = useMarketNav();
   const [page, setPage] = useState(0);
+  const [photo, setPhoto] = useState<number | null>(null);
 
   if (isError) {
     return (
@@ -77,13 +78,24 @@ export default function ListingScreen() {
   return (
     <View style={{ flex: 1 }}>
       <Stack.Screen options={{ headerShown: false }} />
+      <PhotoViewer images={pics} index={photo ?? 0} visible={photo !== null} onClose={() => setPhoto(null)} />
       <ScrollView contentContainerStyle={{ paddingBottom: 32 }}>
         <View style={{ height: heroH, backgroundColor: colors.imageTile }}>
           {l ? (
             <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false} onMomentumScrollEnd={onScroll} scrollEventThrottle={16}>
-              {pics.map((src, i) => (
-                <ProductImage key={i} source={src} width={width} aspectRatio={width / heroH} round={0} padding={56} />
-              ))}
+              {pics.map((src, i) =>
+                src.kind === 'remote' ? (
+                  <Pressable
+                    key={i}
+                    accessibilityRole="button"
+                    accessibilityLabel={pics.length > 1 ? `Open photo ${i + 1} of ${pics.length}` : 'Open photo'}
+                    onPress={() => setPhoto(photoIndex(pics, src))}>
+                    <ProductImage source={src} width={width} aspectRatio={width / heroH} round={0} padding={56} />
+                  </Pressable>
+                ) : (
+                  <ProductImage key={i} source={src} width={width} aspectRatio={width / heroH} round={0} padding={56} />
+                ),
+              )}
             </ScrollView>
           ) : (
             <Skeleton height={heroH} round={0} />

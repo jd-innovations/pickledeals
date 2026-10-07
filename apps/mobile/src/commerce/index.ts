@@ -9,4 +9,5 @@ export { PriceChart, shortDate, type ChartPoint } from './PriceChart';
 export { PriceBreakdown, RetailerOfferCard, retailerMonogram, StatGrid, StickyDealBar, type RetailerOfferCardData } from './Retail';
 export { ProductDescription } from './Description';
 export { ProductGallery } from './ProductGallery';
+export { PhotoViewer, photoIndex } from './PhotoViewer';
 export { CollectionBanner, DealHero, PriceDropRow, type DealHeroData, type PriceDropRowData } from './Deals';

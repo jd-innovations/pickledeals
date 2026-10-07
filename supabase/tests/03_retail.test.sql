@@ -61,7 +61,7 @@ select lives_ok($$insert into public.retailer_offers (variant_id, retailer_id, u
 
 -- Ranking, promos, rounding -----------------------------------------------------------------------
 
-select is((select price_cents + shipping_cents - delivered_cents from public.variant_offer_ranking
+select is((select price_cents - delivered_cents from public.variant_offer_ranking
             where variant_id = (select vid from t) and retailer_slug = 'joola-com'), 2999,
   'percent codes round the saving down (15% of $199.99 = $29.99, not $30.00)');
 select is((select promo_code from public.variant_offer_ranking where variant_id = (select vid from t) and retailer_slug = 'joola-com'), 'DINK15',
@@ -72,16 +72,16 @@ select (select vid from t), id, 'https://courtside-pro-shop.example/cfs-14', 169
 insert into public.retailer_offers (variant_id, retailer_id, url, price_cents)
 select (select vid from t), id, 'https://baseline-sports.example/cfs-14', 18000 from public.retailers where slug = 'baseline-sports';
 
-select is((select retailer_slug from public.variant_offer_ranking where variant_id = (select vid from t) and rank = 1), 'joola-com',
-  'ranking orders by delivered price including the best code (JOOLA $170.00 < CourtSide $175.00)');
+select is((select retailer_slug from public.variant_offer_ranking where variant_id = (select vid from t) and rank = 1), 'courtside-pro-shop',
+  'ranking orders by item price after the best code; shipping is settled at checkout (CourtSide $169.00 + $6 shipping < JOOLA $170.00)');
 select is((select promo_code from public.variant_offer_ranking where variant_id = (select vid from t) and retailer_slug = 'baseline-sports'), null,
   'a code verified 30 days ago is stale and never applied');
 select is((select count(*)::int from public.live_promo_codes where code = 'OLDCODE'), 0, 'stale codes are hidden');
 select is((select promo_code from public.variant_offer_ranking where variant_id = (select vid from t) and retailer_slug = 'courtside-pro-shop'), null,
   'category-targeted codes do not apply outside their category (COURT20 is shoes only)');
 
-select is((select best_delivered_cents from public.variant_price_stats where variant_id = (select vid from t)), 17000,
-  'stats pick the best delivered price');
+select is((select best_delivered_cents from public.variant_price_stats where variant_id = (select vid from t)), 16900,
+  'stats pick the best price after codes');
 select is((select offer_count from public.variant_price_stats where variant_id = (select vid from t)), 5, 'stats count every listed offer');
 select is((select deal_quality from public.variant_price_stats where variant_id = (select vid from t)), null,
   'no deal-quality label until there is a week of history');

@@ -203,7 +203,7 @@ Rule: **routes compose; features own logic; `ui/` and `commerce/` own all visual
 | `variant_market_stats` | `variant_id` PK, `active_listings`, `min_ask_cents`, `used_p25_cents`, `used_p75_cents` | Derived from listings (sold prices are weighted more heavily). Powers "Typical used $105–$135". |
 | `outbound_clicks` | `user_id?`, `offer_id?`, `promo_id?`, `placement`, `created_at` | Written by the `go` redirect function. |
 
-**Best-price rule (SQL view `variant_offer_ranking`):** `delivered = price + shipping − best applicable verified promo`, ordered ascending, ties broken by `in_stock` then `last_checked_at`. The view selects nothing from `affiliate_programs`, and a pgTAP test enforces that.
+**Best-price rule (SQL view `variant_offer_ranking`):** `delivered = price − best applicable verified promo` (revised Oct 7, 2026, owner decision: shipping is per order and settled at the store's checkout, so it's never added to a price; the store's `retailers.shipping_policy` line is shown instead). Ordered ascending, ties broken by `in_stock`, a disclosed tie preference, lower shipping (free first), then retailer name. Free-shipping codes don't change a price. The view selects nothing from `affiliate_programs`, and a pgTAP test enforces that.
 
 ### 4.4 User intent
 | Table | Notes |
@@ -509,7 +509,7 @@ Parallelizable once 6 lands: **7 alongside 8**. Admin work in 11 can start incre
    - Run separate staging and prod projects. Your existing free projects are paused, which is the free-tier behaviour to avoid in production.
 9. **Admin surface:** a small Next.js admin in `apps/admin` (recommended) vs. Supabase Studio plus scripts, or a third-party tool. A minimal version is needed by Phase 2.
 10. **Product photography source:** who supplies and background-removes catalog images (brand assets, retailer images under affiliate terms, or your own)? This affects licensing and the look of the image-tile design.
-11. **Pricing scope:** USD and US only in V1. Taxes are excluded from "delivered price" (stated in the UI).
+11. **Pricing scope:** USD and US only in V1. Prices exclude tax and shipping (stated in the UI); shipping is shown as the store's policy.
 12. **Minimum iOS version:** iOS 17+ recommended, with Liquid Glass on iOS 26 and blur fallback below.
 
 ---

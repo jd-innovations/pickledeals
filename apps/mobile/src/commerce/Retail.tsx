@@ -112,10 +112,16 @@ export function RetailerOfferCard({ offer, actionLabel, onAction }: { offer: Ret
 export function PriceBreakdown({
   rows,
   totalCents,
+  totalNote,
+  shipping,
   referenceCents,
 }: {
   rows: { label: string; value: string; strike?: boolean }[];
   totalCents: number;
+  /** After the total, e.g. "+ shipping" when the store settles it at checkout. */
+  totalNote?: string;
+  /** Shipping line under the total ("Free", "At checkout · free over $39"). */
+  shipping?: string;
   referenceCents: number | null;
 }) {
   const { colors } = useTheme();
@@ -135,13 +141,30 @@ export function PriceBreakdown({
       ))}
       <View
         accessible
-        accessibilityLabel={`You pay ${formatPrice(totalCents)}`}
+        accessibilityLabel={spoken(`You pay ${formatPrice(totalCents)}`, totalNote)}
         style={[styles.line, { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.separator, paddingTop: 10, marginTop: 2 }]}>
         <Text variant="headline">You pay</Text>
-        <Text variant="priceLarge" numeric>
-          {formatPrice(totalCents)}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', gap: 6 }}>
+          <Text variant="priceLarge" numeric>
+            {formatPrice(totalCents)}
+          </Text>
+          {totalNote ? (
+            <Text variant="footnote" tone="secondary">
+              {totalNote}
+            </Text>
+          ) : null}
+        </View>
       </View>
+      {shipping ? (
+        <View accessible accessibilityLabel={spoken('Shipping', shipping)} style={styles.line}>
+          <Text variant="footnote" tone="secondary">
+            Shipping
+          </Text>
+          <Text variant="footnote" weight="600">
+            {shipping}
+          </Text>
+        </View>
+      ) : null}
       {saved && pct ? (
         <View
           accessible

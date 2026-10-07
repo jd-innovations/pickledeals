@@ -11,9 +11,10 @@ import type { RankedOffer } from '../api';
 import { apiPriceDisclaimer, isApiPrice, offerBreakdown, priceAsOf, shipsFromLabel, stockLabel } from '../format';
 import { openDeal, useProductOffers } from '../hooks';
 
+/** 'delivered' = price after the best code (shipping is settled at checkout); 'item' = before codes. */
 type Mode = 'delivered' | 'item';
 
-/** All offers compared (design). Ranked by what you pay; check-price offers are listed last (D1). */
+/** All offers compared (design). Ranked by price after codes; check-price offers are listed last (D1). */
 export default function OffersScreen() {
   const { slug = '', variant: variantParam } = useLocalSearchParams<{ slug: string; variant?: string }>();
   const { data: product } = useProduct(slug);
@@ -40,8 +41,8 @@ export default function OffersScreen() {
       )}
       <SegmentedControl
         options={[
-          { value: 'delivered', label: 'Delivered price' },
-          { value: 'item', label: 'Item price' },
+          { value: 'delivered', label: 'With codes' },
+          { value: 'item', label: 'Before codes' },
         ]}
         value={mode}
         onChange={setMode}
@@ -64,7 +65,7 @@ export default function OffersScreen() {
                 tagline: checkPrice
                   ? 'Price shown at retailer'
                   : [
-                      isBest ? (mode === 'delivered' ? 'Lowest delivered price' : 'Lowest item price') : stockLabel(o),
+                      isBest ? (mode === 'delivered' ? 'Lowest price with codes' : 'Lowest price before codes') : stockLabel(o),
                       o.retailer.kind === 'manufacturer' ? 'Manufacturer' : null,
                       o.promo ? `code ${o.promo.code}` : null,
                     ]

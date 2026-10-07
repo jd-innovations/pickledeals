@@ -20,7 +20,7 @@ const RANGES = [
 type Range = (typeof RANGES)[number]['value'];
 
 const QUALITY_SENTENCE: Record<string, string> = {
-  all_time_low: 'The lowest delivered price we’ve tracked.',
+  all_time_low: 'The lowest price we’ve tracked.',
   excellent: 'Well below what it usually sells for.',
   good: 'Below its usual price.',
   typical: 'About what it usually sells for.',

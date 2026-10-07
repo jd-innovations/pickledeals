@@ -1,5 +1,5 @@
 begin;
-select plan(27);
+select plan(29);
 
 -- This file covers the review path; auto-create (on for the store) is covered in 18_store_auto_create.
 update public.ingestion_sources set config = config - 'auto_create' where slug = 'shopify-gripdoctor';
@@ -99,15 +99,20 @@ create function pg_temp.first() returns text language sql as $$
 $$;
 
 select is(pg_temp.first(), 'pickleball-grip-doctor', 'an exact tie goes to Grip Doctor (a disclosed preference)');
+select is((select shipping_policy from public.variant_offer_ranking where variant_id = (select (r ->> 'variant_id')::uuid from made)
+            and retailer_slug = 'pickleball-grip-doctor'), 'Free shipping over $39', 'the app gets the store''s shipping policy line');
 update public.retailer_offers set in_stock = false where external_ref = 'variant-pdtest-9001';
 select is(pg_temp.first(), 'baseline-sports', 'but never when it’s out of stock');
 update public.retailer_offers set in_stock = true where external_ref = 'variant-pdtest-9001';
 
 update public.retailers set wins_price_ties = false where slug = 'pickleball-grip-doctor';
 select is(pg_temp.first(), 'baseline-sports', 'without the preference, a fresher feed doesn’t win ties (retailer name decides)');
-update public.retailer_offers set price_cents = 19499, shipping_cents = 500
+update public.retailer_offers set shipping_cents = 500
  where retailer_id = (select id from public.retailers where slug = 'baseline-sports') and variant_id = (select (r ->> 'variant_id')::uuid from made);
-select is(pg_temp.first(), 'pickleball-grip-doctor', 'equal delivered prices: lower shipping wins');
+select is(pg_temp.first(), 'pickleball-grip-doctor', 'equal prices: lower shipping (free first) wins');
+update public.retailer_offers set price_cents = 19499
+ where retailer_id = (select id from public.retailers where slug = 'baseline-sports') and variant_id = (select (r ->> 'variant_id')::uuid from made);
+select is(pg_temp.first(), 'baseline-sports', 'a lower item price wins even with shipping (shipping is settled at checkout)');
 update public.retailers set wins_price_ties = true where slug = 'pickleball-grip-doctor';
 update public.retailer_offers set price_cents = 18999, shipping_cents = 0
  where retailer_id = (select id from public.retailers where slug = 'baseline-sports') and variant_id = (select (r ->> 'variant_id')::uuid from made);

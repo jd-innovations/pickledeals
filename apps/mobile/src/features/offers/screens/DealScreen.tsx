@@ -11,7 +11,7 @@ import { SaveAlertButtons } from '@/features/alerts/SaveAlertButtons';
 import { galleryImages, useProduct, useProductSlug } from '@/features/catalog/hooks';
 import { Chip, ErrorState, Group, Icon, ListRow, Skeleton, Text } from '@/ui';
 
-import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, ownershipDisclosure, priceAsOf, promoDetail, shippingLabel, shipsFromLabel } from '../format';
+import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, ownershipDisclosure, priceAsOf, promoDetail, shippingLabel, shippingValue, shipsFromLabel } from '../format';
 import { openDeal, useLivePromos, useOffer } from '../hooks';
 
 /** Deal detail (design: "Deal detail (promo code)"): one offer, its code and what you pay. */
@@ -104,10 +104,11 @@ export default function DealScreen() {
                   rows={[
                     ...(msrp != null && msrp > (o.priceCents ?? 0) ? [{ label: 'List price', value: formatPrice(msrp), strike: true }] : []),
                     { label: `Price at ${o.retailer.name}`, value: formatPrice(o.priceCents!) },
-                    { label: 'Shipping', value: o.shippingCents ? formatPrice(o.shippingCents) : 'Free' },
                     ...(o.promo ? [{ label: `Code ${o.promo.code}`, value: `−${formatPrice(o.promo.discountCents)}` }] : []),
                   ]}
                   totalCents={o.deliveredCents!}
+                  totalNote={o.shippingCents === 0 ? undefined : '+ shipping'}
+                  shipping={shippingValue(o)}
                   referenceCents={msrp}
                 />
               )}

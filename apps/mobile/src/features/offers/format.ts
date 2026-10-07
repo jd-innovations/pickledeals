@@ -4,18 +4,31 @@ import type { LivePromo, RankedOffer, VariantStats } from './api';
 
 /** Copy for offers, shared by Product, All offers and Deal detail so they always agree. */
 
+/**
+ * Shipping is the store's business at checkout (per order, by cart and address), so prices never include
+ * it. The label is information: "free shipping" when this item ships free, else the store's policy
+ * ("free shipping over $39"), else "shipping at checkout".
+ */
 export function shippingLabel(o: RankedOffer): string {
   if (o.shippingCents == null) return '';
-  return o.shippingCents === 0 ? 'free shipping' : `${formatPrice(o.shippingCents)} shipping`;
+  if (o.shippingCents === 0) return 'free shipping';
+  const policy = o.shippingPolicy?.trim();
+  return policy ? policy.charAt(0).toLowerCase() + policy.slice(1) : 'shipping at checkout';
 }
 
-/** "$189 + $6 shipping", "$229 − $34 code + free shipping". */
+/** Breakdown-row value for shipping: "Free", or "At checkout · free over $39". */
+export function shippingValue(o: RankedOffer): string {
+  if (o.shippingCents === 0) return 'Free';
+  const policy = o.shippingPolicy?.trim().replace(/^free shipping/i, 'free');
+  return policy ? `At checkout · ${policy}` : 'At checkout';
+}
+
+/** "$189 · shipping at checkout", "$229 − $34 code · free shipping". */
 export function offerBreakdown(o: RankedOffer): string {
   if (o.priceCents == null) return 'Price shown at retailer';
   const parts = [formatPrice(o.priceCents)];
   if (o.promo) parts.push(`− ${formatPrice(o.promo.discountCents)} code`);
-  parts.push(`+ ${shippingLabel(o)}`);
-  return parts.join(' ');
+  return [parts.join(' '), shippingLabel(o)].filter(Boolean).join(' · ');
 }
 
 /** "Ships from Engage" for items a supplier ships on the retailer's behalf. */
@@ -77,4 +90,5 @@ export function apiPriceDisclaimer(offers: RankedOffer[]): string | null {
 /** Amazon's Associates policies restrict price tracking, so history, deal quality and alerts leave it out. */
 export const UNTRACKED_NOTE = 'Price history and alerts don’t include Amazon.';
 
-export const AFFILIATE_DISCLOSURE = 'Affiliate links — PickleDeals may earn a commission. Offers are ranked by what you pay, never by commission.';
+export const AFFILIATE_DISCLOSURE =
+  'Affiliate links — PickleDeals may earn a commission. Offers are ranked by price after codes, never by commission. Prices exclude tax and shipping, which the store settles at checkout.';

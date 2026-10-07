@@ -14,7 +14,9 @@ export type RankedOffer = {
   /** D1: 'check_price' offers carry no price and render a CTA. */
   priceDisplay: 'show' | 'check_price';
   priceCents: number | null;
+  /** The store's estimate for this item alone; shipping is settled at checkout and never added to prices. */
   shippingCents: number | null;
+  /** What the item costs after the best code (shipping excluded). Offers rank on it. */
   deliveredCents: number | null;
   promo: { id: string; code: string; discountCents: number } | null;
   rank: number | null;
@@ -31,6 +33,8 @@ export type RankedOffer = {
   ownershipNote: string | null;
   /** The retailer applies the promo code at checkout itself (Shopify discount link). */
   codeAutoApplied: boolean;
+  /** The store's policy line, e.g. "Free shipping over $39". */
+  shippingPolicy: string | null;
 };
 
 export type VariantStats = {
@@ -83,10 +87,11 @@ type RankingRow = {
   ships_from: string | null;
   ownership_note: string | null;
   code_auto_applied: boolean;
+  shipping_policy: string | null;
 };
 
 const RANKING_COLUMNS =
-  'offer_id, variant_id, retailer_slug, retailer_name, retailer_kind, price_display, price_cents, shipping_cents, delivered_cents, promo_id, promo_code, promo_discount_cents, rank, in_stock, available_sizes, last_checked_at, price_source, tracking_excluded, ships_from, ownership_note, code_auto_applied';
+  'offer_id, variant_id, retailer_slug, retailer_name, retailer_kind, price_display, price_cents, shipping_cents, delivered_cents, promo_id, promo_code, promo_discount_cents, rank, in_stock, available_sizes, last_checked_at, price_source, tracking_excluded, ships_from, ownership_note, code_auto_applied, shipping_policy';
 
 const toOffer = (r: RankingRow): RankedOffer => ({
   offerId: r.offer_id,
@@ -106,6 +111,7 @@ const toOffer = (r: RankingRow): RankedOffer => ({
   shipsFrom: r.ships_from,
   ownershipNote: r.ownership_note,
   codeAutoApplied: r.code_auto_applied ?? false,
+  shippingPolicy: r.shipping_policy ?? null,
 });
 
 /** Priced offers in rank order, then check-price offers (D1: listed, never ranked). */

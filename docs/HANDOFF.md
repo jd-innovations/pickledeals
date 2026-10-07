@@ -66,6 +66,11 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    overlapping sticky bars; not yet audited: signed-in screens and the map.
 
 ### Facts to know
+- **Prices exclude shipping (Oct 7, owner decision; migration 20261025, plan §5 updated):** every price and
+  ranking is item price − best code. Shipping shows as the store's policy (`retailers.shipping_policy`, Grip
+  Doctor: "Free shipping over $39"; no admin field yet) and is only a tie-breaker (free first). Free-shipping
+  codes don't change prices. History, typical price and lows use item prices. App copy: "Prices exclude tax and
+  shipping"; All offers toggle is "With codes / Before codes"; deal breakdown "You pay $X + shipping".
 - **Auto-create (Oct 7, user decision):** `shopify-gripdoctor` has `config.auto_create = true`. New in-stock store
   items become published products by themselves (migrations 20261023/24): brand from the vendor (new vendors →
   new brand, " Pickleball" suffix dropped), category from Shopify Product type else title keywords

@@ -71,6 +71,11 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - **Builds:** paid Expo plan; preview builds are the preferred way to test. `eas.json`: preview/production use
   the hosted URL + publishable key; `development` uses the PC (`.env.local`); `simulator` = iOS Simulator build
   of preview (EAS build 90748ede…, for Appetize; UI fixes via `eas update --channel preview`).
+- **OTA to the preview build:** `eas update` reads `apps/mobile/.env.local` (the PC), not eas.json, so pass
+  the hosted values: from `apps/mobile`, `APP_ENV=staging EXPO_PUBLIC_SUPABASE_URL=https://tadxbjlhknukpyxbqrpt.supabase.co
+  EXPO_PUBLIC_SUPABASE_ANON_KEY=<publishable key from eas.json> npx eas-cli update --channel preview --environment preview
+  --platform ios --message "…" --non-interactive`; then check `dist/_expo/static/js/ios/*.hbc` contains the hosted URL.
+  First OTA (Oct 6): deal CTA/promo row fix, update group 9e1577a4….
 - **Email:** paid Resend plan; open question: which sending domain.
 - **CI:** check the GitHub run after each push (public API:
   `https://api.github.com/repos/jd-innovations/pickledeals/actions/runs?head_sha=<sha>`); `gh` isn't installed.

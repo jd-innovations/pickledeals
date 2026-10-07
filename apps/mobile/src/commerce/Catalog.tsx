@@ -9,7 +9,7 @@ import { ProductImage, type ImageSource } from './ProductImage';
 
 /** Catalog visuals (Phase 2): product cards and rows, category tiles, brand marks and rows. */
 
-export type ProductCardData = { slug: string; brand: string; name: string; image: ImageSource; msrpCents: number | null; meta?: string };
+export type ProductCardData = { slug: string; brand: string; name: string; image: ImageSource; msrpCents: number | null; priceCents?: number | null; meta?: string };
 
 /** Grid card for catalog products. Prices from retailers replace the MSRP line once offers exist. */
 export function ProductCard({ product, width, onPress }: { product: ProductCardData; width: number; onPress?: () => void }) {
@@ -19,7 +19,7 @@ export function ProductCard({ product, width, onPress }: { product: ProductCardD
       accessibilityLabel={spoken(
         product.brand,
         product.name,
-        product.msrpCents != null && `MSRP ${formatPrice(product.msrpCents)}`,
+        product.priceCents != null ? formatPrice(product.priceCents) : product.msrpCents != null && `MSRP ${formatPrice(product.msrpCents)}`,
         product.meta && speakable(product.meta),
       )}
       onPress={onPress}
@@ -32,11 +32,15 @@ export function ProductCard({ product, width, onPress }: { product: ProductCardD
         <Text variant="subhead" style={{ lineHeight: 19 }} numberOfLines={2}>
           {product.name}
         </Text>
-        {product.msrpCents != null && (
+        {product.priceCents != null ? (
+          <Text variant="subhead" weight="700" numeric>
+            {formatPrice(product.priceCents)}
+          </Text>
+        ) : product.msrpCents != null ? (
           <Text variant="footnote" tone="secondary" numeric>
             MSRP {formatPrice(product.msrpCents)}
           </Text>
-        )}
+        ) : null}
         {product.meta ? (
           <Text variant="caption" weight="400" tone="secondary" numberOfLines={1}>
             {product.meta}

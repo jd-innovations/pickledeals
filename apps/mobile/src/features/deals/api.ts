@@ -118,7 +118,7 @@ export type FeedQuery = {
   limit?: number;
 };
 
-export async function fetchDeals(q: FeedQuery): Promise<{ total: number; items: Deal[] }> {
+export async function fetchDeals(q: FeedQuery, skip = 0): Promise<{ total: number; items: Deal[] }> {
   const { data, error } = await requireSupabase().rpc('deals_feed', {
     feed: q.feed ?? 'today',
     category_slug: q.category,
@@ -131,6 +131,7 @@ export async function fetchDeals(q: FeedQuery): Promise<{ total: number; items: 
     in_stock_only: q.inStockOnly ?? false,
     sort: q.sort,
     max_rows: q.limit ?? 60,
+    skip,
   });
   if (error) throw error;
   const raw = data as unknown as { total: number; items: Row[] };

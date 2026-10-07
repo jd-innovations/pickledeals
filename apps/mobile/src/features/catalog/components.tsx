@@ -20,7 +20,7 @@ export const openProduct = (slug: string) => router.push({ pathname: '/deals/pro
 export const openCategory = (slug: string) => router.push({ pathname: '/deals/category/[slug]', params: { slug } });
 export const openBrand = (slug: string) => router.push({ pathname: '/deals/brand/[slug]', params: { slug } });
 
-export function ProductGrid({ products, showBrand = true }: { products: ProductSummary[]; showBrand?: boolean }) {
+export function ProductGrid({ products, showBrand = true }: { products: (ProductSummary & { priceCents?: number })[]; showBrand?: boolean }) {
   const cardW = useGridCardWidth();
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: GAP, rowGap: 20, paddingHorizontal: GUTTER }}>
@@ -28,7 +28,7 @@ export function ProductGrid({ products, showBrand = true }: { products: ProductS
         <ProductCard
           key={p.id}
           width={cardW}
-          product={{ slug: p.slug, brand: showBrand ? p.brand.name : p.category.name, name: p.name, image: productImage(p), msrpCents: p.msrpCents }}
+          product={{ slug: p.slug, brand: showBrand ? p.brand.name : p.category.name, name: p.name, image: productImage(p), msrpCents: p.msrpCents, priceCents: p.priceCents }}
           onPress={() => openProduct(p.slug)}
         />
       ))}

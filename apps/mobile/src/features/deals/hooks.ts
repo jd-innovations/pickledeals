@@ -1,5 +1,5 @@
 import { formatPrice, pickDealBadge } from '@pickledeals/shared';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { create } from 'zustand';
 
 import type { DealCardData } from '@/commerce';
@@ -12,12 +12,27 @@ const DEALS_STALE = 60_000;
 export const dealKeys = {
   home: ['deals', 'home'] as const,
   feed: (q: FeedQuery) => ['deals', 'feed', q] as const,
+  paged: (q: FeedQuery) => ['deals', 'paged', q] as const,
   collection: (slug: string) => ['deals', 'collection', slug] as const,
 };
 
 export const useDealsHome = () => useQuery({ queryKey: dealKeys.home, queryFn: fetchHome, staleTime: DEALS_STALE });
 export const useDeals = (q: FeedQuery, enabled = true) =>
   useQuery({ queryKey: dealKeys.feed(q), queryFn: () => fetchDeals(q), staleTime: DEALS_STALE, enabled, placeholderData: keepPreviousData });
+/** Deal lists page through the whole feed (30 at a time) so nothing past the first page is cut off. */
+const PAGE = 30;
+export const useDealsPaged = (q: FeedQuery) =>
+  useInfiniteQuery({
+    queryKey: dealKeys.paged(q),
+    queryFn: ({ pageParam }) => fetchDeals({ ...q, limit: PAGE }, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (last, pages) => {
+      const loaded = pages.reduce((n, p) => n + p.items.length, 0);
+      return last.items.length > 0 && loaded < last.total ? loaded : undefined;
+    },
+    staleTime: DEALS_STALE,
+    placeholderData: keepPreviousData,
+  });
 export const useCollection = (slug: string) =>
   useQuery({ queryKey: dealKeys.collection(slug), queryFn: () => fetchCollection(slug), staleTime: 5 * 60_000, enabled: !!slug });
 

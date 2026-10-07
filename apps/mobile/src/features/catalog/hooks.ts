@@ -14,6 +14,7 @@ import {
   fetchCategory,
   fetchProduct,
   fetchProductSlug,
+  fetchProductsUnder,
   imageUrl,
   searchCatalog,
   type ProductDetail,
@@ -29,6 +30,7 @@ export const catalogKeys = {
   category: (slug: string) => ['catalog', 'category', slug] as const,
   brand: (slug: string) => ['catalog', 'brand', slug] as const,
   product: (slug: string) => ['catalog', 'product', slug] as const,
+  under: (maxCents: number) => ['catalog', 'under', maxCents] as const,
 };
 
 function useDebounced<T>(value: T, ms: number): T {
@@ -61,6 +63,8 @@ export const useBrand = (slug: string) =>
 export const useProduct = (slug: string) =>
   useQuery({ queryKey: catalogKeys.product(slug), queryFn: () => fetchProduct(slug), staleTime: CATALOG_STALE, enabled: !!slug });
 
+export const useProductsUnder = (maxCents: number, enabled = true) =>
+  useQuery({ queryKey: catalogKeys.under(maxCents), queryFn: () => fetchProductsUnder(maxCents), staleTime: CATALOG_STALE, enabled });
 export const useProductSlug = (productId: string | undefined) =>
   useQuery({ queryKey: ['catalog', 'slug', productId ?? ''], queryFn: () => fetchProductSlug(productId!), enabled: !!productId, staleTime: Infinity });
 

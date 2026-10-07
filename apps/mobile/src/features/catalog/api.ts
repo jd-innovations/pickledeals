@@ -139,6 +139,30 @@ const toSummary = (row: ProductRow): ProductSummary => ({
   image: firstImage(row.images),
 });
 
+/**
+ * Regular-priced products whose best price (after codes, no shipping) is at most `maxCents`, cheapest
+ * first; one entry per product (its cheapest variant). For "More under $50" below the deals.
+ */
+export async function fetchProductsUnder(maxCents: number, limit = 100): Promise<(ProductSummary & { priceCents: number })[]> {
+  const { data, error } = await requireSupabase()
+    .from('variant_price_stats')
+    .select(`best_delivered_cents, variant:product_variants!inner(product_id, product:products!inner(status, ${PRODUCT_COLUMNS}))`)
+    .lte('best_delivered_cents', maxCents)
+    .eq('variant.product.status', 'active')
+    .order('best_delivered_cents')
+    .limit(limit);
+  if (error) throw error;
+  const seen = new Set<string>();
+  const out: (ProductSummary & { priceCents: number })[] = [];
+  for (const r of data as unknown as { best_delivered_cents: number; variant: { product: ProductRow } }[]) {
+    const p = r.variant.product;
+    if (seen.has(p.id)) continue;
+    seen.add(p.id);
+    out.push({ ...toSummary(p), priceCents: r.best_delivered_cents });
+  }
+  return out;
+}
+
 export async function fetchCategory(slug: string): Promise<{ category: Ref; products: ProductSummary[] }> {
   const client = requireSupabase();
   const [category, products] = await Promise.all([

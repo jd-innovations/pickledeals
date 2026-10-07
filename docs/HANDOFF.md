@@ -66,6 +66,10 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    overlapping sticky bars; not yet audited: signed-in screens and the map.
 
 ### Facts to know
+- **Domain `pickledeals.app` (registered Oct 7; DNS at Hostinger, `dns-parking.com`).** Resend domain verified
+  (send.* MX/SPF, DKIM, DMARC p=none). Supabase hosted SMTP = Resend (`no-reply@pickledeals.app`, "PickleDeals"),
+  email rate limit 100/h; test code delivered Oct 7. Next for the domain: website with /privacy and /terms (App
+  Store), optional admin.pickledeals.app, later universal links.
 - **Prices exclude shipping (Oct 7, owner decision; migration 20261025, plan §5 updated):** every price and
   ranking is item price − best code. Shipping shows as the store's policy (`retailers.shipping_policy`, Grip
   Doctor: "Free shipping over $39"; editable in admin › Retailers) and is only a tie-breaker (free first). Free-shipping

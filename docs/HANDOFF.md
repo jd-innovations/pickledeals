@@ -39,9 +39,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    (`flat_cents` 499, `free_over_cents` 3900), every 30 min. First run: 32 products, 15 skipped (out of
    stock), 17 unmatched → review queue; 0 offers until staff link/publish them in the hosted admin. All 7
    cron jobs exist.
-3. **Preview build** for the iPhone: `eas build --profile preview --platform ios` (from `apps/mobile`; internal
-   distribution, hosted backend). The user signs in with an email code; then grant admin on hosted:
-   `insert into public.user_roles (user_id, role) select id, 'admin' from auth.users where email = '<their email>';`
+3. **Preview build (Oct 6): done.** EAS build 67a1c076… (preview, hosted backend) installed; the user
+   signed in as dhjesus122@gmail.com and has `admin` on hosted. Next for the user: `npm run admin:hosted` →
+   review queue → link/publish the 17 Grip Doctor products, then check offers in the app.
 4. **Admin on hosted:** done. `npm run admin:hosted` (or launch config `admin-hosted`, :5175) runs the admin
    against hosted via Vite mode `hosted` (`apps/admin/.env.hosted`, public values, committed); the tab title
    starts with "HOSTED". Usable once the user has the admin role on hosted (step 3) and email codes send (step 1).

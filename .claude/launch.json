@@ -72,6 +72,18 @@
         "EXPO_PUBLIC_SUPABASE_URL": "https://tadxbjlhknukpyxbqrpt.supabase.co",
         "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_gTRmKe2DsjR3g7xmj4XsEA_2EcRyVIw"
       }
+    },
+    {
+      "name": "site",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "5181",
+        "--directory",
+        "site"
+      ],
+      "port": 5181
     }
   ]
 }

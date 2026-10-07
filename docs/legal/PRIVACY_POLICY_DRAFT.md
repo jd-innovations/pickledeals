@@ -1,5 +1,10 @@
 # PickleDeals Privacy Policy (DRAFT)
 
+> **Published v1 (Oct 7, 2026): `site/privacy/index.html` is the live Privacy Policy at pickledeals.app.**
+> Edit that file, not this draft. Owner decisions: operator JD Innovations LLC (Florida, no street address
+> published), contact support@pickledeals.app, 18+, Florida law, v1 without lawyer review (review before App Store launch).
+
+
 > **Draft for review, not legal advice.** Written from what the code actually stores (October 2026).
 > A lawyer should review it before publishing, especially the sections marked ⚠. Fill in the
 > bracketed items. Keep it in sync with the App Store privacy labels in `docs/APP_STORE.md`.

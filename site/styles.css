@@ -1,0 +1,78 @@
+/* PickleDeals website. Tokens follow the app's design (preview/pd.css): monochrome, product imagery
+   provides colour, dark tuned separately. */
+:root {
+  --bg: #ffffff;
+  --surface: #f4f4f3;
+  --text-1: #0a0a0a;
+  --text-2: #555555;
+  --text-3: #717171;
+  --border: #e2e2e0;
+  --int: #0a0a0a;
+  --on-int: #ffffff;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b0b0c;
+    --surface: #161617;
+    --text-1: #f5f5f4;
+    --text-2: #a6a6a6;
+    --text-3: #8a8a8a;
+    --border: #2e2e31;
+    --int: #f5f5f4;
+    --on-int: #0b0b0c;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-1);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+.wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
+header.site { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+.brand { font-weight: 800; font-size: 20px; letter-spacing: -0.03em; text-decoration: none; }
+nav.site a { color: var(--text-2); text-decoration: none; font-size: 15px; font-weight: 600; margin-left: 18px; }
+nav.site a:hover { color: var(--text-1); }
+
+.hero { padding: 56px 0 40px; }
+.hero h1 { font-size: 44px; line-height: 1.08; letter-spacing: -0.035em; margin: 0 0 16px; font-weight: 800; }
+.hero p { font-size: 20px; color: var(--text-2); margin: 0 0 28px; }
+.pill {
+  display: inline-flex; align-items: center; height: 52px; padding: 0 24px; border-radius: 26px;
+  background: var(--int); color: var(--on-int); font-weight: 700; text-decoration: none;
+}
+.pill.muted { background: var(--surface); color: var(--text-1); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 8px 0 48px; }
+.card { background: var(--surface); border-radius: 20px; padding: 20px; }
+.card h2 { font-size: 17px; margin: 0 0 6px; letter-spacing: -0.01em; }
+.card p { margin: 0; color: var(--text-2); font-size: 15px; }
+
+.doc { padding: 24px 0 56px; }
+.doc h1 { font-size: 34px; letter-spacing: -0.025em; line-height: 1.15; margin: 8px 0 6px; }
+.doc .meta { color: var(--text-3); font-size: 15px; margin: 0 0 28px; }
+.doc h2 { font-size: 22px; letter-spacing: -0.015em; margin: 36px 0 8px; }
+.doc p, .doc li { color: var(--text-1); }
+.doc ul { padding-left: 22px; }
+.doc li { margin: 4px 0; }
+.summary { background: var(--surface); border-radius: 20px; padding: 4px 20px; margin: 0 0 8px; }
+.table-wrap { overflow-x: auto; margin: 12px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px 10px 0; border-bottom: 1px solid var(--border); }
+th { color: var(--text-2); font-weight: 600; }
+
+footer.site { border-top: 1px solid var(--border); padding: 24px 0 40px; color: var(--text-3); font-size: 14px; }
+footer.site a { color: var(--text-2); margin-right: 16px; }
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 36px; }
+  .hero p { font-size: 18px; }
+  nav.site a { margin-left: 12px; }
+}

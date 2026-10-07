@@ -1,5 +1,10 @@
 # PickleDeals Terms of Use (DRAFT)
 
+> **Published v1 (Oct 7, 2026): `site/terms/index.html` is the live Terms at pickledeals.app.**
+> Edit that file, not this draft. Owner decisions: operator JD Innovations LLC (Florida, no street address
+> published), contact support@pickledeals.app, 18+, Florida law, v1 without lawyer review (review before App Store launch).
+
+
 > **Draft for review, not legal advice.** A lawyer should review it before publishing, especially
 > the sections marked ⚠. Apple requires apps with user posts and messaging to have users agree to
 > terms that forbid objectionable content and abusive users (App Store Review Guideline 1.2). These

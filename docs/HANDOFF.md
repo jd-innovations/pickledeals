@@ -66,6 +66,12 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    overlapping sticky bars; not yet audited: signed-in screens and the map.
 
 ### Facts to know
+- **Branding (parked by the user, Oct 7):** the app icon and splash are still Expo defaults (`assets/expo.icon`,
+  `images/icon.png`, `splash-icon.png`); iOS push shows the app icon. The approved design's brand is the "pd"
+  monogram (black rounded square, white heavy lowercase "pd") + "PickleDeals" wordmark (preview/Launch.dc.html;
+  Appearance lists "App icon: Black"). Proposed set (awaiting the user's logo decision): SVG/PNG logo files under
+  site/brand, an iOS 26 .icon (new build needed), branded sign-in email (supabase/templates/email-code.html is
+  plain), website favicon/OG image. Must be done before external TestFlight / App Store.
 - **Domain `pickledeals.app` (registered Oct 7; DNS at Hostinger, `dns-parking.com`).** Resend domain verified
   (send.* MX/SPF, DKIM, DMARC p=none). Supabase hosted SMTP = Resend (`no-reply@pickledeals.app`, "PickleDeals"),
   email rate limit 100/h; test code delivered Oct 7.

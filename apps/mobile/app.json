@@ -38,10 +38,11 @@
         {
           "backgroundColor": "#FFFFFF",
           "dark": {
+            "image": "./assets/images/splash-logo-dark.png",
             "backgroundColor": "#0B0B0C"
           },
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "image": "./assets/images/splash-logo.png",
+          "imageWidth": 220
         }
       ],
       "expo-secure-store",

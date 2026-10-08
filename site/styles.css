@@ -39,7 +39,7 @@ a { color: inherit; }
 .wrap { max-width: 720px; margin: 0 auto; padding: 0 20px; }
 header.site { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
 .brand { display: block; line-height: 0; text-decoration: none; }
-.brand img { display: block; height: 40px; width: auto; }
+.brand img { display: block; height: 36px; width: auto; }
 nav.site a { color: var(--text-2); text-decoration: none; font-size: 15px; font-weight: 600; margin-left: 18px; }
 nav.site a:hover { color: var(--text-1); }
 

@@ -76,16 +76,13 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   only when Shopify says it's applicable; rejected codes are left to lapse (14 days) and named in the run note.
   First run caught NEWCUSTOMER20 targeting 4 products Shopify excludes (HEXXO ×2, GrippySocks, Trigger): app
   targets now match Shopify's 6 (WrapCore, WrapGrip 4/8, Training Aid, PickleSole, Pro Towel).
-- **Branding (parked by the user, Oct 7):** the app icon and splash are still Expo defaults (`assets/expo.icon`,
-  `images/icon.png`, `splash-icon.png`); iOS push shows the app icon. The approved design's brand is the "pd"
-  monogram (black rounded square, white heavy lowercase "pd") + "PickleDeals" wordmark (preview/Launch.dc.html;
-  Appearance lists "App icon: Black"). UPDATE Oct 7: the owner supplied the logo (site/brand: light = black PICKLE +
-  flat gold DEALS #D39E06; dark = white PICKLE + gold gradient, dark backgrounds only). App icon A chosen:
-  assets/images/app-icon.png (dark logo on #0A0A0A, 1024 opaque), wired in app.json; shows from the NEXT build.
-  Website header logo (light/dark) and the branded sign-in email are live (templates pushed with config push:
-  auth only, storage declined). Splash and the bell colour not approved yet. Proposed set (awaiting the user's logo decision): SVG/PNG logo files under
-  site/brand, an iOS 26 .icon (new build needed), branded sign-in email (supabase/templates/email-code.html is
-  plain), website favicon/OG image. Must be done before external TestFlight / App Store.
+- **Branding (Oct 8, owner approved):** the brand is the owner's **PD logo** ("PD" box + "PICKLE / DEALS"), black #0A0A0A
+  on light, white on dark, rebuilt as vector in `site/brand/v2` (build_logo_svg.py, Montserrat OFL; PNG exports;
+  compare.html). Live: website header (SVG, light/dark) and sign-in email (pd-logo-black-480.png). App: icon =
+  white PD monogram on black (`assets/images/app-icon.png` from pd-app-icon-1024.png), splash = full logo
+  (`splash-logo.png` / `splash-logo-dark.png`, width 220): both show from the NEXT native build (not run yet).
+  Earlier logos (site/brand/*.png: PICKLE/DEALS gold; the 3D script logo was declined: Apple-logo resemblance)
+  are unused history.
 - **Domain `pickledeals.app` (registered Oct 7; DNS at Hostinger, `dns-parking.com`).** Resend domain verified
   (send.* MX/SPF, DKIM, DMARC p=none). Supabase hosted SMTP = Resend (`no-reply@pickledeals.app`, "PickleDeals"),
   email rate limit 100/h; test code delivered Oct 7.

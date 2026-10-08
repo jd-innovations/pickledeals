@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logo comparison</title>
+<style>
+  body { margin: 0; padding: 24px; font: 14px -apple-system, system-ui, sans-serif; background: #f2f2f7; color: #333; }
+  .row { display: flex; gap: 24px; align-items: flex-start; margin-bottom: 24px; }
+  .cell { background: #fff; padding: 16px; border-radius: 12px; }
+  .cell p { margin: 0 0 8px; font-weight: 600; }
+  img { display: block; width: 640px; height: auto; }
+  .stack { position: relative; width: 640px; }
+  .stack img { position: absolute; top: 0; left: 0; }
+  .stack .orig { opacity: 1; }
+  .stack .svg { opacity: 0.55; filter: invert(17%) sepia(97%) saturate(7000%) hue-rotate(352deg); mix-blend-mode: multiply; }
+  .dark { background: #0b0b0c; }
+  .dark p { color: #ddd; }
+  .zoom img { width: 1300px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="cell"><p>Original (PNG)</p><img src="pd-logo-black.png" alt=""></div>
+    <div class="cell"><p>Rebuilt (SVG)</p><img src="pd-logo-black.svg" alt=""></div>
+  </div>
+  <div class="row">
+    <div class="cell"><p>Overlay: black = original, red = rebuilt (dark red = both agree)</p><div class="stack" style="height:171px"><img class="orig" src="pd-logo-black.png" alt=""><img class="svg" src="pd-logo-black.svg" alt=""></div></div>
+    <div class="cell dark"><p>Rebuilt, white on dark</p><img src="pd-logo-white.svg" alt=""></div>
+  </div>
+  <div class="row">
+    <div class="cell zoom"><p>Detail at 2× (rebuilt)</p><img src="pd-logo-black.svg" alt=""></div>
+  </div>
+</body>
+</html>

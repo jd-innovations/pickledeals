@@ -79,7 +79,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   `pickledeals-site` (git import, root `site/`, auto-deploys on push). Hostinger DNS: A @ 76.76.21.21, CNAME www →
   Vercel. The Vercel connector is read-only on jdflow (create project/deploy = 403). Legal v1 published without
   lawyer review (review before App Store launch). support@pickledeals.app needs a Hostinger forward (user).
-  Still to do in the app: links to Privacy/Terms/Support, and terms acceptance before first post/message (Apple 1.2).
+  In the app (Oct 7): Profile › About links (Support, Terms, Privacy, Version), sign-in agreement line, and a one-time
+  "Community rules" agreement before a first listing/message/offer (TERMS_VERSION in shared domain.ts; stored by
+  accept_terms in profiles_private; bump the version when the published terms change).
 - **Prices exclude shipping (Oct 7, owner decision; migration 20261025, plan §5 updated):** every price and
   ranking is item price − best code. Shipping shows as the store's policy (`retailers.shipping_policy`, Grip
   Doctor: "Free shipping over $39"; editable in admin › Retailers) and is only a tie-breaker (free first). Free-shipping

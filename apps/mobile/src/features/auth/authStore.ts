@@ -1,4 +1,4 @@
-import { requiresPublicName, type AuthIntent } from '@pickledeals/shared';
+import { requiresPublicName, TERMS_VERSION, type AuthIntent } from '@pickledeals/shared';
 import type { User } from '@supabase/supabase-js';
 import { router } from 'expo-router';
 import { create } from 'zustand';
@@ -28,12 +28,15 @@ type AuthState = {
   resumeAfterSignIn: () => void;
   /** Called by the display-name sheet after saving. */
   resumeAfterProfile: () => void;
+  resumeAfterTerms: () => void;
   cancel: () => void;
   refreshProfile: () => Promise<MyProfile | null>;
   setProfile: (profile: MyProfile) => void;
 };
 
 const needsPublicName = (intent: AuthIntent, profile: MyProfile | null) => requiresPublicName(intent) && profile?.nameSource !== 'provided';
+/** Posting intents need the current Terms accepted (Guideline 1.2), after the public name. */
+export const needsTerms = (intent: AuthIntent, profile: MyProfile | null) => requiresPublicName(intent) && profile?.termsVersion !== TERMS_VERSION;
 
 function finish(pending: PendingIntent | null) {
   if (router.canGoBack()) router.back();
@@ -54,6 +57,9 @@ export const useAuth = create<AuthState>((set, get) => ({
     } else if (needsPublicName(intent, profile)) {
       set({ pending: { intent, run } });
       router.push({ pathname: '/display-name', params: { intent } });
+    } else if (needsTerms(intent, profile)) {
+      set({ pending: { intent, run } });
+      router.push({ pathname: '/terms-agree', params: { intent } });
     } else {
       run();
     }
@@ -64,10 +70,23 @@ export const useAuth = create<AuthState>((set, get) => ({
       router.replace({ pathname: '/display-name', params: { intent: pending.intent } });
       return;
     }
+    if (pending && needsTerms(pending.intent, profile)) {
+      router.replace({ pathname: '/terms-agree', params: { intent: pending.intent } });
+      return;
+    }
     set({ pending: null });
     finish(pending);
   },
   resumeAfterProfile: () => {
+    const { pending, profile } = get();
+    if (pending && needsTerms(pending.intent, profile)) {
+      router.replace({ pathname: '/terms-agree', params: { intent: pending.intent } });
+      return;
+    }
+    set({ pending: null });
+    finish(pending);
+  },
+  resumeAfterTerms: () => {
     const { pending } = get();
     set({ pending: null });
     finish(pending);
@@ -91,7 +110,8 @@ export const useAuth = create<AuthState>((set, get) => ({
       throw e;
     }
   },
-  setProfile: (profile) => set({ profile }),
+  // Keeps the known terms version when an update returns the public profile only.
+  setProfile: (profile) => set({ profile: { ...profile, termsVersion: profile.termsVersion ?? get().profile?.termsVersion ?? null } }),
 }));
 
 function toAuthUser(user: User): AuthUser {

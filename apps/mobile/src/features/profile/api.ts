@@ -9,6 +9,8 @@ export type MyProfile = {
   nameSource: 'generated' | 'provided';
   memberSince: string;
   areaLabel: string | null;
+  /** Terms of Use version the user agreed to (null: not yet). */
+  termsVersion?: string | null;
 };
 
 type ProfileRow = {
@@ -30,9 +32,18 @@ const toProfile = (row: ProfileRow): MyProfile => ({
 });
 
 export async function fetchProfile(userId: string): Promise<MyProfile> {
-  const { data, error } = await requireSupabase().from('profiles').select(COLUMNS).eq('id', userId).single<ProfileRow>();
+  const client = requireSupabase();
+  const [{ data, error }, terms] = await Promise.all([
+    client.from('profiles').select(COLUMNS).eq('id', userId).single<ProfileRow>(),
+    client.from('profiles_private').select('terms_version').eq('user_id', userId).maybeSingle(),
+  ]);
   if (error) throw error;
-  return toProfile(data);
+  return { ...toProfile(data), termsVersion: terms.data?.terms_version ?? null };
+}
+
+export async function acceptTerms(version: string): Promise<void> {
+  const { error } = await requireSupabase().rpc('accept_terms', { version });
+  if (error) throw error;
 }
 
 export async function updateDisplayName(userId: string, name: string): Promise<MyProfile> {

@@ -885,13 +885,13 @@ isOneToOne: false
                   ]
                 },"profiles_private": {
                   Row: {
-                    "appearance": string | null,"created_at": string,"daily_deal_cap": number | null,"home_label": string | null,"home_point": unknown,"quiet_enabled": boolean,"quiet_end": string,"quiet_start": string,"search_radius_m": number,"tz": string,"updated_at": string,"user_id": string
+                    "appearance": string | null,"created_at": string,"daily_deal_cap": number | null,"home_label": string | null,"home_point": unknown,"quiet_enabled": boolean,"quiet_end": string,"quiet_start": string,"search_radius_m": number,"terms_accepted_at": string | null,"terms_version": string | null,"tz": string,"updated_at": string,"user_id": string
                   }
                   Insert: {
-                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"tz"?: string,"updated_at"?: string,"user_id": string
+                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"tz"?: string,"updated_at"?: string,"user_id"?: string
+                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -1402,6 +1402,9 @@ isOneToOne: false
           Functions: {
             "accept_offer":
 { Args: { "offer": string }; Returns: string
+                           },
+"accept_terms":
+{ Args: { "version": string }; Returns: undefined
                            },
 "apply_raw_offer":
 { Args: { "raw_id": string,"vid": string }; Returns: Json

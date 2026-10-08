@@ -38,8 +38,10 @@ export default function DisplayNameSheet() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Dismissing without saving abandons the pending action.
-  useEffect(() => () => cancel(), [cancel]);
+  // Dismissing without saving abandons the pending action (not when it moved on to the Terms sheet).
+  useEffect(() => () => {
+    if (useAuth.getState().profile?.nameSource !== 'provided') cancel();
+  }, [cancel]);
 
   const invalid = validateDisplayName(name);
   const unchanged = profile?.nameSource === 'provided' && normalizeDisplayName(name) === profile.displayName;

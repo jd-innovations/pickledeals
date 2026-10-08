@@ -1,6 +1,7 @@
-import type { AuthIntent } from '@pickledeals/shared';
+import { LEGAL_URLS, type AuthIntent } from '@pickledeals/shared';
 import * as AppleAuthentication from 'expo-apple-authentication';
 import { useLocalSearchParams } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
@@ -198,7 +199,15 @@ export default function SignInSheet() {
       ) : null}
 
       <Text variant="caption" weight="400" tone="tertiary" align="center" style={{ marginTop: 'auto' }}>
-        Browsing never requires an account.
+        By continuing, you agree to our{' '}
+        <Text variant="caption" weight="600" tone="secondary" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.terms)} accessibilityRole="link">
+          Terms of Use
+        </Text>{' '}
+        and{' '}
+        <Text variant="caption" weight="600" tone="secondary" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.privacy)} accessibilityRole="link">
+          Privacy Policy
+        </Text>
+        . Browsing never requires an account.
       </Text>
     </ScrollView>
   );

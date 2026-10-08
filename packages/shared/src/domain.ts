@@ -65,3 +65,14 @@ export type AuthIntent = (typeof AUTH_INTENTS)[number];
 /** Intents that put the user's name in front of other people; they need a chosen display name. */
 export const PUBLIC_IDENTITY_INTENTS: readonly AuthIntent[] = ['message_seller', 'make_offer', 'create_listing'];
 export const requiresPublicName = (intent: AuthIntent) => PUBLIC_IDENTITY_INTENTS.includes(intent);
+
+/**
+ * Terms of Use version (its effective date). Posting intents (listing, message, offer) need the user to
+ * have agreed to this version first (App Store Guideline 1.2). Bump it when the published terms change.
+ */
+export const TERMS_VERSION = '2026-10-07';
+export const LEGAL_URLS = {
+  terms: 'https://pickledeals.app/terms',
+  privacy: 'https://pickledeals.app/privacy',
+  support: 'https://pickledeals.app/support',
+} as const;

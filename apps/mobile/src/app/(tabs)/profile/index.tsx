@@ -1,4 +1,7 @@
+import { LEGAL_URLS } from '@pickledeals/shared';
+import Constants from 'expo-constants';
 import { router } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import { Alert, ScrollView, View } from 'react-native';
 
@@ -11,6 +14,7 @@ import { useHomeArea, useMyListings } from '@/features/market/hooks';
 import { Button, Group, ListRow, Text } from '@/ui';
 
 const APPEARANCE_LABEL = { system: 'System', light: 'Light', dark: 'Dark' } as const;
+const APP_VERSION = Constants.expoConfig?.version ?? '';
 
 /**
  * D5 (revised): Profile is the canonical home of the Saved library, buying & selling and Messages.
@@ -95,6 +99,13 @@ export default function ProfileScreen() {
         {user && <ListRow title="Notifications" onPress={() => router.push('/profile/notifications')} />}
         <ListRow title="Appearance" value={APPEARANCE_LABEL[preference]} onPress={() => router.push('/profile/appearance')} last={!user} />
         {user && <ListRow title="Account" onPress={() => router.push('/profile/account')} last />}
+      </Group>
+
+      <Group label="About">
+        <ListRow title="Support" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.support)} />
+        <ListRow title="Terms of Use" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.terms)} />
+        <ListRow title="Privacy Policy" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.privacy)} />
+        <ListRow title="Version" value={APP_VERSION} last />
       </Group>
 
       {__DEV__ && (

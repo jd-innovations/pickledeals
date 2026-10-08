@@ -45,6 +45,7 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="sign-in" options={sheet} />
         <Stack.Screen name="display-name" options={sheet} />
+        <Stack.Screen name="terms-agree" options={sheet} />
         {/* Chat lives above the tabs (no tab bar), reachable from listings, Profile → Messages and pushes. */}
         <Stack.Screen name="conversation/[id]" />
         <Stack.Screen name="meetup" options={{ ...sheet, sheetAllowedDetents: [0.9] }} />

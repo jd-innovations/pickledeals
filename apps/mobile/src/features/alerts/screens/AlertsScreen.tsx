@@ -10,7 +10,7 @@ import { useAuth } from '@/features/auth/authStore';
 import { productImage } from '@/features/catalog/hooks';
 import { useDealFilterStore, EMPTY_FILTERS } from '@/features/deals/hooks';
 import { DEFAULT_MARKET_FILTERS, useMarketFilters, useMarketSearch } from '@/features/market/hooks';
-import { Button, EmptyState, Icon, IconButton, SegmentedControl, Skeleton, Text, Toggle, type IconName } from '@/ui';
+import { EmptyState, Icon, IconButton, SegmentedControl, Skeleton, Text, Toggle, type IconName } from '@/ui';
 
 import type { AppNotification, PriceAlert, SavedSearch } from '../api';
 import { useAlertPrices, useAlerts, useMeMutations, useNotifications, useSavedSearches } from '../hooks';
@@ -41,7 +41,17 @@ export default function AlertsScreen() {
       <Stack.Screen
         options={{
           headerRight: () =>
-            section === 'activity' && unread > 0 ? <Button label="Mark all read" variant="link" size="sm" onPress={() => markRead.mutate(undefined)} /> : null,
+            section === 'activity' && unread > 0 ? (
+              <IconButton
+                icon="checkCircle"
+                label="Mark all read"
+                size={34}
+                onPress={() => {
+                  haptic.tap();
+                  markRead.mutate(undefined);
+                }}
+              />
+            ) : null,
         }}
       />
       <SegmentedControl

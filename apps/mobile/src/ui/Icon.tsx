@@ -22,6 +22,7 @@ const ICONS = {
   arrowDown: { sf: 'arrow.down', d: 'M12 5v14 M6 13l6 6 6-6' },
   copy: { sf: 'doc.on.doc', d: 'M8 8h12v12H8z M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2' },
   check: { sf: 'checkmark', d: 'M5 12.5l4.5 4.5L19 7.5' },
+  checkCircle: { sf: 'checkmark.circle', d: 'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M8 12.3l2.8 2.8L16.2 9.6' },
   close: { sf: 'xmark', d: 'M6 6l12 12 M18 6L6 18' },
   plus: { sf: 'plus', d: 'M12 5v14 M5 12h14' },
   minus: { sf: 'minus', d: 'M5 12h14' },

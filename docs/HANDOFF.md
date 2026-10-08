@@ -72,7 +72,8 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   Appearance lists "App icon: Black"). UPDATE Oct 7: the owner supplied the logo (site/brand: light = black PICKLE +
   flat gold DEALS #D39E06; dark = white PICKLE + gold gradient, dark backgrounds only). App icon A chosen:
   assets/images/app-icon.png (dark logo on #0A0A0A, 1024 opaque), wired in app.json; shows from the NEXT build.
-  Website/email logo, splash and the bell colour not approved yet. Proposed set (awaiting the user's logo decision): SVG/PNG logo files under
+  Website header logo (light/dark) and the branded sign-in email are live (templates pushed with config push:
+  auth only, storage declined). Splash and the bell colour not approved yet. Proposed set (awaiting the user's logo decision): SVG/PNG logo files under
   site/brand, an iOS 26 .icon (new build needed), branded sign-in email (supabase/templates/email-code.html is
   plain), website favicon/OG image. Must be done before external TestFlight / App Store.
 - **Domain `pickledeals.app` (registered Oct 7; DNS at Hostinger, `dns-parking.com`).** Resend domain verified

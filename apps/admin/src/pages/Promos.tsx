@@ -20,6 +20,8 @@ type Promo = {
   ends_at: string | null;
   verified_at: string | null;
   is_exclusive: boolean;
+  /** Applies only to items a supplier ships for the store (e.g. Shopify Collective). */
+  supplier_items_only: boolean;
   status: 'active' | 'removed';
   retailer: { name: string } | null;
   targets: { category_id: string | null; product: { name: string; slug: string } | null; category: { name: string } | null; variant: { label: string } | null }[];
@@ -65,7 +67,7 @@ export function PromosPage() {
     const { data, error } = await supabase
       .from('promo_codes')
       .select(
-        'id, retailer_id, terms, verified_by, code, title, discount_type, discount_value, min_purchase_cents, starts_at, ends_at, verified_at, is_exclusive, status, retailer:retailers(name), targets:promo_code_targets(category_id, product:products(name, slug), category:categories(name), variant:product_variants(label))',
+        'id, retailer_id, terms, verified_by, code, title, discount_type, discount_value, min_purchase_cents, starts_at, ends_at, verified_at, is_exclusive, supplier_items_only, status, retailer:retailers(name), targets:promo_code_targets(category_id, product:products(name, slug), category:categories(name), variant:product_variants(label))',
       )
       .order('created_at', { ascending: false })
       .returns<Promo[]>();
@@ -157,6 +159,7 @@ export function PromosPage() {
                   <div className="muted" style={{ fontSize: 12 }}>
                     {p.title}
                     {p.is_exclusive ? ' · exclusive' : ''}
+                    {p.supplier_items_only ? ' · supplier items only' : ''}
                   </div>
                 </td>
                 <td>{p.retailer?.name}</td>
@@ -224,10 +227,11 @@ function PromoForm({
           min: promo.min_purchase_cents ? centsToInput(promo.min_purchase_cents) : '',
           ends: promo.ends_at ? promo.ends_at.slice(0, 10) : '',
           exclusive: promo.is_exclusive,
+          supplierOnly: promo.supplier_items_only,
           verified: false,
           terms: promo.terms ?? '',
         }
-      : { retailer: '', code: '', title: '', type: 'percent' as Promo['discount_type'], value: '', min: '', ends: '', exclusive: false, verified: true, terms: '' },
+      : { retailer: '', code: '', title: '', type: 'percent' as Promo['discount_type'], value: '', min: '', ends: '', exclusive: false, supplierOnly: false, verified: true, terms: '' },
   );
   const [targetKind, setTargetKind] = useState<'all' | 'product' | 'category'>(target?.product ? 'product' : target?.category_id ? 'category' : 'all');
   const [product, setProduct] = useState<PickedVariant | null>(
@@ -256,6 +260,7 @@ function PromoForm({
       min_purchase_cents: min,
       ends_at: f.ends ? new Date(`${f.ends}T23:59:59`).toISOString() : null,
       is_exclusive: f.exclusive,
+      supplier_items_only: f.supplierOnly,
       terms: f.terms.trim() || null,
       // Editing never un-verifies; ticking the box re-verifies.
       ...(f.verified || !promo ? { verified_at: f.verified ? new Date().toISOString() : null } : {}),
@@ -369,6 +374,9 @@ function PromoForm({
         </label>
         <label className="row">
           <input type="checkbox" checked={f.exclusive} onChange={(e) => setF({ ...f, exclusive: e.target.checked })} /> PickleDeals exclusive
+        </label>
+        <label className="row" title="For example Shopify Collective items: offers a supplier ships for the store.">
+          <input type="checkbox" checked={f.supplierOnly} onChange={(e) => setF({ ...f, supplierOnly: e.target.checked })} /> Only items shipped by suppliers
         </label>
         <span className="grow" />
         <button type="button" className="btn" onClick={onCancel}>

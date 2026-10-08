@@ -66,6 +66,12 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
    overlapping sticky bars; not yet audited: signed-in screens and the map.
 
 ### Facts to know
+- **PICKLEDEALS5 (Oct 8, owner decision):** 5% off Shopify Collective items at Pickleball Grip Doctor, PickleDeals
+  exclusive, no end date (owner chose an honest ongoing code over a fake 30-day "ending soon" renewal). Shopify:
+  unpublished smart collection "Shopify Collective items (PickleDeals)" (tag = "Shopify Collective") + discount
+  PICKLEDEALS5 (all customers, reusable, no combining, like NEWCUSTOMER20). App: promo_codes.supplier_items_only
+  (migration 20261027, pgTAP 20) applies it to offers with ships_from; admin Promos has the checkbox. Both codes
+  hide after 14 days without re-verification: re-verify NEWCUSTOMER20 by ~Oct 20 and PICKLEDEALS5 by ~Oct 22.
 - **Branding (parked by the user, Oct 7):** the app icon and splash are still Expo defaults (`assets/expo.icon`,
   `images/icon.png`, `splash-icon.png`); iOS push shows the app icon. The approved design's brand is the "pd"
   monogram (black rounded square, white heavy lowercase "pd") + "PickleDeals" wordmark (preview/Launch.dc.html;

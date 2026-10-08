@@ -70,8 +70,12 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   exclusive, no end date (owner chose an honest ongoing code over a fake 30-day "ending soon" renewal). Shopify:
   unpublished smart collection "Shopify Collective items (PickleDeals)" (tag = "Shopify Collective") + discount
   PICKLEDEALS5 (all customers, reusable, no combining, like NEWCUSTOMER20). App: promo_codes.supplier_items_only
-  (migration 20261027, pgTAP 20) applies it to offers with ships_from; admin Promos has the checkbox. Both codes
-  hide after 14 days without re-verification: re-verify NEWCUSTOMER20 by ~Oct 20 and PICKLEDEALS5 by ~Oct 22.
+  (migration 20261027, pgTAP 20) applies it to offers with ships_from; admin Promos has the checkbox.
+- **Store codes re-verify themselves (Oct 8, migration 20261028, pgTAP 21):** each Shopify import run puts one in-stock
+  sample item per active code in a Storefront API test cart with the code (no order) and marks the code verified
+  only when Shopify says it's applicable; rejected codes are left to lapse (14 days) and named in the run note.
+  First run caught NEWCUSTOMER20 targeting 4 products Shopify excludes (HEXXO ×2, GrippySocks, Trigger): app
+  targets now match Shopify's 6 (WrapCore, WrapGrip 4/8, Training Aid, PickleSole, Pro Towel).
 - **Branding (parked by the user, Oct 7):** the app icon and splash are still Expo defaults (`assets/expo.icon`,
   `images/icon.png`, `splash-icon.png`); iOS push shows the app icon. The approved design's brand is the "pd"
   monogram (black rounded square, white heavy lowercase "pd") + "PickleDeals" wordmark (preview/Launch.dc.html;

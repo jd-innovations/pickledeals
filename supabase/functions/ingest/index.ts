@@ -42,6 +42,8 @@ type Fetched = {
   notes: string[];
   /** External refs the source reports as not purchasable (sold out, pre-order): their offers are hidden. */
   unavailable?: string[];
+  /** Shopify (Storefront API): what's needed to test the store's promo codes in a cart. */
+  shop?: { domain: string; token: string; products: ShopifyProduct[] };
 };
 
 function serviceKey(): string {
@@ -168,8 +170,10 @@ async function fetchShopify(source: Source): Promise<Fetched> {
 
   const products: ShopifyProduct[] = [];
   let complete = true;
+  let storefrontToken: string | undefined;
   if (mode === 'storefront') {
     const token = shopifyEnv(source, 'token_env');
+    storefrontToken = token;
     if (!token) throw new ConfigError(`The Storefront API token secret ${String(source.config.token_env)} isn’t configured.`);
     let cursor: string | null = null;
     for (let page = 0; ; page++) {
@@ -221,7 +225,56 @@ async function fetchShopify(source: Source): Promise<Fetched> {
   if (!complete) notes.push('Stopped at the page limit; offers not seen this run are kept.');
   const truncated = !complete || skipped.some((s) => s.reason === 'over max_records');
   const unavailable = skipped.filter((s) => s.reason === 'out of stock').map((s) => s.ref);
-  return { records, complete: source.config.complete === true && !truncated, notes, unavailable };
+  return {
+    records,
+    complete: source.config.complete === true && !truncated,
+    notes,
+    unavailable,
+    shop: storefrontToken ? { domain, token: storefrontToken, products } : undefined,
+  };
+}
+
+// --- Store promo codes: re-verified at the store ----------------------------------------------------------
+
+const CART_CODE_CHECK = `mutation ($input: CartInput!) {
+  cartCreate(input: $input) { cart { discountCodes { code applicable } } userErrors { message } }
+}`;
+
+/**
+ * For each active code of this store, put one in-stock item it should apply to in a Storefront API test
+ * cart with the code, and mark the code verified only if Shopify says it's applicable. Nothing is ordered;
+ * the cart is abandoned. Codes Shopify rejects aren't touched, so they drop out of the app after 14 days.
+ */
+async function verifyStoreCodes(db: SupabaseClient, source: Source, shop: NonNullable<Fetched['shop']>): Promise<string[]> {
+  const { data: targets, error } = await db.rpc('promo_verification_targets', { source_slug: source.slug });
+  if (error || !targets?.length) return [];
+  const byId = new Map(shop.products.map((p) => [p.id, p]));
+  const verified: string[] = [];
+  const rejected: string[] = [];
+  for (const t of targets as { promo_id: string; code: string; content_ref: string }[]) {
+    const product = byId.get(t.content_ref.replace(/^shopify-product-/, ''));
+    const variant = product?.variants.find((v) => v.available !== false && v.requiresShipping);
+    if (!variant) continue;
+    const res = await fetch(`https://${shop.domain}/api/${SHOPIFY_API_VERSION}/graphql.json`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'Shopify-Storefront-Private-Token': shop.token },
+      body: JSON.stringify({
+        query: CART_CODE_CHECK,
+        variables: { input: { lines: [{ merchandiseId: `gid://shopify/ProductVariant/${variant.id}`, quantity: 1 }], discountCodes: [t.code] } },
+      }),
+    }).catch(() => null);
+    const body = (await res?.json().catch(() => ({}))) as { data?: { cartCreate?: { cart?: { discountCodes?: { code: string; applicable: boolean }[] } } } };
+    const applied = body?.data?.cartCreate?.cart?.discountCodes?.find((d) => d.code.toUpperCase() === t.code.toUpperCase());
+    if (!res?.ok || !applied) continue; // couldn't check: leave the code as it is
+    (applied.applicable ? verified : rejected).push(applied.applicable ? t.promo_id : t.code);
+  }
+  const notes: string[] = [];
+  if (verified.length) {
+    await db.rpc('mark_promos_verified', { promo_ids: verified });
+    notes.push(`Verified ${verified.length} store code(s) at checkout.`);
+  }
+  if (rejected.length) notes.push(`The store rejected ${rejected.join(', ')}; not re-verified.`);
+  return notes;
 }
 
 // --- Store content sync (descriptions, specs, images) ----------------------------------------------------
@@ -369,6 +422,7 @@ async function runSource(db: SupabaseClient, source: Source) {
       if (soldOut) notes.push(`Hid ${soldOut} offer(s) that are sold out or pre-order only.`);
     }
     if (ok && sourceId) notes.push(...(await syncStoreContent(db, source, sourceId, fetched.records)));
+    if (ok && fetched.shop) notes.push(...(await verifyStoreCodes(db, source, fetched.shop).catch(() => [])));
     const { data: finish } = await db.rpc('finish_ingestion_run', { source_slug: source.slug, run: runId, ok, message: notes.join(' ') || undefined, complete: fetched.complete && ok });
     return { source: source.slug, ok, records: fetched.records.length, matched: r.matched, unmatched: r.unmatched, errors: r.error_count ?? 0, sold_out_hidden: soldOut, ...(finish as object) };
   } catch (e) {

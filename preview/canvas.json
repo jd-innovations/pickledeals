@@ -408,6 +408,112 @@
    "w": 390,
    "h": 844,
    "title": "Map base (approximate-area map)"
+  },
+  "WebHome.dc.html": {
+   "x": 0,
+   "y": 24000,
+   "w": 1440,
+   "h": 3540,
+   "title": "Web · Home",
+   "is_interactive": true
+  },
+  "WebDeals.dc.html": {
+   "x": 1520,
+   "y": 24000,
+   "w": 1440,
+   "h": 2000,
+   "title": "Web · Deal list + filters",
+   "is_interactive": true
+  },
+  "WebDealModal.dc.html": {
+   "x": 3040,
+   "y": 24000,
+   "w": 1440,
+   "h": 1180,
+   "title": "Web · Deal pop-up",
+   "is_interactive": true
+  },
+  "WebProduct.dc.html": {
+   "x": 0,
+   "y": 27740,
+   "w": 1440,
+   "h": 2900,
+   "title": "Web · Product",
+   "is_interactive": true
+  },
+  "WebBrand.dc.html": {
+   "x": 1520,
+   "y": 27740,
+   "w": 1440,
+   "h": 1900,
+   "title": "Web · Brand",
+   "is_interactive": true
+  },
+  "WebPromoCodes.dc.html": {
+   "x": 3040,
+   "y": 27740,
+   "w": 1440,
+   "h": 1900,
+   "title": "Web · Promo codes",
+   "is_interactive": true
+  },
+  "WebMarketplace.dc.html": {
+   "x": 0,
+   "y": 30840,
+   "w": 1440,
+   "h": 1100,
+   "title": "Web · Pre-owned + map",
+   "is_interactive": true
+  },
+  "WebListing.dc.html": {
+   "x": 1520,
+   "y": 30840,
+   "w": 1440,
+   "h": 1700,
+   "title": "Web · Listing (view only)",
+   "is_interactive": true
+  },
+  "WebSaveInApp.dc.html": {
+   "x": 3040,
+   "y": 30840,
+   "w": 1440,
+   "h": 900,
+   "title": "Web · Save in the app",
+   "is_interactive": true
+  },
+  "WebHomeMobile.dc.html": {
+   "x": 0,
+   "y": 32740,
+   "w": 390,
+   "h": 2400,
+   "title": "Web (phone) · Home + tab bar",
+   "is_interactive": true,
+   "radius": 40
+  },
+  "WebSaveInAppMobile.dc.html": {
+   "x": 470,
+   "y": 32740,
+   "w": 390,
+   "h": 844,
+   "title": "Web (phone) · Save in the app",
+   "is_interactive": true,
+   "radius": 40
+  },
+  "WebHeader.dc.html": {
+   "x": 940,
+   "y": 32740,
+   "w": 1440,
+   "h": 157,
+   "title": "Web · Header",
+   "is_interactive": true
+  },
+  "WebFooter.dc.html": {
+   "x": 2460,
+   "y": 32740,
+   "w": 1440,
+   "h": 420,
+   "title": "Web · Footer",
+   "is_interactive": true
   }
  },
  "order": [
@@ -456,7 +562,20 @@
   "DarkProduct.dc.html",
   "DarkListing.dc.html",
   "DarkConversation.dc.html",
-  "DarkMap.dc.html"
+  "DarkMap.dc.html",
+  "WebHome.dc.html",
+  "WebDeals.dc.html",
+  "WebDealModal.dc.html",
+  "WebProduct.dc.html",
+  "WebBrand.dc.html",
+  "WebPromoCodes.dc.html",
+  "WebMarketplace.dc.html",
+  "WebListing.dc.html",
+  "WebSaveInApp.dc.html",
+  "WebHomeMobile.dc.html",
+  "WebSaveInAppMobile.dc.html",
+  "WebHeader.dc.html",
+  "WebFooter.dc.html"
  ],
  "notes": {
   "t0": {
@@ -514,6 +633,13 @@
    "text": "Dark mode — designed, not inverted",
    "kind": "title1",
    "maxW": 2270
+  },
+  "tweb": {
+   "x": 0,
+   "y": 23720,
+   "text": "Website (W0) — desktop and phone browser",
+   "kind": "title1",
+   "maxW": 3680
   }
  },
  "designSystems": []

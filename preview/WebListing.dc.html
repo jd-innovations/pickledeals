@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Website · Pre-owned listing</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+<link rel="stylesheet" href="./web.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 1440px; min-height: 1700px; position: relative; background: var(--bg)">
+<dc-import name="WebHeader" active="market" hint-size="1440px,157px"></dc-import>
+<main class="wrap" style="padding-top: 24px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 20px">
+<nav aria-label="Breadcrumb" style="font-size: 13px; color: var(--text-2); display: flex; gap: 6px"><a href="WebMarketplace.dc.html">Pre-owned</a><span>›</span><span>Paddles</span><span>›</span><span style="color: var(--text-1)">JOOLA Perseus Pro IV 16mm</span></nav>
+<div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="position: relative; height: 600px; border-radius: 26px; background: var(--img); padding: 60px 110px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import><span class="num" style="position: absolute; right: 14px; bottom: 14px; font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 10px; background: var(--glass)">1 / 5</span></div>
+<div style="display: flex; gap: 10px"><sc-for list="{{thumbs}}" as="t" hint-placeholder-count="5"><div style="width: 84px; height: 84px; border-radius: 14px; background: var(--img); padding: 8px; box-shadow: inset 0 0 0 {{t}} var(--text-1)"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import></div></sc-for></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 14px; font-weight: 600; color: var(--text-2)">Pre-owned · Paddles · listed 2 days ago</span>
+<h1 style="font-size: 36px; line-height: 1.1; font-weight: 800; letter-spacing: -0.03em">JOOLA Perseus Pro IV 16mm</h1>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 4px"><span class="num" style="font-size: 40px; font-weight: 800; letter-spacing: -0.03em">$145</span><span class="num" style="font-size: 15px; color: var(--text-2)">New from $179 · save $34</span></div>
+<div style="display: flex; gap: 8px; margin-top: 4px"><span style="height: 30px; padding: 0 10px; border-radius: 8px; background: var(--surface); font-size: 13px; font-weight: 600; display: flex; align-items: center">Like New</span><span style="height: 30px; padding: 0 10px; border-radius: 8px; background: var(--surface); font-size: 13px; font-weight: 600; display: flex; align-items: center">Pickup · Sarasota, FL</span><span style="height: 30px; padding: 0 10px; border-radius: 8px; background: var(--surface); font-size: 13px; font-weight: 600; display: flex; align-items: center">Accepts offers</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 18px; border-radius: 22px; background: var(--surface)">
+<div style="display: flex; gap: 10px">
+<a href="WebSaveInApp.dc.html" style="flex: 1; height: 52px; border-radius: 26px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 0 1-12.3 7.6L3.5 20.5l1-4.4A8.5 8.5 0 1 1 20.5 12z"/></svg>Message seller in the app</a>
+<a href="WebSaveInApp.dc.html" aria-label="Save in the app" style="width: 52px; height: 52px; border-radius: 26px; background: var(--bg); display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.8-7.5 10.2-7.5 10.2z"/></svg></a>
+<a href="#" aria-label="Share" style="width: 52px; height: 52px; border-radius: 26px; background: var(--bg); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg></a>
+</div>
+<a href="WebSaveInApp.dc.html" style="height: 46px; border-radius: 23px; background: var(--bg); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">Make an offer in the app</a>
+<span style="font-size: 12px; color: var(--text-2); text-align: center">Chat, offers and meet-up spots happen in the PickleDeals app, so your contact details stay private.</span>
+</div>
+<a href="#" class="hov" style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 18px; border: 1px solid var(--border)">
+<span style="width: 48px; height: 48px; border-radius: 24px; background: var(--surface-pressed); display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700">M</span>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 700">Marcus T.</span><span class="num" style="font-size: 13px; color: var(--text-2)">Member since 2026 · Sarasota, FL · 4 listings</span></div>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</a>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 style="font-size: 20px; font-weight: 700">About this paddle</h2>
+<p style="font-size: 15px; line-height: 1.55; color: var(--text-1)">Played about 10 sessions, no edge guard damage. Switching to 14mm. Comes with the original cover. Happy to meet at Lakewood Ranch courts.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h2 style="font-size: 20px; font-weight: 700">Area</h2>
+<div style="position: relative; height: 180px; border-radius: 18px; overflow: hidden; background: var(--map-land)"><div style="position: absolute; left: -20px; top: -280px; width: 390px; height: 844px; transform: scale(1.6); transform-origin: 0 0"><dc-import name="MapBase" hint-size="100%,100%"></dc-import></div><span style="position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 60px; background: rgba(10,10,10,.10); border: 2px solid var(--text-1)"></span></div>
+<span style="font-size: 12px; color: var(--text-2)">Sarasota, FL · shown to about 1 km. The exact spot is shared privately in chat.</span>
+</div>
+</div>
+</div>
+</main>
+<dc-import name="WebFooter" hint-size="1440px,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { mode: this.props.theme === 'dark' ? 'dark' : '', thumbs: ['2px', '0', '0', '0', '0'] };
+  }
+}
+</script>
+</body>
+</html>

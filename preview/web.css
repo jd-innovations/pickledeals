@@ -1,0 +1,8 @@
+/* Website (W0) helpers on top of pd.css: one container width, logo per theme, hover states. */
+.pd .wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+.pd .logo-w{display:none}
+.pd.dark .logo-b{display:none}
+.pd.dark .logo-w{display:block}
+.pd .hov:hover{background:var(--surface-pressed)}
+.pd .card-h:hover .card-img{box-shadow:inset 0 0 0 1.5px var(--border)}
+.pd .ulink:hover{text-decoration:underline}

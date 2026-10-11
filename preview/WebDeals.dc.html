@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Website · Deal list</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+<link rel="stylesheet" href="./web.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 1440px; min-height: 2000px; position: relative; background: var(--bg)">
+<dc-import name="WebHeader" active="drops" hint-size="1440px,157px"></dc-import>
+
+<main class="wrap" style="padding-top: 24px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 20px">
+<nav aria-label="Breadcrumb" style="font-size: 13px; color: var(--text-2); display: flex; gap: 6px"><a href="WebHome.dc.html">Deals</a><span>›</span><span style="color: var(--text-1)">Price drops</span></nav>
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 6px"><h1 style="font-size: 40px; font-weight: 800; letter-spacing: -0.03em">Price drops</h1><span class="num" style="font-size: 15px; color: var(--text-2)">64 deals that got cheaper this week · Amazon prices aren’t tracked</span></div>
+<button style="height: 40px; padding: 0 14px; border-radius: 20px; border: 1px solid var(--border); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px">Sort: Biggest drop<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+</div>
+
+<div style="display: grid; grid-template-columns: 260px 1fr; gap: 36px; align-items: start">
+<aside aria-label="Filters" style="position: sticky; top: 16px; display: flex; flex-direction: column; gap: 22px; padding: 20px; border-radius: 20px; background: var(--surface)">
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="font-size: 17px; font-weight: 700">Filters</span><button style="font-size: 13px; font-weight: 600; color: var(--text-2)">Clear all</button></div>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; font-weight: 700; color: var(--text-2)">{{g.h}}</span>
+<sc-for list="{{g.opts}}" as="o" hint-placeholder-count="4">
+<label style="display: flex; align-items: center; gap: 10px; font-size: 15px; cursor: pointer"><span style="width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid {{o.bd}}; background: {{o.bg}}; display: flex; align-items: center; justify-content: center; color: var(--on-int)"><sc-if value="{{o.on}}" hint-placeholder-val="{{false}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></sc-if></span><span style="flex: 1">{{o.t}}</span><span class="num" style="font-size: 13px; color: var(--text-3)">{{o.n}}</span></label>
+</sc-for>
+</div>
+</sc-for>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-size: 13px; font-weight: 700; color: var(--text-2)">Price</span>
+<div style="position: relative; height: 20px"><div style="position: absolute; left: 0; right: 0; top: 9px; height: 3px; border-radius: 2px; background: var(--border)"></div><div style="position: absolute; left: 0; right: 30%; top: 9px; height: 3px; border-radius: 2px; background: var(--int)"></div><span style="position: absolute; left: 0; top: 0; width: 20px; height: 20px; border-radius: 10px; background: var(--bg); box-shadow: var(--shadow); border: 1px solid var(--border)"></span><span style="position: absolute; left: 70%; top: 0; width: 20px; height: 20px; border-radius: 10px; background: var(--bg); box-shadow: var(--shadow); border: 1px solid var(--border)"></span></div>
+<div class="num" style="display: flex; justify-content: space-between; font-size: 13px; color: var(--text-2)"><span>$0</span><span>$200</span></div>
+</div>
+</aside>
+
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<sc-for list="{{active}}" as="a" hint-placeholder-count="3"><span style="height: 34px; padding: 0 12px; border-radius: 17px; background: var(--int); color: var(--on-int); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px">{{a}}<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></span></sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 20px">
+<sc-for list="{{items}}" as="d" hint-placeholder-count="12">
+<dc-import name="WebDealCard" kind="{{d.kind}}" c1="{{d.c1}}" c2="{{d.c2}}" brand="{{d.brand}}" name="{{d.name}}" price="{{d.price}}" was="{{d.was}}" off="{{d.off}}" meta="{{d.meta}}" badge="{{d.badge}}" rank="" hint-size="100%,340px"></dc-import>
+</sc-for>
+</div>
+<button style="align-self: center; height: 48px; padding: 0 28px; border-radius: 24px; background: var(--chip); font-size: 16px; font-weight: 700; margin-top: 8px">Show more deals</button>
+</div>
+</div>
+</main>
+<dc-import name="WebFooter" hint-size="1440px,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const o = (t, n, on) => ({ t, n, on: !!on, bg: on ? 'var(--int)' : 'transparent', bd: on ? 'var(--int)' : 'var(--border)' });
+    const base = [
+      { kind: 'paddle', c1: '#D7263D', c2: '#F4D35E', badge: 'LOWEST PRICE', brand: 'Selkirk', name: 'Vanguard Power Air Invikta', price: '$189', was: '$229', off: '−17%', meta: 'Selkirk.com · dropped $40' },
+      { kind: 'shoe', c1: '#3A86FF', c2: '#FFBE0B', badge: 'HOT DEAL', brand: 'K-Swiss', name: 'Express Light Pickleball', price: '$89', was: '$129', off: '−31%', meta: 'CourtSide Pro Shop · dropped $40' },
+      { kind: 'paddle', c1: '#26282B', c2: '#9BE15D', badge: '', brand: 'CRBN', name: '3X Power Series 16mm', price: '$169', was: '$229', off: '−26%', meta: 'CRBN.com · with code' },
+      { kind: 'bag', c1: '#EF476F', c2: '#FFD166', badge: '', brand: 'JOOLA', name: 'Vision Backpack', price: '$79', was: '$99', off: '−20%', meta: 'JOOLA.com · dropped $20' },
+      { kind: 'machine', c1: '#FF7F11', c2: '#FFFFFF', badge: '', brand: 'Lobster', name: 'Pickle Elite Ball Machine', price: '$649', was: '$749', off: '−13%', meta: 'Baseline Sports' },
+      { kind: 'paddle', c1: '#0F9D8A', c2: '#FFD166', badge: 'NEW DEAL', brand: 'Engage', name: 'Pursuit Pro1 6.0', price: '$159', was: '$199', off: '−20%', meta: 'Engage Pickleball' }
+    ];
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      groups: [
+        { h: 'Category', opts: [o('Paddles', 28, true), o('Shoes', 12), o('Balls', 9), o('Bags', 7), o('Accessories', 8)] },
+        { h: 'Deal type', opts: [o('Price drop', 64, true), o('Promo code', 22), o('Ending soon', 6), o('Lowest we’ve tracked', 14)] },
+        { h: 'Store', opts: [o('JOOLA.com', 11), o('Selkirk.com', 9), o('Pickleball Grip Doctor', 17), o('CourtSide Pro Shop', 6)] }
+      ],
+      active: ['Paddles', 'Price drop'],
+      items: base.concat(base)
+    };
+  }
+}
+</script>
+</body>
+</html>

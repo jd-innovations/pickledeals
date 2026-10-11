@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Web footer</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+<link rel="stylesheet" href="./web.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>body{margin:0}</style>
+</helmet>
+<footer style="width: 100%; background: var(--surface); margin-top: 24px">
+<div class="wrap" style="padding-top: 48px; padding-bottom: 40px; display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 14px">
+<img class="logo-b" src="brand/pd-logo-black.svg" alt="PickleDeals" style="height: 30px; width: auto; align-self: flex-start"><img class="logo-w" src="brand/pd-logo-white.svg" alt="PickleDeals" style="height: 30px; width: auto; align-self: flex-start">
+<p style="font-size: 14px; line-height: 1.5; color: var(--text-2); max-width: 280px">Pickleball deals, promo codes and pre-owned gear. Prices checked through the day.</p>
+<a href="WebHomeMobile.dc.html" style="align-self: flex-start; height: 40px; padding: 0 16px; border-radius: 20px; background: var(--int); color: var(--on-int); font-size: 14px; font-weight: 700; display: flex; align-items: center">Get the iPhone app</a>
+</div>
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; font-weight: 700">{{c.h}}</span>
+<sc-for list="{{c.links}}" as="l" hint-placeholder-count="5"><a class="ulink" href="#" style="font-size: 14px; color: var(--text-2)">{{l}}</a></sc-for>
+</div>
+</sc-for>
+</div>
+<div class="wrap" style="padding-bottom: 32px; display: flex; flex-direction: column; gap: 16px">
+<p style="font-size: 12px; line-height: 1.5; color: var(--text-3); border-top: 1px solid var(--border); padding-top: 20px">PickleDeals may earn a commission when you buy through links on this site, at no extra cost to you. Prices and codes come from the stores and can change; the price at the store’s checkout is the one that applies.</p>
+<div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--text-3)">
+<span>© 2026 JD Innovations LLC · Bradenton, Florida</span>
+<div role="radiogroup" aria-label="Appearance" style="display: flex; padding: 3px; border-radius: 18px; background: var(--bg); border: 1px solid var(--border)">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="3"><button role="radio" aria-checked="{{t.on}}" style="height: 28px; padding: 0 12px; border-radius: 14px; font-size: 13px; font-weight: 600; background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button></sc-for>
+</div>
+</div>
+</div>
+</footer>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":420}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const th = (label, on) => ({ label, on, bg: on ? 'var(--surface-pressed)' : 'transparent', fg: on ? 'var(--text-1)' : 'var(--text-2)' });
+    return {
+      cols: [
+        { h: 'Deals', links: ['Today’s deals', 'Price drops', 'Promo codes', 'Ending soon', 'New deals'] },
+        { h: 'Shop', links: ['Paddles', 'Shoes', 'Balls', 'Bags', 'All categories'] },
+        { h: 'Brands', links: ['JOOLA', 'Selkirk', 'CRBN', 'Six Zero', 'All brands'] },
+        { h: 'PickleDeals', links: ['Get the app', 'Support', 'Affiliate disclosure', 'Privacy', 'Terms'] }
+      ],
+      themes: [th('System', true), th('Light', false), th('Dark', false)]
+    };
+  }
+}
+</script>
+</body>
+</html>

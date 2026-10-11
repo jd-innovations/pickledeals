@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Website · Promo codes</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+<link rel="stylesheet" href="./web.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 1440px; min-height: 1900px; position: relative; background: var(--bg)">
+<dc-import name="WebHeader" active="codes" hint-size="1440px,157px"></dc-import>
+<main class="wrap" style="padding-top: 24px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 36px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="font-size: 40px; font-weight: 800; letter-spacing: -0.03em">Promo codes</h1>
+<span class="num" style="font-size: 15px; color: var(--text-2)">22 codes from pickleball stores · each one re-verified in the last 14 days</span>
+</div>
+
+<section style="display: flex; flex-direction: column; gap: 14px">
+<h2 style="font-size: 24px; font-weight: 700; letter-spacing: -0.015em">Store-wide codes</h2>
+<div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px">
+<sc-for list="{{stores}}" as="p" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 16px; padding: 18px; border-radius: 20px; border: 1.5px dashed var(--border)">
+<div style="width: 56px; height: 56px; border-radius: 28px; background: var(--int); color: var(--on-int); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; letter-spacing: -0.02em">{{p.mono}}</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 17px; font-weight: 700">{{p.t}}</span><span style="font-size: 13px; color: var(--text-2)">{{p.d}}</span><span class="num" style="font-size: 12px; color: var(--text-3)">{{p.v}}</span></div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px">
+<button style="height: 36px; padding: 0 12px; border-radius: 10px; background: var(--surface); font-family: ui-monospace, 'SF Mono', monospace; font-size: 15px; font-weight: 700; letter-spacing: .05em; display: flex; align-items: center; gap: 6px">{{p.code}}<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg></button>
+<a href="#" style="font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 4px">Copy &amp; shop<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></a>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="font-size: 24px; font-weight: 700; letter-spacing: -0.015em">Products with a code</h2><span style="font-size: 13px; color: var(--text-2)">Prices shown after the code</span></div>
+<div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 28px 20px">
+<sc-for list="{{items}}" as="d" hint-placeholder-count="10">
+<dc-import name="WebDealCard" kind="{{d.kind}}" c1="{{d.c1}}" c2="{{d.c2}}" brand="{{d.brand}}" name="{{d.name}}" price="{{d.price}}" was="{{d.was}}" off="{{d.off}}" meta="{{d.meta}}" badge="" rank="" hint-size="100%,340px"></dc-import>
+</sc-for>
+</div>
+</section>
+</main>
+<dc-import name="WebFooter" hint-size="1440px,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const items = [
+      { kind: 'paddle', c1: '#1F5FD1', c2: '#C8F03C', brand: 'JOOLA', name: 'Perseus Pro IV 16mm', price: '$179', was: '$229', off: '−22%', meta: 'JOOLA.com · code DINK15' },
+      { kind: 'grip', c1: '#2EC4B6', c2: '#0B132B', brand: 'Pickleball Grip Doctor', name: 'Engage Grip Builder Kit', price: '$15', was: '$19', off: '−20%', meta: 'Grip Doctor · code NEWCUSTOMER20' },
+      { kind: 'shoe', c1: '#FF5D8F', c2: '#1C1C1C', brand: 'Skechers', name: 'Viper Court Pro', price: '$94', was: '$114', off: '−18%', meta: 'Skechers.com · code COURT20' },
+      { kind: 'paddle', c1: '#26282B', c2: '#9BE15D', brand: 'CRBN', name: '3X Power Series 16mm', price: '$169', was: '$188', off: '−10%', meta: 'CRBN.com · code CRBN10' },
+      { kind: 'bag', c1: '#EF476F', c2: '#FFD166', brand: 'JOOLA', name: 'Vision Backpack', price: '$67', was: '$79', off: '−15%', meta: 'JOOLA.com · code DINK15' }
+    ];
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      stores: [
+        { mono: 'JOOLA', t: '15% off sitewide', d: 'JOOLA.com · exclusive to PickleDeals', v: 'Ends Oct 16 · verified today', code: 'DINK15' },
+        { mono: 'PGD', t: '20% off your first order', d: 'Pickleball Grip Doctor · not valid on paddles', v: 'No end date · verified 3 days ago', code: 'NEWCUSTOMER20' },
+        { mono: 'SKX', t: '$20 off court shoes over $100', d: 'Skechers.com', v: 'Ends in 2 days · verified 2h ago', code: 'COURT20' },
+        { mono: 'CRBN', t: '10% off the 3X series', d: 'CRBN.com · 3X paddles only', v: 'Ends Oct 21 · verified yesterday', code: 'CRBN10' }
+      ],
+      items: items.concat(items)
+    };
+  }
+}
+</script>
+</body>
+</html>

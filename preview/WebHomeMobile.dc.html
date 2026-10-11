@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Website · Home (phone)</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+<link rel="stylesheet" href="./web.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 390px; height: 2400px; position: relative; overflow: hidden; background: var(--bg)">
+<div style="height: 64px; padding: 0 12px 0 16px; display: flex; align-items: center; gap: 10px; background: var(--surface)">
+<span style="width: 40px; height: 40px; border-radius: 10px; background: var(--int); color: var(--on-int); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800">PD</span>
+<div style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 14px; font-weight: 700">PickleDeals for iPhone</span><span style="font-size: 12px; color: var(--text-2)">Price alerts, saves and chat</span></div>
+<a href="WebSaveInAppMobile.dc.html" style="height: 32px; padding: 0 14px; border-radius: 16px; background: var(--int); color: var(--on-int); font-size: 14px; font-weight: 700; display: flex; align-items: center">Open</a>
+</div>
+<main style="display: flex; flex-direction: column; gap: 32px; padding: 16px 0 140px">
+<header style="display: flex; flex-direction: column; gap: 14px; padding: 0 16px">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<img class="logo-b" src="brand/pd-logo-black.svg" alt="PickleDeals" style="height: 28px; width: auto"><img class="logo-w" src="brand/pd-logo-white.svg" alt="PickleDeals" style="height: 28px; width: auto">
+<button aria-label="Appearance: System" style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
+</div>
+<h1 style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em">Deals</h1>
+<a href="WebDeals.dc.html" style="height: 44px; border-radius: 22px; background: var(--surface); display: flex; align-items: center; gap: 8px; padding: 0 14px; color: var(--text-2)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span style="font-size: 17px">Search paddles, shoes, brands</span></a>
+<div class="noscroll" style="display: flex; gap: 8px; overflow-x: auto; margin: 0 -16px; padding: 0 16px">
+<sc-for list="{{chips}}" as="c" hint-placeholder-count="6"><a href="WebDeals.dc.html" style="flex-shrink: 0; height: 36px; padding: 0 14px; border-radius: 18px; background: {{c.bg}}; color: {{c.fg}}; font-size: 15px; font-weight: 600; display: flex; align-items: center">{{c.t}}</a></sc-for>
+</div>
+<span class="num" style="font-size: 13px; color: var(--text-2)">312 live deals · prices checked 4 min ago</span>
+</header>
+
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="font-size: 22px; font-weight: 700; letter-spacing: -0.015em">Today’s best deal</h2><span style="font-size: 13px; color: var(--text-2)">Organic pick</span></div>
+<a href="WebProduct.dc.html" style="display: flex; flex-direction: column; gap: 14px">
+<div style="position: relative; height: 300px; border-radius: 24px; background: var(--img); padding: 26px 40px"><dc-import name="ProductArt" kind="paddle" c1="#1F5FD1" c2="#C8F03C" hint-size="100%,100%"></dc-import><span style="position: absolute; left: 14px; top: 14px; font-size: 11px; font-weight: 700; letter-spacing: .06em; padding: 5px 8px; border-radius: 6px; background: var(--int); color: var(--on-int)">LOWEST IN 90 DAYS</span></div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 0 2px">
+<span style="font-size: 13px; font-weight: 600; color: var(--text-2)">JOOLA · Paddles</span>
+<span style="font-size: 22px; font-weight: 700; letter-spacing: -0.015em">Perseus Pro IV 16mm</span>
+<div style="display: flex; align-items: baseline; gap: 10px; margin-top: 4px"><span class="num" style="font-size: 32px; font-weight: 700; letter-spacing: -0.03em">$179</span><span class="num" style="font-size: 17px; color: var(--text-3); text-decoration: line-through">$279</span><span class="num" style="font-size: 13px; font-weight: 700; padding: 3px 7px; border-radius: 6px; background: var(--int); color: var(--on-int)">−36%</span></div>
+<span class="num" style="font-size: 15px; color: var(--text-2)">Save $100 at JOOLA.com with code · 4 other offers</span>
+</div>
+</a>
+<div style="display: flex; gap: 10px">
+<a href="WebDealModal.dc.html" style="flex: 1; height: 50px; border-radius: 25px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px">Get deal <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M9 7h8v8"/></svg></a>
+<a href="WebProduct.dc.html" style="flex: 1; height: 50px; border-radius: 25px; background: var(--chip); font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center">Compare</a>
+</div>
+</section>
+
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: baseline; justify-content: space-between"><h2 style="font-size: 22px; font-weight: 700; letter-spacing: -0.015em">Under $100</h2><a href="WebDeals.dc.html" style="font-size: 15px; font-weight: 600; color: var(--text-2)">See all</a></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 12px">
+<sc-for list="{{under}}" as="d" hint-placeholder-count="4">
+<dc-import name="WebDealCard" kind="{{d.kind}}" c1="{{d.c1}}" c2="{{d.c2}}" brand="{{d.brand}}" name="{{d.name}}" price="{{d.price}}" was="{{d.was}}" off="{{d.off}}" meta="{{d.meta}}" badge="{{d.badge}}" rank="" href="WebProduct.dc.html" hint-size="100%,300px"></dc-import>
+</sc-for>
+</div>
+</section>
+
+<section style="padding: 0 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 4px"><h2 style="font-size: 22px; font-weight: 700; letter-spacing: -0.015em">Promo codes</h2><a href="WebPromoCodes.dc.html" style="font-size: 15px; font-weight: 600; color: var(--text-2)">See all</a></div>
+<sc-for list="{{promos}}" as="p" hint-placeholder-count="2">
+<div style="display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 16px; border: 1.5px dashed var(--border)">
+<div style="width: 44px; height: 44px; border-radius: 22px; background: var(--int); color: var(--on-int); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; letter-spacing: -0.02em">{{p.mono}}</div>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 600">{{p.t}}</span><span style="font-size: 12px; color: var(--text-2)">{{p.d}}</span></div>
+<button style="height: 36px; padding: 0 10px; border-radius: 10px; background: var(--surface); font-family: ui-monospace, 'SF Mono', monospace; font-size: 14px; font-weight: 700; letter-spacing: .05em">{{p.code}}</button>
+</div>
+</sc-for>
+</section>
+
+<footer style="padding: 8px 16px 0; display: flex; flex-direction: column; gap: 10px; font-size: 12px; color: var(--text-3)">
+<span>PickleDeals may earn a commission when you buy through links on this site.</span>
+<span><a class="ulink" href="#">Support</a> · <a class="ulink" href="#">Privacy</a> · <a class="ulink" href="#">Terms</a> · © 2026 JD Innovations LLC</span>
+</footer>
+</main>
+<div style="position: absolute; left: 16px; top: 724px"><dc-import name="WebTabBar" active="deals" hint-size="358px,64px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":390,"height":2400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const chip = (t, on) => ({ t, bg: on ? 'var(--int)' : 'var(--surface)', fg: on ? 'var(--on-int)' : 'var(--text-1)' });
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      chips: [chip('Today', true), chip('Price drops'), chip('Ending soon'), chip('Promo codes'), chip('Under $50'), chip('New')],
+      under: [
+        { kind: 'ball', c1: '#D8F23A', c2: '#000', badge: 'LOWEST PRICE', brand: 'Franklin', name: 'X-40 Outdoor Balls, 12-pack', price: '$27', was: '$40', off: '−33%', meta: 'Franklin Sports' },
+        { kind: 'grip', c1: '#4CC9F0', c2: '#F72585', badge: '', brand: 'Tourna', name: 'Grip XL Overgrip, 3-pack', price: '$9', was: '$13', off: '−31%', meta: 'Tourna' },
+        { kind: 'eyewear', c1: '#1C1C1C', c2: '#7B2CBF', badge: 'ENDING SOON', brand: 'Onix', name: 'Eye Guard Pro Glasses', price: '$34', was: '$50', off: '−32%', meta: 'Ends in 5h' },
+        { kind: 'bag', c1: '#EF476F', c2: '#FFD166', badge: '', brand: 'Selkirk', name: 'Core Line Sling Bag', price: '$59', was: '$80', off: '−26%', meta: 'Selkirk.com' }
+      ],
+      promos: [
+        { mono: 'JOOLA', t: '15% off sitewide', d: 'JOOLA.com · ends Oct 16', code: 'DINK15' },
+        { mono: 'PGD', t: '20% off your first order', d: 'Grip Doctor · not on paddles', code: 'NEWCUSTOMER20' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

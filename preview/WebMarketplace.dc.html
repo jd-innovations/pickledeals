@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Website · Pre-owned marketplace</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+<link rel="stylesheet" href="./web.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 1440px; height: 1100px; position: relative; overflow: hidden; background: var(--bg)">
+<dc-import name="WebHeader" active="market" hint-size="1440px,157px"></dc-import>
+<div style="display: grid; grid-template-columns: 820px 1fr; height: 943px">
+<section style="padding: 24px 28px 24px 80px; display: flex; flex-direction: column; gap: 18px; overflow: hidden">
+<div style="display: flex; align-items: flex-end; justify-content: space-between">
+<div style="display: flex; flex-direction: column; gap: 4px"><h1 style="font-size: 36px; font-weight: 800; letter-spacing: -0.03em">Pre-owned near Sarasota, FL</h1><span class="num" style="font-size: 14px; color: var(--text-2)">148 listings in this map area · areas are approximate (about 1 km)</span></div>
+</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<button style="height: 36px; padding: 0 14px; border-radius: 18px; border: 1px solid var(--border); font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filters</button>
+<sc-for list="{{chips}}" as="c" hint-placeholder-count="5"><span style="height: 36px; padding: 0 14px; border-radius: 18px; background: {{c.bg}}; color: {{c.fg}}; font-size: 14px; font-weight: 600; display: flex; align-items: center">{{c.t}}</span></sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 16px">
+<sc-for list="{{listings}}" as="l" hint-placeholder-count="6">
+<a href="WebListing.dc.html" style="display: flex; flex-direction: column; gap: 6px">
+<div style="position: relative; aspect-ratio: 1 / 1; border-radius: 16px; background: var(--img); padding: 16px; box-shadow: inset 0 0 0 {{l.ring}} var(--text-1)"><dc-import name="ProductArt" kind="{{l.kind}}" c1="{{l.c1}}" c2="{{l.c2}}" hint-size="100%,100%"></dc-import><span style="position: absolute; left: 8px; bottom: 8px; font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 6px; background: var(--bg)">{{l.cond}}</span><button aria-label="Save" class="glass" style="position: absolute; top: 8px; right: 8px; width: 34px; height: 34px; border-radius: 17px; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-7.5-4.4-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.8-7.5 10.2-7.5 10.2z"/></svg></button></div>
+<div style="display: flex; align-items: baseline; gap: 6px"><span class="num" style="font-size: 18px; font-weight: 700">{{l.price}}</span><span class="num" style="font-size: 12px; color: var(--text-2)">{{l.newp}}</span></div>
+<span style="font-size: 15px; font-weight: 500; line-height: 1.25">{{l.name}}</span>
+<span class="num" style="font-size: 12px; color: var(--text-2)">{{l.where}}</span>
+</a>
+</sc-for>
+</div>
+</section>
+<section aria-label="Map" style="position: relative; overflow: hidden; background: var(--map-land)">
+<div style="position: absolute; left: -40px; top: -60px; width: 390px; height: 844px; transform: scale(1.75); transform-origin: 0 0"><dc-import name="MapBase" hint-size="100%,100%"></dc-import></div>
+<sc-for list="{{pins}}" as="p" hint-placeholder-count="8"><a href="WebListing.dc.html" class="num" style="position: absolute; left: {{p.x}}px; top: {{p.y}}px; height: 30px; padding: 0 10px; border-radius: 15px; background: {{p.bg}}; color: {{p.fg}}; box-shadow: var(--shadow); border: 0.5px solid var(--border); font-size: 13px; font-weight: 700; display: flex; align-items: center">{{p.t}}</a></sc-for>
+<sc-for list="{{clusters}}" as="c" hint-placeholder-count="2"><span class="num" style="position: absolute; left: {{c.x}}px; top: {{c.y}}px; width: 44px; height: 44px; border-radius: 22px; background: var(--int); color: var(--on-int); border: 3px solid var(--surface-elev); box-shadow: var(--shadow); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center">{{c.n}}</span></sc-for>
+<button style="position: absolute; left: 50%; top: 20px; transform: translateX(-50%); height: 40px; padding: 0 16px; border-radius: 20px; background: var(--surface-elev); box-shadow: var(--shadow); font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg>Search this area</button>
+<div style="position: absolute; right: 20px; bottom: 24px; display: flex; flex-direction: column; border-radius: 14px; background: var(--surface-elev); box-shadow: var(--shadow); overflow: hidden"><button aria-label="Zoom in" style="width: 40px; height: 40px; font-size: 20px; font-weight: 600; border-bottom: 1px solid var(--sep)">+</button><button aria-label="Zoom out" style="width: 40px; height: 40px; font-size: 20px; font-weight: 600">−</button></div>
+<span style="position: absolute; left: 12px; bottom: 10px; font-size: 11px; color: var(--text-3)">Apple Maps</span>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1440,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const chip = (t, on) => ({ t, bg: on ? 'var(--int)' : 'var(--surface)', fg: on ? 'var(--on-int)' : 'var(--text-1)' });
+    const pin = (x, y, t, on) => ({ x, y, t, bg: on ? 'var(--int)' : 'var(--surface-elev)', fg: on ? 'var(--on-int)' : 'var(--text-1)' });
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      chips: [chip('Paddles', true), chip('Pickup'), chip('Ships'), chip('Under $150'), chip('Like New')],
+      listings: [
+        { kind: 'paddle', c1: '#1F5FD1', c2: '#C8F03C', cond: 'Like New', price: '$145', newp: 'New $179', name: 'JOOLA Perseus Pro IV 16mm', where: 'Sarasota · 4 mi · pickup', ring: '2px' },
+        { kind: 'paddle', c1: '#D7263D', c2: '#F4D35E', cond: 'Excellent', price: '$125', newp: 'New $189', name: 'Selkirk Vanguard Power Air', where: 'Lakewood Ranch · 3 mi', ring: '0' },
+        { kind: 'paddle', c1: '#26282B', c2: '#9BE15D', cond: 'Good', price: '$95', newp: 'New $169', name: 'CRBN 3X Power 16mm', where: 'Bradenton · 9 mi · or ships', ring: '0' },
+        { kind: 'paddle', c1: '#111111', c2: '#F2C14E', cond: 'Like New', price: '$120', newp: 'New $149', name: 'Six Zero Double Black Diamond', where: 'Venice · 18 mi', ring: '0' },
+        { kind: 'paddle', c1: '#0F9D8A', c2: '#FFD166', cond: 'Excellent', price: '$110', newp: 'New $159', name: 'Engage Pursuit Pro1 6.0', where: 'Sarasota · 6 mi', ring: '0' },
+        { kind: 'paddle', c1: '#FF6B35', c2: '#1C1C1C', cond: 'Fair', price: '$85', newp: 'New $199', name: 'Gearbox Pro Power Fusion', where: 'Osprey · 11 mi', ring: '0' }
+      ],
+      pins: [pin(150, 160, '$145', true), pin(300, 120, '$125'), pin(420, 260, '$95'), pin(210, 330, '$120'), pin(470, 420, '$110'), pin(120, 520, '$85'), pin(360, 560, '$60'), pin(500, 660, '$420')],
+      clusters: [{ x: 260, y: 440, n: 12 }, { x: 80, y: 700, n: 7 }]
+    };
+  }
+}
+</script>
+</body>
+</html>

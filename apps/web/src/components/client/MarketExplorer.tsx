@@ -26,13 +26,11 @@ function loadMapKit(): Promise<boolean> {
     (r) =>
       r.enabled &&
       new Promise<boolean>((resolve) => {
-        const s = document.createElement('script');
-        s.src = MAPKIT_SRC;
-        s.crossOrigin = 'anonymous';
-        s.dataset.libraries = 'map,annotations';
-        s.onload = () => {
+        // mapkit.core.js loads the "map" and "annotations" libraries after the script itself, then
+        // calls data-callback; mapkit.Map only exists from that point on.
+        (window as unknown as Record<string, () => void>).__pdMapKitReady = () => {
           const mk = window.mapkit;
-          if (!mk) return resolve(false);
+          if (!mk?.Map) return resolve(false);
           mk.init({
             authorizationCallback: (done: (t: string) => void) =>
               fetch('/api/mapkit-token')
@@ -41,6 +39,12 @@ function loadMapKit(): Promise<boolean> {
           });
           resolve(true);
         };
+        const s = document.createElement('script');
+        s.src = MAPKIT_SRC;
+        s.crossOrigin = 'anonymous';
+        s.async = true;
+        s.dataset.libraries = 'map,annotations';
+        s.dataset.callback = '__pdMapKitReady';
         s.onerror = () => resolve(false);
         document.head.appendChild(s);
       }),

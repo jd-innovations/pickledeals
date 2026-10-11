@@ -514,6 +514,14 @@
    "h": 420,
    "title": "Web · Footer",
    "is_interactive": true
+  },
+  "WebPartners.dc.html": {
+   "x": 0,
+   "y": 35340,
+   "w": 1440,
+   "h": 2122,
+   "title": "Web · Partner with PickleDeals",
+   "is_interactive": true
   }
  },
  "order": [
@@ -575,7 +583,8 @@
   "WebHomeMobile.dc.html",
   "WebSaveInAppMobile.dc.html",
   "WebHeader.dc.html",
-  "WebFooter.dc.html"
+  "WebFooter.dc.html",
+  "WebPartners.dc.html"
  ],
  "notes": {
   "t0": {

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Website · Partner with PickleDeals</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="./pd.css">
+<link rel="stylesheet" href="./web.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>body{margin:0} .pd input,.pd textarea{border:1px solid var(--border);background:var(--bg);border-radius:12px;padding:0 14px;height:46px;font-size:16px;width:100%} .pd textarea{height:110px;padding:12px 14px;resize:none}</style>
+</helmet>
+<div class="pd {{mode}}" style="width: 1440px; min-height: 2100px; position: relative; background: var(--bg)">
+<dc-import name="WebHeader" active="none" hint-size="1440px,157px"></dc-import>
+<main class="wrap" style="padding-top: 40px; padding-bottom: 32px; display: flex; flex-direction: column; gap: 56px">
+
+<section style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: start">
+<div style="display: flex; flex-direction: column; gap: 18px; padding-top: 12px">
+<span style="align-self: flex-start; height: 30px; padding: 0 12px; border-radius: 15px; background: var(--surface); font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v11H4z"/></svg>For brands and stores on Shopify</span>
+<h1 style="font-size: 52px; line-height: 1.04; font-weight: 800; letter-spacing: -0.035em">Get your gear in front of pickleball players</h1>
+<p style="font-size: 18px; line-height: 1.5; color: var(--text-2); max-width: 520px">PickleDeals compares prices and promo codes across pickleball stores, in the iPhone app and on the web. Connect your Shopify store and your products show up wherever players are comparing.</p>
+<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px">
+<sc-for list="{{facts}}" as="f" hint-placeholder-count="3"><div style="display: flex; align-items: center; gap: 10px; font-size: 15px"><span style="width: 28px; height: 28px; border-radius: 14px; background: var(--surface); display: flex; align-items: center; justify-content: center; flex-shrink: 0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span>{{f}}</div></sc-for>
+</div>
+</div>
+
+<div id="apply" style="border-radius: 28px; background: var(--surface); padding: 28px; display: flex; flex-direction: column; gap: 16px">
+<sc-if value="{{isForm}}" hint-placeholder-val="{{true}}">
+<div style="display: flex; flex-direction: column; gap: 4px"><h2 style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em">Apply to partner</h2><span style="font-size: 14px; color: var(--text-2)">We reply by email, usually within two business days.</span></div>
+<sc-if value="{{notShopify}}" hint-placeholder-val="{{false}}"><div role="alert" style="padding: 12px 14px; border-radius: 14px; background: var(--bg); border: 1.5px solid var(--text-1); font-size: 14px; line-height: 1.45"><b>We couldn’t find a Shopify store at courtgear.com.</b> We currently partner with Shopify stores only. Check the address, or use your <span style="font-family: ui-monospace, monospace">name.myshopify.com</span> address.</div></sc-if>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700">Brand or store name<input value="{{v.company}}" placeholder="CourtGear"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700">Your name<input value="{{v.name}}" placeholder="Alex Rivera"></label>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700">Work email<input value="{{v.email}}" placeholder="alex@courtgear.com"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700">Shopify store address<input value="{{v.store}}" placeholder="courtgear.com or courtgear.myshopify.com" style="border-color: {{storeBorder}}"><span style="font-size: 12px; font-weight: 400; color: var(--text-2)">We check that it’s a Shopify store when you send this.</span></label>
+<fieldset style="border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px"><legend style="font-size: 13px; font-weight: 700; margin-bottom: 8px; padding: 0">I’m interested in</legend>
+<sc-for list="{{interests}}" as="o" hint-placeholder-count="3"><label style="display: flex; align-items: center; gap: 10px; font-size: 15px"><span style="width: 20px; height: 20px; border-radius: 6px; border: 1.5px solid {{o.bd}}; background: {{o.bg}}; display: flex; align-items: center; justify-content: center; color: var(--on-int)"><sc-if value="{{o.on}}" hint-placeholder-val="{{false}}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></sc-if></span>{{o.t}}</label></sc-for>
+</fieldset>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700">Anything else? <span style="font-weight: 400; color: var(--text-2)">Optional</span><textarea placeholder="Which products, launch dates, codes you’d like to offer…">{{v.msg}}</textarea></label>
+<button onClick="{{submit}}" style="height: 52px; border-radius: 26px; background: var(--int); color: var(--on-int); font-size: 17px; font-weight: 700; text-align: center">Send application</button>
+<span style="font-size: 12px; color: var(--text-2); line-height: 1.45">We use these details only to reply about partnering. See our <a href="#" style="text-decoration: underline">Privacy Policy</a>.</span>
+</sc-if>
+<sc-if value="{{isSent}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 14px; align-items: flex-start; padding: 24px 4px">
+<span style="width: 56px; height: 56px; border-radius: 28px; background: var(--int); color: var(--on-int); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span>
+<h2 style="font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Thanks, CourtGear</h2>
+<p style="font-size: 16px; line-height: 1.5; color: var(--text-2)">We got your application and found your Shopify store. We’ll email alex@courtgear.com, usually within two business days, with next steps for connecting your store.</p>
+<button onClick="{{reset}}" style="height: 44px; padding: 0 18px; border-radius: 22px; background: var(--chip); font-size: 15px; font-weight: 700">Send another</button>
+</div>
+</sc-if>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 18px">
+<h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em">Ways to partner</h2>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px">
+<sc-for list="{{offers}}" as="o" hint-placeholder-count="3">
+<div style="padding: 24px; border-radius: 22px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; justify-content: space-between"><span style="width: 44px; height: 44px; border-radius: 22px; background: var(--surface); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{o.icon}}"/></svg></span><span style="font-size: 12px; font-weight: 700; padding: 3px 8px; border-radius: 6px; background: {{o.tagBg}}; color: {{o.tagFg}}">{{o.tag}}</span></div>
+<h3 style="font-size: 19px; font-weight: 700; letter-spacing: -0.01em">{{o.t}}</h3>
+<p style="font-size: 15px; line-height: 1.5; color: var(--text-2)">{{o.d}}</p>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em">How it works</h2>
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+<div style="display: flex; gap: 14px"><span class="num" style="width: 32px; height: 32px; border-radius: 16px; background: var(--int); color: var(--on-int); font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0">{{s.n}}</span><div style="display: flex; flex-direction: column; gap: 2px; padding-top: 4px"><b style="font-size: 16px">{{s.t}}</b><span style="font-size: 15px; line-height: 1.5; color: var(--text-2)">{{s.d}}</span></div></div>
+</sc-for>
+</div>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<h2 style="font-size: 28px; font-weight: 800; letter-spacing: -0.02em">Our rules</h2>
+<div style="border-radius: 22px; background: var(--surface); padding: 6px 20px">
+<sc-for list="{{rules}}" as="r" hint-placeholder-count="4"><div style="padding: 14px 0; border-bottom: 1px solid var(--sep); display: flex; flex-direction: column; gap: 2px"><b style="font-size: 15px">{{r.t}}</b><span style="font-size: 14px; line-height: 1.5; color: var(--text-2)">{{r.d}}</span></div></sc-for>
+</div>
+</div>
+</section>
+</main>
+<dc-import name="WebFooter" hint-size="1440px,420px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"state":{"editor":"enum","options":["form","notShopify","sent"],"default":"form"},"$preview":{"width":1440,"height":2100}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { s: props.state || 'form' }; }
+  renderVals() {
+    const s = this.state.s;
+    const o = (t, on) => ({ t, on, bg: on ? 'var(--int)' : 'transparent', bd: on ? 'var(--int)' : 'var(--border)' });
+    const filled = s !== 'form';
+    return {
+      mode: this.props.theme === 'dark' ? 'dark' : '',
+      isForm: s !== 'sent', isSent: s === 'sent', notShopify: s === 'notShopify',
+      storeBorder: s === 'notShopify' ? 'var(--text-1)' : 'var(--border)',
+      v: filled ? { company: 'CourtGear', name: 'Alex Rivera', email: 'alex@courtgear.com', store: 'courtgear.com', msg: '' } : { company: '', name: '', email: '', store: '', msg: '' },
+      submit: () => this.setState({ s: 'sent' }),
+      reset: () => this.setState({ s: 'form' }),
+      facts: ['Offers ranked by price after codes, never by commission', 'Products and prices sync from Shopify automatically', 'Shoppers check out on your store, not ours'],
+      interests: [o('Connecting my Shopify store', true), o('An exclusive promo code', false), o('Sponsored placement', false)],
+      offers: [
+        { icon: 'M4 9l1.5-5h13L20 9 M4 9h16v11H4z M9.5 20v-5.5h5V20', tag: 'Free', tagBg: 'var(--surface)', tagFg: 'var(--text-1)', t: 'Connect your Shopify store', d: 'Your products, prices and stock sync automatically through Shopify, and show up next to every other store’s offer for the same item.' },
+        { icon: 'M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z', tag: 'Free', tagBg: 'var(--surface)', tagFg: 'var(--text-1)', t: 'Exclusive promo codes', d: 'Give PickleDeals shoppers a code of their own. It’s applied with a Shopify discount link, so nobody has to copy it, and it’s tagged “exclusive”.' },
+        { icon: 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z', tag: 'Paid', tagBg: 'var(--int)', tagFg: 'var(--on-int)', t: 'Sponsored placement', d: 'A featured spot on the home page or in a category, always labeled “Sponsored”. Pricing on request.' }
+      ],
+      steps: [
+        { n: '1', t: 'Apply', d: 'Tell us about your brand or store. We check that it runs on Shopify.' },
+        { n: '2', t: 'We reply', d: 'Usually within two business days, with what we need to connect your store.' },
+        { n: '3', t: 'Connect', d: 'You give us read-only access to your public product catalog through Shopify. No orders, no customer data.' },
+        { n: '4', t: 'Go live', d: 'Your products appear in the app and on pickledeals.app, matched to the right items, with prices checked through the day.' }
+      ],
+      rules: [
+        { t: 'Ranked by price only', d: 'Offers are ordered by price after codes. Partnering never moves your offer up.' },
+        { t: 'Sponsored is always labeled', d: 'Paid spots say “Sponsored” wherever they appear.' },
+        { t: 'Your store, your checkout', d: 'Shoppers buy on your Shopify store. We never take payment or hold stock.' },
+        { t: 'Shopify stores only, for now', d: 'It’s how we keep products and prices accurate without manual updates.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -3,7 +3,8 @@ import { createPrivateKey, sign } from 'node:crypto';
 import { NextResponse, type NextRequest } from 'next/server';
 
 /**
- * Short-lived MapKit JS token (Apple Maps on the website). Needs MAPKIT_TEAM_ID, MAPKIT_KEY_ID and
+ * MapKit JS token (Apple Maps on the website): MAPKIT_TOKEN (a token made in Apple Developer), or a
+ * short-lived one we sign from MAPKIT_TEAM_ID, MAPKIT_KEY_ID and
  * MAPKIT_PRIVATE_KEY (the .p8 from Apple Developer › Keys, MapKit JS enabled) in the environment.
  * The token only works on our own origins. Without the key the map simply doesn't show.
  */
@@ -15,8 +16,12 @@ export async function GET(req: NextRequest) {
   const team = process.env.MAPKIT_TEAM_ID;
   const kid = process.env.MAPKIT_KEY_ID;
   const pem = process.env.MAPKIT_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  // A ready-made token from Apple Developer (Maps IDs › MapKit JS token), restricted by Apple to the
+  // domains chosen when it was created. Used as-is; takes priority over signing our own.
+  const issued = process.env.MAPKIT_TOKEN?.trim();
   // ?check=1: does the site have a map at all? (Answered quietly, so pages don't log an error.)
-  if (req.nextUrl.searchParams.has('check')) return NextResponse.json({ enabled: !!(team && kid && pem) });
+  if (req.nextUrl.searchParams.has('check')) return NextResponse.json({ enabled: !!issued || !!(team && kid && pem) });
+  if (issued) return new NextResponse(issued, { headers: { 'content-type': 'text/plain', 'cache-control': 'private, max-age=600' } });
   if (!team || !kid || !pem) return new NextResponse('MapKit is not configured', { status: 503 });
 
   const host = req.headers.get('host') ?? '';

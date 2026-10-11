@@ -9,7 +9,8 @@ import { useTheme } from '@/design/theme';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { SaveAlertButtons } from '@/features/alerts/SaveAlertButtons';
 import { galleryImages, useProduct, useProductSlug } from '@/features/catalog/hooks';
-import { Chip, ErrorState, Group, Icon, ListRow, Skeleton, Text } from '@/ui';
+import { shareItem } from '@/lib/share';
+import { Chip, ErrorState, Group, Icon, IconButton, ListRow, Skeleton, Text } from '@/ui';
 
 import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, ownershipDisclosure, priceAsOf, promoDetail, shippingLabel, shippingValue, shipsFromLabel } from '../format';
 import { openDeal, useLivePromos, useOffer } from '../hooks';
@@ -57,10 +58,20 @@ export default function DealScreen() {
       <Stack.Screen
         options={{
           title: '',
-          headerRight: () =>
-            saveTarget ? (
-              <FavoriteButton saved={isSaved} label={isSaved ? 'Saved' : 'Save'} onToggle={() => toggleSave(saveTarget.kind, saveTarget.id, isSaved)} />
-            ) : null,
+          headerRight: () => (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              {o && product ? (
+                <IconButton
+                  icon="share"
+                  label="Share"
+                  onPress={() => shareItem({ kind: 'deal', offerId: o.offerId, dealId: deal }, `${product.brand.name} ${product.name} at ${o.retailer.name}, on PickleDeals`)}
+                />
+              ) : null}
+              {saveTarget ? (
+                <FavoriteButton saved={isSaved} label={isSaved ? 'Saved' : 'Save'} onToggle={() => toggleSave(saveTarget.kind, saveTarget.id, isSaved)} />
+              ) : null}
+            </View>
+          ),
         }}
       />
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 140, gap: 18 }}>

@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["ZSH27U747N.app.pickledeals"],
+        "components": [
+          { "/": "/p/*", "comment": "product" },
+          { "/": "/d/*", "comment": "deal" },
+          { "/": "/l/*", "comment": "pre-owned listing" },
+          { "/": "/b/*", "comment": "brand" },
+          { "/": "/open", "comment": "links in notification emails" }
+        ]
+      }
+    ]
+  }
+}

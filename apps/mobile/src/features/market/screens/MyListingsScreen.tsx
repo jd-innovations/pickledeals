@@ -1,11 +1,12 @@
 import { formatAgo, formatPrice, radius, spoken } from '@pickledeals/shared';
 import { router, Stack } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ProductImage } from '@/commerce';
 import { useTheme } from '@/design/theme';
 import { useListingActivity } from '@/features/chat/hooks';
+import { shareItem } from '@/lib/share';
 import { Button, EmptyState, IconButton, SegmentedControl, Skeleton, Text } from '@/ui';
 
 import type { MyListing } from '../api';
@@ -59,7 +60,7 @@ function Row({ l }: { l: MyListing }) {
   const title = listingTitle(l);
   const primary =
     l.status === 'active'
-      ? { label: 'Share listing', run: () => Share.share({ message: `${title} — ${formatPrice(l.priceCents)} on PickleDeals` }).catch(() => {}) }
+      ? { label: 'Share listing', run: () => shareItem({ kind: 'listing', id: l.id }, `${title} — ${formatPrice(l.priceCents)} on PickleDeals`) }
       : l.status === 'pending'
         ? { label: 'Mark as sold', run: () => openManage(l.id) }
         : { label: 'Sell a similar item', run: () => router.push('/sell') };

@@ -10,7 +10,8 @@ import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { DealGrid } from '@/features/deals/components';
 import { useDeals } from '@/features/deals/hooks';
 import { useLivePromos } from '@/features/offers/hooks';
-import { Button, Chip, ChipRow, SectionHeader, Skeleton, Text } from '@/ui';
+import { shareItem } from '@/lib/share';
+import { Button, Chip, ChipRow, IconButton, SectionHeader, Skeleton, Text } from '@/ui';
 
 import { brandLogoUrl } from '../api';
 import { GridSkeleton, LoadError, ProductGrid } from '../components';
@@ -48,7 +49,14 @@ export default function BrandScreen() {
 
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: 120, gap: 16 }}>
-      <Stack.Screen options={{ title: '', headerLargeTitle: false }} />
+      <Stack.Screen
+        options={{
+          title: '',
+          headerLargeTitle: false,
+          headerRight: () =>
+            data ? <IconButton icon="share" label="Share" onPress={() => shareItem({ kind: 'brand', slug: data.brand.slug }, `${data.brand.name} deals on PickleDeals`)} /> : null,
+        }}
+      />
       {isError && !data ? (
         <LoadError onRetry={refetch} />
       ) : (

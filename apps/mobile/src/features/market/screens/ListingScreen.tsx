@@ -1,7 +1,7 @@
 import { formatAgo, formatPrice, LISTING_CONDITIONS, radius, spoken } from '@pickledeals/shared';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, Share, StyleSheet, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ConditionBadge, FavoriteButton, PhotoViewer, photoIndex, ProductImage, UsedVsNew, type ImageSource } from '@/commerce';
@@ -12,6 +12,7 @@ import { AreaMap } from '@/features/map';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { openProduct } from '@/features/catalog/components';
+import { shareItem } from '@/lib/share';
 import { Button, DetailTable, ErrorState, Icon, IconButton, Skeleton, Text } from '@/ui';
 
 import { listingImageUrl, type ListingDetail } from '../api';
@@ -63,7 +64,7 @@ export default function ListingScreen() {
   const specs = l?.product ? Object.entries(l.product.specs).slice(0, 4) : [];
 
   const onScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => setPage(Math.round(e.nativeEvent.contentOffset.x / width));
-  const share = () => l && Share.share({ message: `${fullTitle} — ${formatPrice(l.priceCents)} on PickleDeals` }).catch(() => {});
+  const share = () => l && shareItem({ kind: 'listing', id: l.id }, `${fullTitle} — ${formatPrice(l.priceCents)} on PickleDeals`);
   const message = () =>
     requireAuth('message_seller', async () => {
       try {

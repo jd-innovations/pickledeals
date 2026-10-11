@@ -276,6 +276,12 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
     `dispatch-emails` active; OTA 8976224d… (preview) adds the switch. Resend webhook 381cad20… (bounced,
     complained) → email-events, `RESEND_WEBHOOK_SECRET` set; a signed test event suppressed (row removed).
     Live test: a system notice to the user's address was delivered Oct 11 (notice deleted afterwards).
+- **Smart links (Oct 11, user-approved):** Share on product, deal (new), brand (new), listing and My listings
+  shares `pickledeals.app/p|d|l|b/<key>` (`packages/shared/src/share.ts`, `lib/share.ts`). Site: `api/share.js`
+  (Vercel function via `vercel.json` rewrites) renders a preview page with Open Graph tags from public data
+  (D1: no number for check-price/API prices; D2: area label only). Universal links: `.well-known/
+  apple-app-site-association` + `ios.associatedDomains` (needs a new build) and `app/+native-intent.tsx` maps
+  links (and email `/open?to=`) to routes. Product Share button is now the standard 40 pt size.
 - **Map (Phase 7, D4):**
   - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
   - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).

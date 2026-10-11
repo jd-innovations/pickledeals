@@ -5,10 +5,46 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "DENY" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        }
       ]
+    },
+    {
+      "source": "/.well-known/apple-app-site-association",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/json"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/p/:key",
+      "destination": "/api/share?kind=p&key=:key"
+    },
+    {
+      "source": "/d/:key",
+      "destination": "/api/share?kind=d&key=:key"
+    },
+    {
+      "source": "/l/:key",
+      "destination": "/api/share?kind=l&key=:key"
+    },
+    {
+      "source": "/b/:key",
+      "destination": "/api/share?kind=b&key=:key"
     }
   ]
 }

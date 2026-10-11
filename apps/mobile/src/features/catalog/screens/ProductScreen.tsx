@@ -3,7 +3,7 @@ import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, Share, View } from 'react-native';
+import { Pressable, ScrollView, View } from 'react-native';
 
 import {
   DealQualityMeter,
@@ -38,6 +38,7 @@ import {
   shipsFromLabel,
 } from '@/features/offers/format';
 import { openDeal, useLivePromos, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
+import { shareItem } from '@/lib/share';
 import { Button, Chip, ChipRow, DetailTable, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
 
 import { LoadError, openBrand, openCategory, openProduct, useGridCardWidth } from '../components';
@@ -73,7 +74,7 @@ export default function ProductScreen() {
     <SaveAlertButtons save={{ kind: 'product', id: p.id }} product={p} variantId={variant?.id} showAlert={!untrackedOnly} />
   ) : null;
 
-  const share = () => p && Share.share({ message: `${p.brand.name} ${p.name} on PickleDeals` }).catch(() => {});
+  const share = () => p && shareItem({ kind: 'product', slug: p.slug }, `${p.brand.name} ${p.name} on PickleDeals`);
   const getDeal = async (o: RankedOffer, placement: string) => {
     if (o.promo) {
       await Clipboard.setStringAsync(o.promo.code);
@@ -86,7 +87,7 @@ export default function ProductScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <Stack.Screen options={{ headerRight: () => <IconButton icon="share" label="Share" size={34} onPress={share} /> }} />
+      <Stack.Screen options={{ headerRight: () => <IconButton icon="share" label="Share" onPress={share} /> }} />
       <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingBottom: best ? 140 : 120, gap: 20 }}>
         {isError && !p ? (
           <LoadError onRetry={refetch} />

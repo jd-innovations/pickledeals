@@ -15,7 +15,10 @@
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       },
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "associatedDomains": [
+        "applinks:pickledeals.app"
+      ]
     },
     "android": {
       "adaptiveIcon": {

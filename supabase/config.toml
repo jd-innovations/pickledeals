@@ -435,3 +435,11 @@ enabled = true
 # Outbound "Get deal" redirect: public (the in-app browser cannot send auth headers).
 [functions.go]
 verify_jwt = false
+
+# One-click email unsubscribe: mail clients and the website call it without a JWT (token in the link).
+[functions.email-unsubscribe]
+verify_jwt = false
+
+# Resend webhook: authenticated by its Svix signature, not a JWT.
+[functions.email-events]
+verify_jwt = false

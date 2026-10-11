@@ -34,6 +34,9 @@ Copy from `supabase/functions/.env`; never paste them in chat.
 | `SHOPIFY_GRIPDOCTOR_DOMAIN`, `SHOPIFY_GRIPDOCTOR_TOKEN` | Pickleball Grip Doctor feed |
 | `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY`, `APPLE_CLIENT_ID` (see `.env.example`) | Apple token revocation on account deletion |
 | `EXPO_ACCESS_TOKEN` (optional) | push sending with enhanced security |
+| `RESEND_API_KEY` | missed-message emails (dispatch-emails); without it the function does nothing |
+| `RESEND_WEBHOOK_SECRET` | Resend webhook (email-events): the `whsec_…` signing secret |
+| `EMAIL_FROM`, `SITE_URL` (optional) | default `PickleDeals <notifications@pickledeals.app>`, `https://pickledeals.app` |
 | `AMAZON_*`, `FEED_URL_*` | later (Amazon after launch; affiliate feeds when approved) |
 
 Vault (SQL editor), so cron can call the functions:
@@ -55,6 +58,12 @@ select vault.create_secret('<service role key>', 'dispatch_key');
      applies to the built-in sender).
   5. Send yourself a code from the app to confirm; the email uses the project's OTP template, pushed
      with `supabase config push`.
+- **Missed-message emails:** set `RESEND_API_KEY` (a sending-access key, separate from the SMTP one is
+  fine) and deploy `dispatch-emails`, `email-unsubscribe`, `email-events`. Then Resend → Webhooks → add
+  `https://tadxbjlhknukpyxbqrpt.supabase.co/functions/v1/email-events` for `email.bounced` and
+  `email.complained`, and set its signing secret as `RESEND_WEBHOOK_SECRET`. Apple private relay
+  addresses are skipped until the domain is registered under Apple Developer → Services → Sign in
+  with Apple for Email Communication (then remove the `apple_relay` rule in `claim_pending_emails`).
 - **Sign in with Apple:** Authentication → Providers → Apple: the app's bundle id `app.pickledeals` as
   client id (still blocked by Apple's "Sign Up Not Complete" issue; see the handoff).
 - **First admin:** sign in once in the app or admin, then grant the role in the SQL editor:

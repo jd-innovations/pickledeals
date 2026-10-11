@@ -31,10 +31,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 
 ### Next steps, in order
 1. **Hosted dashboard (Oct 6): done** — Shopify function secrets set; Vault `dispatch_key` = legacy
-   `service_role` JWT (verified by the user). **Resend SMTP skipped**: the user has no sending domain yet, so
-   sign-in codes use Supabase's built-in mailer (project team members only, a few per hour). Later: verify a
-   domain in Resend → Authentication → SMTP (`smtp.resend.com`, 465, user `resend`, password = Resend API
-   key, sender `no-reply@<domain>`, name PickleDeals) → Rate Limits: raise emails/hour.
+   `service_role` JWT (verified by the user). Resend SMTP is on since Oct 7 (see the domain note below).
 2. **Shopify on hosted: on (Oct 6).** `shopify-gripdoctor` active, storefront, shipping $4.99, free from $39
    (`flat_cents` 499, `free_over_cents` 3900), every 30 min. First run: 32 products, 15 skipped (out of
    stock), 17 unmatched → review queue; 0 offers until staff link/publish them in the hosted admin. All 7
@@ -259,6 +256,22 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
     - push taps mark the notification read
     - the app icon badge equals unread Activity plus unread threads
     - Activity icons per type
+- **Missed-message emails (Oct 11; user-approved design: NotifPrefs › Delivery › "Email me what I miss"):**
+  - Scope: `offer` and `new_message` still unread an hour later (switch on, default on), one email per thread
+    per 24 h (newest wins, older ones `grouped`), held through quiet hours, not for muted threads; `system`
+    account notices go at once and ignore the switch. Nothing else is emailed (no digest email: it would be
+    marketing and need a full postal address; the footer says "Bradenton, Florida", the user's choice).
+  - Migration `20261029000000_email_notifications.sql`: `notifications.email_status/email_at/email_error`
+    (queued by a before-insert trigger), `profiles_private.email_missed` + secret `email_token`,
+    `email_suppressions`, `claim_pending_emails(max_rows, at)` (rules; skip reasons in `email_error`),
+    `unsubscribe_email(token)`, `suppress_email`, cron `dispatch-emails` every 5 min. Tests `22_email_notifications`.
+  - Functions: `dispatch-emails` (Resend API, idempotency key = notification id, RFC 8058 one-click headers;
+    no-op without `RESEND_API_KEY`; `RESEND_URL` can point at a mock), `email-unsubscribe` and
+    `email-events` (Resend webhook, Svix signature; hard bounces and complaints → suppression), both
+    `verify_jwt = false`. Template and signature check in `_shared/email.ts` (tests in `packages/shared`).
+  - Site: `/open?to=<route>` hands the route to the app (`pickledeals://`), `/unsubscribe?t=` (button, not on
+    load, so mail scanners don't unsubscribe). Privacy policy mentions notification emails. Universal links
+    (AASA + associatedDomains) are a later step and need a new build.
 - **Map (Phase 7, D4):**
   - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
   - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).

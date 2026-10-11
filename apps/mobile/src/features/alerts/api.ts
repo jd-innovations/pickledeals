@@ -270,6 +270,8 @@ export type NotificationSettings = {
   tz: string;
   dailyDealCap: number | null;
   radiusM: number;
+  /** "Email me what I miss": offers and messages still unread after an hour. */
+  emailMissed: boolean;
 };
 
 export async function fetchNotificationSettings(): Promise<NotificationSettings | null> {
@@ -284,6 +286,7 @@ export async function fetchNotificationSettings(): Promise<NotificationSettings 
     tz: string;
     daily_deal_cap: number | null;
     radius_m: number;
+    email_missed: boolean;
   };
   return {
     categories: Object.fromEntries(NOTIFICATION_CATEGORIES.map((c) => [c, !!(r.categories[c]?.push || r.categories[c]?.in_app)])) as Record<NotificationCategory, boolean>,
@@ -293,6 +296,7 @@ export async function fetchNotificationSettings(): Promise<NotificationSettings 
     tz: r.tz,
     dailyDealCap: r.daily_deal_cap,
     radiusM: r.radius_m,
+    emailMissed: r.email_missed,
   };
 }
 
@@ -301,7 +305,14 @@ export async function setNotificationCategory(category: NotificationCategory, en
   if (error) throw error;
 }
 
-export async function setNotificationSettings(s: { quietEnabled?: boolean; quietStart?: string; quietEnd?: string; tz?: string; dailyDealCap?: number | null }) {
+export async function setNotificationSettings(s: {
+  quietEnabled?: boolean;
+  quietStart?: string;
+  quietEnd?: string;
+  tz?: string;
+  dailyDealCap?: number | null;
+  emailMissed?: boolean;
+}) {
   const { error } = await requireSupabase().rpc('set_notification_settings', {
     quiet_enabled: s.quietEnabled,
     quiet_start: s.quietStart,
@@ -309,6 +320,7 @@ export async function setNotificationSettings(s: { quietEnabled?: boolean; quiet
     tz: s.tz,
     daily_deal_cap: s.dailyDealCap ?? undefined,
     clear_cap: s.dailyDealCap === null,
+    email_missed: s.emailMissed,
   });
   if (error) throw error;
 }

@@ -286,6 +286,19 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"email_suppressions": {
+                  Row: {
+                    "created_at": string,"email": string,"reason": string
+                  }
+                  Insert: {
+                    "created_at"?: string,"email": string,"reason": string
+                  }
+                  Update: {
+                    "created_at"?: string,"email"?: string,"reason"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"ingestion_runs": {
                   Row: {
                     "created_at": string,"created_by": string | null,"id": string,"report": NonNullable<Json>,"source_id": string
@@ -538,13 +551,13 @@ isOneToOne: false
                   ]
                 },"notifications": {
                   Row: {
-                    "body": string,"created_at": string,"data": NonNullable<Json>,"dedupe_key": string,"held_until": string | null,"id": string,"push_error": string | null,"push_status": Database["public"]['Enums']["push_status"],"pushed_at": string | null,"read_at": string | null,"route": string | null,"title": string,"type": string,"user_id": string
+                    "body": string,"created_at": string,"data": NonNullable<Json>,"dedupe_key": string,"email_at": string | null,"email_error": string | null,"email_status": Database["public"]['Enums']["push_status"] | null,"held_until": string | null,"id": string,"push_error": string | null,"push_status": Database["public"]['Enums']["push_status"],"pushed_at": string | null,"read_at": string | null,"route": string | null,"title": string,"type": string,"user_id": string
                   }
                   Insert: {
-                    "body": string,"created_at"?: string,"data"?: NonNullable<Json>,"dedupe_key": string,"held_until"?: string | null,"id"?: string,"push_error"?: string | null,"push_status"?: Database["public"]['Enums']["push_status"],"pushed_at"?: string | null,"read_at"?: string | null,"route"?: string | null,"title": string,"type": string,"user_id": string
+                    "body": string,"created_at"?: string,"data"?: NonNullable<Json>,"dedupe_key": string,"email_at"?: string | null,"email_error"?: string | null,"email_status"?: Database["public"]['Enums']["push_status"] | null,"held_until"?: string | null,"id"?: string,"push_error"?: string | null,"push_status"?: Database["public"]['Enums']["push_status"],"pushed_at"?: string | null,"read_at"?: string | null,"route"?: string | null,"title": string,"type": string,"user_id": string
                   }
                   Update: {
-                    "body"?: string,"created_at"?: string,"data"?: NonNullable<Json>,"dedupe_key"?: string,"held_until"?: string | null,"id"?: string,"push_error"?: string | null,"push_status"?: Database["public"]['Enums']["push_status"],"pushed_at"?: string | null,"read_at"?: string | null,"route"?: string | null,"title"?: string,"type"?: string,"user_id"?: string
+                    "body"?: string,"created_at"?: string,"data"?: NonNullable<Json>,"dedupe_key"?: string,"email_at"?: string | null,"email_error"?: string | null,"email_status"?: Database["public"]['Enums']["push_status"] | null,"held_until"?: string | null,"id"?: string,"push_error"?: string | null,"push_status"?: Database["public"]['Enums']["push_status"],"pushed_at"?: string | null,"read_at"?: string | null,"route"?: string | null,"title"?: string,"type"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -885,13 +898,13 @@ isOneToOne: false
                   ]
                 },"profiles_private": {
                   Row: {
-                    "appearance": string | null,"created_at": string,"daily_deal_cap": number | null,"home_label": string | null,"home_point": unknown,"quiet_enabled": boolean,"quiet_end": string,"quiet_start": string,"search_radius_m": number,"terms_accepted_at": string | null,"terms_version": string | null,"tz": string,"updated_at": string,"user_id": string
+                    "appearance": string | null,"created_at": string,"daily_deal_cap": number | null,"email_missed": boolean,"email_token": string,"home_label": string | null,"home_point": unknown,"quiet_enabled": boolean,"quiet_end": string,"quiet_start": string,"search_radius_m": number,"terms_accepted_at": string | null,"terms_version": string | null,"tz": string,"updated_at": string,"user_id": string
                   }
                   Insert: {
-                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id": string
+                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"email_missed"?: boolean,"email_token"?: string,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id"?: string
+                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"email_missed"?: boolean,"email_token"?: string,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -1435,6 +1448,11 @@ isOneToOne: false
               "config": Json,"kind": string,"name": string,"retailer_slug": string,"slug": string
             }[]
                            },
+"claim_pending_emails":
+{ Args: { "at"?: string,"max_rows"?: number }; Returns: {
+              "body": string,"email": string,"id": string,"kind": string,"listing_title": string,"route": string,"title": string,"token": string,"unread": number,"user_id": string
+            }[]
+                           },
 "claim_pending_notifications":
 { Args: { "at"?: string,"max_rows"?: number }; Returns: {
               "badge": number,"body": string,"id": string,"route": string,"title": string,"user_id": string
@@ -1532,6 +1550,9 @@ isOneToOne: false
 "mark_notifications_read":
 { Args: { "ids"?: (string)[] }; Returns: number
                            },
+"mark_promos_verified":
+{ Args: { "promo_ids": (string)[] }; Returns: number
+                           },
 "market_feed":
 { Args: { "brand_slugs"?: (string)[],"category_slug"?: string,"conditions"?: (string)[],"ids"?: (string)[],"include_shipping"?: boolean,"lat"?: number,"lng"?: number,"max_cents"?: number,"max_rows"?: number,"min_cents"?: number,"pickup_only"?: boolean,"product"?: string,"q"?: string,"radius_m"?: number,"seller"?: string,"skip"?: number,"sort"?: string,"statuses"?: (string)[],"use_home"?: boolean }; Returns: Json
                            },
@@ -1619,6 +1640,11 @@ isOneToOne: false
 "promo_is_live":
 { Args: { "p": Database["public"]['Tables']["promo_codes"]['Row'] }; Returns: boolean
                            },
+"promo_verification_targets":
+{ Args: { "source_slug": string }; Returns: {
+              "code": string,"content_ref": string,"promo_id": string
+            }[]
+                           },
 "promote_listing_review":
 { Args: { "brand": string,"name": string,"review": string,"variant_label"?: string }; Returns: string
                            },
@@ -1699,7 +1725,7 @@ isOneToOne: false
 { Args: { "category": string,"enabled": boolean }; Returns: undefined
                            },
 "set_notification_settings":
-{ Args: { "clear_cap"?: boolean,"daily_deal_cap"?: number,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"tz"?: string }; Returns: undefined
+{ Args: { "clear_cap"?: boolean,"daily_deal_cap"?: number,"email_missed"?: boolean,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"tz"?: string }; Returns: undefined
                            },
 "set_viewing":
 { Args: { "conversation": string,"viewing"?: boolean }; Returns: undefined
@@ -1772,10 +1798,16 @@ isOneToOne: false
 "suggest_catalog_matches":
 { Args: { "brand"?: string,"max_rows"?: number,"title": string }; Returns: Json
                            },
+"suppress_email":
+{ Args: { "address": string,"why": string }; Returns: undefined
+                           },
 "takedown_listing":
 { Args: { "lid": string,"reason": string,"tell_seller"?: boolean }; Returns: boolean
                            },
 "trigger_dispatch":
+{ Args: Record<PropertyKey, never>; Returns: undefined
+                           },
+"trigger_email_dispatch":
 { Args: Record<PropertyKey, never>; Returns: undefined
                            },
 "try_uuid":
@@ -1786,6 +1818,9 @@ isOneToOne: false
                            },
 "unread_conversation_count":
 { Args: Record<PropertyKey, never>; Returns: number
+                           },
+"unsubscribe_email":
+{ Args: { "token": string }; Returns: boolean
                            },
 "update_listing":
 { Args: { "changes": Json,"listing": string }; Returns: undefined

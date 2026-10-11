@@ -51,6 +51,8 @@ nav.site a:hover { color: var(--text-1); }
   background: var(--int); color: var(--on-int); font-weight: 700; text-decoration: none;
 }
 .pill.muted { background: var(--surface); color: var(--text-1); }
+button.pill { border: 0; font: inherit; font-weight: 700; cursor: pointer; }
+button.pill:disabled { opacity: 0.5; cursor: default; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 8px 0 48px; }
 .card { background: var(--surface); border-radius: 20px; padding: 20px; }
 .card h2 { font-size: 17px; margin: 0 0 6px; letter-spacing: -0.01em; }

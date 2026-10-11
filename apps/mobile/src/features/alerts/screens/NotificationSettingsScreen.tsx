@@ -95,9 +95,24 @@ export default function NotificationSettingsScreen() {
             </Section>
           ))}
 
-          <Section label="Delivery" footnote="During quiet hours, offers and messages wait in a morning summary.">
+          <Section
+            label="Delivery"
+            footnote="During quiet hours, offers and messages wait in a morning summary. Missed ones are emailed after an hour, at most once a day per conversation.">
             <DeliveryRow title="Quiet hours" value={s.quietEnabled ? `${clock(s.quietStart)} – ${clock(s.quietEnd)}` : 'Off'} onPress={pickQuiet} divider />
-            <DeliveryRow title="Deal alerts per day" value={capLabel(s.dailyDealCap)} onPress={pickCap} />
+            <DeliveryRow title="Deal alerts per day" value={capLabel(s.dailyDealCap)} onPress={pickCap} divider />
+            <View style={styles.row}>
+              <View style={{ flex: 1, gap: 1 }}>
+                <Text variant="callout">Email me what I miss</Text>
+                <Text variant="caption" weight="400" tone="secondary">
+                  Offers and messages still unread after an hour
+                </Text>
+              </View>
+              <Toggle
+                accessibilityLabel="Email me what I miss"
+                value={s.emailMissed}
+                onValueChange={(emailMissed) => setDelivery.mutate({ emailMissed })}
+              />
+            </View>
           </Section>
         </>
       )}

@@ -35,9 +35,13 @@
 <span style="font-size: 13px; font-weight: 600; color: var(--text-2); padding: 0 16px">Delivery</span>
 <div style="border-radius: 16px; background: var(--bg); overflow: hidden">
 <div style="display: flex; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--sep)"><span style="font-size: 16px">Quiet hours</span><span class="num" style="font-size: 15px; color: var(--text-2)">10 PM – 8 AM ›</span></div>
-<div style="display: flex; justify-content: space-between; padding: 14px 16px"><span style="font-size: 16px">Deal alerts per day</span><span class="num" style="font-size: 15px; color: var(--text-2)">Up to 3 ›</span></div>
+<div style="display: flex; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--sep)"><span style="font-size: 16px">Deal alerts per day</span><span class="num" style="font-size: 15px; color: var(--text-2)">Up to 3 ›</span></div>
+<div style="display: flex; align-items: center; gap: 12px; padding: 11px 16px">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 1px"><span style="font-size: 16px">{{email.t}}</span><span style="font-size: 12px; color: var(--text-2)">{{email.d}}</span></div>
+<button role="switch" aria-checked="{{email.on}}" aria-label="{{email.t}}" onClick="{{email.toggle}}" style="flex-shrink: 0; width: 51px; height: 31px; border-radius: 16px; background: {{email.bg}}; position: relative"><span style="position: absolute; left: {{email.x}}; top: 2px; width: 27px; height: 27px; border-radius: 14px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.2)"></span></button>
 </div>
-<span style="font-size: 12px; color: var(--text-2); padding: 0 16px">During quiet hours, offers and messages wait in a morning summary.</span>
+</div>
+<span style="font-size: 12px; color: var(--text-2); padding: 0 16px">During quiet hours, offers and messages wait in a morning summary. Missed ones are emailed after an hour, at most once a day per conversation.</span>
 </section>
 </div>
 </x-dc>
@@ -45,7 +49,7 @@
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { drop: true, target: true, brand: true, search: true, digest: false, offer: true, msg: true, near: true, status: true };
+    this.state = { drop: true, target: true, brand: true, search: true, digest: false, offer: true, msg: true, near: true, status: true, email: true };
   }
   renderVals() {
     const s = this.state;
@@ -53,6 +57,7 @@ class Component extends DCLogic {
       toggle: () => this.setState({ [k]: !s[k] }) });
     return {
       mode: this.props.theme === 'dark' ? 'dark' : '',
+      email: row('email', 'Email me what I miss', 'Offers and messages still unread after an hour'),
       groups: [
         { label: 'Deals & prices', rows: [
           row('drop', 'Price drops', 'On products and deals you saved'),

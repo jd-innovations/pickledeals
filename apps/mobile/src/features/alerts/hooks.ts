@@ -186,6 +186,7 @@ export function useNotificationSettingsMutations() {
           quietStart: v.quietStart ?? s.quietStart,
           quietEnd: v.quietEnd ?? s.quietEnd,
           dailyDealCap: v.dailyDealCap === undefined ? s.dailyDealCap : v.dailyDealCap,
+          emailMissed: v.emailMissed ?? s.emailMissed,
         }))(),
       onError: rollback,
       onSettled: settle,

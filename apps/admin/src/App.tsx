@@ -12,6 +12,7 @@ import { IntegrationsPage } from './pages/Integrations';
 import { ListingReviewPage } from './pages/ListingReview';
 import { ListingsPage } from './pages/Listings';
 import { OffersPage } from './pages/Offers';
+import { PartnersPage } from './pages/Partners';
 import { PlacementsPage } from './pages/Placements';
 import { ProductEditPage } from './pages/ProductEdit';
 import { ProductsPage } from './pages/Products';
@@ -79,6 +80,7 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
         {link('integrations', 'Integrations')}
         {link('promos', 'Promo codes')}
         {link('retailers', 'Retailers')}
+        {link('partners', 'Partner applications')}
         <span className="muted" style={{ padding: '14px 10px 4px', fontSize: 12 }}>
           Discovery
         </span>
@@ -112,6 +114,7 @@ function Shell({ role }: { role: 'admin' | 'editor' }) {
         {section === 'integrations' && <IntegrationsPage />}
         {section === 'promos' && <PromosPage />}
         {section === 'retailers' && <RetailersPage role={role} />}
+        {section === 'partners' && <PartnersPage />}
         {section === 'deals' && <DealsPage />}
         {section === 'collections' && <CollectionsPage />}
         {section === 'custom-listings' && <ListingReviewPage />}

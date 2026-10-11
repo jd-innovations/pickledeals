@@ -107,6 +107,13 @@ export default async function BrandPage({ params, searchParams }: Props) {
         </section>
       )}
 
+      <p className="muted" style={{ fontSize: 14 }}>
+        Is this your brand, and do you sell on Shopify?{' '}
+        <Link href="/partners" style={{ fontWeight: 700, color: 'var(--text-primary)', textDecoration: 'underline' }}>
+          Partner with PickleDeals
+        </Link>
+      </p>
+
       {products.length > 0 && (
         <section className="section" style={{ marginTop: live.total ? 32 : 0 }}>
           <div className="section-head">

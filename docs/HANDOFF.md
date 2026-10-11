@@ -303,6 +303,13 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
     `.env.development.local` (git-ignored) can point at the local stack. CI builds it.
   - Not live yet: needs a Vercel project with root `apps/web` (Pro plan for commercial use) and the domain moved
     from `pickledeals-site`; `site/` retires then.
+- **Partner page (Oct 11, user-approved mockup `preview/WebPartners.dc.html`):** `/partners` on the website,
+  Shopify stores only. Form → edge function `partner-apply` (verify_jwt off): validation + Shopify check
+  (`/meta.json`, else Shopify response headers; public hosts only, ≤3 redirects) in `_shared/partners.ts`
+  (tests in packages/shared), hidden trap field, ≤3 per hour per salted IP hash, saves to `partner_inquiries`
+  (migration 20261030, staff read; `staff_set_partner_status` logs to staff_actions; tests `23_partner_inquiries`)
+  and emails `PARTNER_INBOX` (function secret; set to the user's Gmail) via Resend with reply-to the applicant.
+  Admin → Retail → Partner applications. Footer and brand pages link to it; privacy table has a row for it.
 - **Map (Phase 7, D4):**
   - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
   - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).

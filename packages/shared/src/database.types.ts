@@ -617,6 +617,19 @@ isOneToOne: false
       referencedColumns: ["promo_id"]
     }
                   ]
+                },"partner_inquiries": {
+                  Row: {
+                    "client_hash": string,"company": string,"contact_name": string,"created_at": string,"email": string,"id": string,"interests": (string)[],"message": string | null,"myshopify_domain": string | null,"shop_name": string | null,"staff_note": string | null,"status": string,"store_host": string,"updated_at": string
+                  }
+                  Insert: {
+                    "client_hash": string,"company": string,"contact_name": string,"created_at"?: string,"email": string,"id"?: string,"interests"?: (string)[],"message"?: string | null,"myshopify_domain"?: string | null,"shop_name"?: string | null,"staff_note"?: string | null,"status"?: string,"store_host": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "client_hash"?: string,"company"?: string,"contact_name"?: string,"created_at"?: string,"email"?: string,"id"?: string,"interests"?: (string)[],"message"?: string | null,"myshopify_domain"?: string | null,"shop_name"?: string | null,"staff_note"?: string | null,"status"?: string,"store_host"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"placements": {
                   Row: {
                     "campaign": string,"collection_id": string | null,"created_at": string,"created_by": string | null,"deal_id": string | null,"ends_at": string | null,"id": string,"is_active": boolean,"kind": Database["public"]['Enums']["placement_kind"],"label": string,"product_id": string | null,"sort": number,"starts_at": string,"updated_at": string
@@ -1771,6 +1784,9 @@ isOneToOne: false
                            },
 "staff_set_listing_status":
 { Args: { "action": string,"listing": string,"reason"?: string }; Returns: undefined
+                           },
+"staff_set_partner_status":
+{ Args: { "inquiry": string,"new_status": string,"note"?: string }; Returns: undefined
                            },
 "staff_suspend_user":
 { Args: { "hide_listings"?: boolean,"reason": string,"target": string }; Returns: number

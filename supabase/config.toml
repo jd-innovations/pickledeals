@@ -443,3 +443,7 @@ verify_jwt = false
 # Resend webhook: authenticated by its Svix signature, not a JWT.
 [functions.email-events]
 verify_jwt = false
+
+# Partner applications from the website: public form, protected by its own checks.
+[functions.partner-apply]
+verify_jwt = false

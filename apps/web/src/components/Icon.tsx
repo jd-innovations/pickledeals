@@ -17,6 +17,7 @@ const PATHS = {
   map: 'M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z M9 4v14 M15 6v14',
   plus: 'M12 5v14 M5 12h14',
   filter: 'M4 6h16 M7 12h10 M10 18h4',
+  star: 'M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z',
 } as const;
 
 export type IconName = keyof typeof PATHS;

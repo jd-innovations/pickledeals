@@ -91,6 +91,7 @@ const COLS = [
     h: 'PickleDeals',
     links: [
       ['Get the app', '/app'],
+      ['Partner with us', '/partners'],
       ['Support', '/support'],
       ['Affiliate disclosure', '/affiliate-disclosure'],
       ['Privacy', '/privacy'],

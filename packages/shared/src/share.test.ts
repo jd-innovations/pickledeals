@@ -31,6 +31,15 @@ describe('appRouteForLink', () => {
     expect(appRouteForLink('pickledeals://b/joola')).toBe('/deals/brand/joola');
   });
 
+  it('maps the website’s page addresses', () => {
+    expect(appRouteForLink('https://pickledeals.app/product/joola-perseus-pro-iv')).toBe('/deals/product/joola-perseus-pro-iv');
+    expect(appRouteForLink(`https://pickledeals.app/deal/${OFFER}`)).toBe(`/deals/offer/${OFFER}`);
+    expect(appRouteForLink(`/listing/${OFFER}`)).toBe(`/market/listing/${OFFER}`);
+    expect(appRouteForLink(`/seller/${OFFER}`)).toBe(`/market/seller/${OFFER}`);
+    expect(appRouteForLink('/brand/joola')).toBe('/deals/brand/joola');
+    expect(appRouteForLink('/category/paddles')).toBe('/deals/category/paddles');
+  });
+
   it('opens email links', () => {
     expect(appRouteForLink('https://pickledeals.app/open?to=%2Fconversation%2Fabc')).toBe('/conversation/abc');
     expect(appRouteForLink('https://pickledeals.app/open?to=https%3A%2F%2Fevil.example')).toBe('/');

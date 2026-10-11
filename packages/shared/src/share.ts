@@ -9,6 +9,9 @@
  *   /l/<listing id>               pre-owned listing
  *   /b/<brand slug>               brand
  *   /open?to=<in-app route>       links in notification emails
+ *
+ * The website's own page addresses (/product/<slug>, /deal/<id>, /listing/<id>, /brand/<slug>,
+ * /category/<slug>, /seller/<id>) map to the same screens, so a link copied from the site opens the app too.
  */
 
 export const SHARE_ORIGIN = 'https://pickledeals.app';
@@ -57,10 +60,12 @@ export function appRouteForLink(link: string): string | null {
     return to && IN_APP_ROUTE.test(to) ? to : '/';
   }
   if (!key) return null;
-  if (kind === 'p' && SLUG.test(key)) return `/deals/product/${key}`;
-  if (kind === 'b' && SLUG.test(key)) return `/deals/brand/${key}`;
-  if (kind === 'l' && UUID.test(key)) return `/market/listing/${key.toLowerCase()}`;
-  if (kind === 'd' && UUID.test(key)) {
+  if ((kind === 'p' || kind === 'product') && SLUG.test(key)) return `/deals/product/${key}`;
+  if ((kind === 'b' || kind === 'brand') && SLUG.test(key)) return `/deals/brand/${key}`;
+  if (kind === 'category' && SLUG.test(key)) return `/deals/category/${key}`;
+  if ((kind === 'l' || kind === 'listing') && UUID.test(key)) return `/market/listing/${key.toLowerCase()}`;
+  if (kind === 'seller' && UUID.test(key)) return `/market/seller/${key.toLowerCase()}`;
+  if ((kind === 'd' || kind === 'deal') && UUID.test(key)) {
     const deal = url.searchParams.get('deal');
     return `/deals/offer/${key.toLowerCase()}${deal && UUID.test(deal) ? `?deal=${deal.toLowerCase()}` : ''}`;
   }

@@ -1,0 +1,22 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["ZSH27U747N.app.pickledeals"],
+        "components": [
+          { "/": "/p/*", "comment": "product (short share link)" },
+          { "/": "/d/*", "comment": "deal (short share link)" },
+          { "/": "/l/*", "comment": "pre-owned listing (short share link)" },
+          { "/": "/b/*", "comment": "brand (short share link)" },
+          { "/": "/product/*", "comment": "product page" },
+          { "/": "/deal/*", "comment": "deal page" },
+          { "/": "/listing/*", "comment": "pre-owned listing page" },
+          { "/": "/brand/*", "comment": "brand page" },
+          { "/": "/category/*", "comment": "category page" },
+          { "/": "/seller/*", "comment": "seller page" },
+          { "/": "/open", "comment": "links in notification emails" }
+        ]
+      }
+    ]
+  }
+}

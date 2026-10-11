@@ -20,3 +20,8 @@ supabase/.temp
 # Hosted Supabase database password (docs/HOSTED_SETUP.md)
 .env.hosted
 !apps/admin/.env.hosted
+
+# Website (apps/web): public env values are committed; build output is not.
+!apps/web/.env
+apps/web/.next/
+apps/web/next-env.d.ts

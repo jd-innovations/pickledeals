@@ -84,6 +84,17 @@
         "site"
       ],
       "port": 5181
+    },
+    {
+      "name": "web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev",
+        "-w",
+        "@pickledeals/web"
+      ],
+      "port": 3100
     }
   ]
 }

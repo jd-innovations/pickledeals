@@ -285,6 +285,24 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   **Next build must be interactive** (`npx eas-cli build --profile preview --platform ios`, Apple sign-in):
   build d6293119… failed because the AdHoc profile lacks Associated Domains; non-interactive builds fail
   until EAS syncs the capability. OTA 51f76ff9… (preview) ships the share buttons meanwhile.
+- **Website (W1, Oct 11; plan + W0 mockups approved by the user):** `apps/web`, Next.js 16.3.6 (App Router, no
+  Cache Components; pages `revalidate` 300 s), browse-only, clean addresses (`/product/<slug>`, `/deal/<offer id>`,
+  `/brand`, `/category`, `/collection`, `/deals/<feed>`, `/promo-codes`, `/search`, `/marketplace`, `/listing`,
+  `/seller`, `/app`, legal pages moved from `site/` unchanged + a website row in the privacy table).
+  - Data: `src/data/*` mirror the app's `features/*/api.ts` with the publishable key (RLS = signed-out view);
+    copy helpers mirror `features/offers/format.ts`. D1: no number for check-price or API (Amazon) prices, JSON-LD
+    only for shown prices; D2: area labels and ~1 km cells only. Theme CSS is generated from `packages/shared` tokens.
+  - Deal pop-up = intercepting route `@modal/(.)deal/[id]` (+ `@modal/[...rest]` clears it); full page on direct visits
+    (canonical → product page). ♡ / alert / follow / message open "Save in the app" (QR on desktop, sheet on phones).
+  - Phone: app-style tab bar (Deals · Pre-owned · Search · Get app) and an Open-in-app banner.
+  - Map: MapKit JS, token from `/api/mapkit-token` (env `MAPKIT_TEAM_ID`, `MAPKIT_KEY_ID`, `MAPKIT_PRIVATE_KEY`);
+    without them the marketplace is list-only. "Near you" uses Vercel's IP geo headers (no permission, not stored).
+  - Short links `/p /d /l /b` 301 to clean addresses; AASA in `public/.well-known` also covers the clean paths, and
+    `appRouteForLink` (shared) maps them to app screens (needs the pending interactive build).
+  - `npm run dev -w @pickledeals/web` (port 3100; launch config `web`). `.env` holds the hosted public values;
+    `.env.development.local` (git-ignored) can point at the local stack. CI builds it.
+  - Not live yet: needs a Vercel project with root `apps/web` (Pro plan for commercial use) and the domain moved
+    from `pickledeals-site`; `site/` retires then.
 - **Map (Phase 7, D4):**
   - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
   - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).

@@ -295,7 +295,7 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   - Deal pop-up = intercepting route `@modal/(.)deal/[id]` (+ `@modal/[...rest]` clears it); full page on direct visits
     (canonical → product page). ♡ / alert / follow / message open "Save in the app" (QR on desktop, sheet on phones).
   - Phone: app-style tab bar (Deals · Pre-owned · Search · Get app) and an Open-in-app banner.
-  - Map: MapKit JS, token from `/api/mapkit-token` (env `MAPKIT_TOKEN` from Apple Developer, or `MAPKIT_TEAM_ID` + `MAPKIT_KEY_ID` + `MAPKIT_PRIVATE_KEY`);
+  - Map: MapKit JS, token from `/api/mapkit-token` (env `MAPKIT_TOKEN` from Apple Developer: one token per domain, comma-separated, served by matching the host; or `MAPKIT_TEAM_ID` + `MAPKIT_KEY_ID` + `MAPKIT_PRIVATE_KEY`);
     without them the marketplace is list-only. "Near you" uses Vercel's IP geo headers (no permission, not stored).
   - Short links `/p /d /l /b` 301 to clean addresses; AASA in `public/.well-known` also covers the clean paths, and
     `appRouteForLink` (shared) maps them to app screens (needs the pending interactive build).

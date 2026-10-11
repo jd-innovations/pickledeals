@@ -18,7 +18,20 @@ export async function GET(req: NextRequest) {
   const pem = process.env.MAPKIT_PRIVATE_KEY?.replace(/\\n/g, '\n');
   // A ready-made token from Apple Developer (Maps IDs › MapKit JS token), restricted by Apple to the
   // domains chosen when it was created. Used as-is; takes priority over signing our own.
-  const issued = process.env.MAPKIT_TOKEN?.trim();
+  // Each token names one origin, so MAPKIT_TOKEN may hold several, comma-separated: serve the one for
+  // this host (pickledeals.app, www.pickledeals.app, the Vercel preview), else the first.
+  const requestHost = (req.headers.get('host') ?? '').toLowerCase();
+  const tokens = (process.env.MAPKIT_TOKEN ?? '').split(',').map((t) => t.trim()).filter(Boolean);
+  const originOf = (t: string) => {
+    try {
+      return String((JSON.parse(Buffer.from(t.split('.')[1] ?? '', 'base64url').toString()) as { origin?: string }).origin ?? '')
+        .toLowerCase()
+        .replace(/^https?:\/\//, '');
+    } catch {
+      return '';
+    }
+  };
+  const issued = tokens.find((t) => originOf(t) === requestHost) ?? tokens[0];
   // ?check=1: does the site have a map at all? (Answered quietly, so pages don't log an error.)
   if (req.nextUrl.searchParams.has('check')) return NextResponse.json({ enabled: !!issued || !!(team && kid && pem) });
   if (issued) return new NextResponse(issued, { headers: { 'content-type': 'text/plain', 'cache-control': 'private, max-age=600' } });

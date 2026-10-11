@@ -273,8 +273,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
     load, so mail scanners don't unsubscribe). Privacy policy mentions notification emails. Universal links
     (AASA + associatedDomains) are a later step and need a new build.
   - **Live on hosted (Oct 11):** migration pushed, 3 functions deployed, `RESEND_API_KEY` set by the user, cron
-    `dispatch-emails` active; OTA 8976224d… (preview) adds the switch. Still to do: Resend webhook +
-    `RESEND_WEBHOOK_SECRET` (email-events answers 503 until then).
+    `dispatch-emails` active; OTA 8976224d… (preview) adds the switch. Resend webhook 381cad20… (bounced,
+    complained) → email-events, `RESEND_WEBHOOK_SECRET` set; a signed test event suppressed (row removed).
+    Live test: a system notice to the user's address was delivered Oct 11 (notice deleted afterwards).
 - **Map (Phase 7, D4):**
   - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
   - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).

@@ -168,6 +168,7 @@ function UserRow({
                   See listings
                 </a>
               </div>
+              <ProfilePhoto userId={u.id} name={u.display_name} report={report} />
               {u.suspended && (
                 <div className="notice">
                   Suspended {u.suspended_at ? formatAgo(u.suspended_at) : ''}: “{u.suspension_reason}”
@@ -202,5 +203,42 @@ function UserRow({
         </tr>
       )}
     </>
+  );
+}
+
+/**
+ * The person's profile photo, with removal for reports (guideline 1.2). Removing it also stops a
+ * Google photo from being pulled in again, and is logged in the account's history.
+ */
+function ProfilePhoto({ userId, name, report }: { userId: string; name: string; report: (e: { message: string } | null, t: string) => void }) {
+  const [path, setPath] = useState<string | null | undefined>(undefined);
+  const [reason, setReason] = useState('');
+  useEffect(() => {
+    supabase
+      .from('profiles')
+      .select('avatar_path')
+      .eq('id', userId)
+      .maybeSingle()
+      .then(({ data }) => setPath(data?.avatar_path ?? null));
+  }, [userId]);
+  if (path === undefined) return null;
+  if (!path) return <div className="muted" style={{ fontSize: 13 }}>No profile photo.</div>;
+  const remove = async () => {
+    const { data: old, error } = await supabase.rpc('staff_remove_avatar', { target: userId, reason: reason.trim() });
+    if (!error && old) await supabase.storage.from('avatars').remove([old]);
+    report(error, `Removed ${name}’s profile photo.`);
+    if (!error) {
+      setPath(null);
+      setReason('');
+    }
+  };
+  return (
+    <div className="row">
+      <img src={supabase.storage.from('avatars').getPublicUrl(path).data.publicUrl} alt="" width={56} height={56} style={{ borderRadius: 28, objectFit: 'cover' }} />
+      <input className="grow" placeholder="Reason for removing the photo (internal)" value={reason} maxLength={500} onChange={(e) => setReason(e.target.value)} />
+      <button className="btn danger" disabled={reason.trim().length < 3} onClick={remove}>
+        Remove photo
+      </button>
+    </div>
   );
 }

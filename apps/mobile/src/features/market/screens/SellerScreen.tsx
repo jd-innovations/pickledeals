@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
+import { PersonAvatar } from '@/commerce';
 import { useAuth } from '@/features/auth/authStore';
+import { useAvatarUrl } from '@/features/profile/avatar';
 import { Button, EmptyState, SegmentedControl, Skeleton, Text } from '@/ui';
 
 import { ListingGrid, ListingGridSkeleton, MarketLoadError } from '../components';
@@ -17,6 +19,7 @@ export default function SellerScreen() {
   const { id = '' } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
   const { data: s, isError, refetch } = useSeller(id);
+  const avatar = useAvatarUrl(id);
   const [tab, setTab] = useState<'active' | 'sold'>('active');
   const requireAuth = useAuth((x) => x.requireAuth);
   const uid = useAuth((x) => x.user?.id);
@@ -35,9 +38,7 @@ export default function SellerScreen() {
       ) : (
         <>
           <View style={{ alignItems: 'center', gap: 8, paddingHorizontal: 16 }}>
-            <View style={[styles.avatar, { backgroundColor: colors.surfacePressed }]}>
-              <Text variant="largeTitle">{s.name.charAt(0)}</Text>
-            </View>
+            <PersonAvatar name={s.name} uri={avatar} size={88} />
             <Text variant="title1" style={{ marginTop: 6 }}>
               {s.name}
             </Text>
@@ -95,7 +96,6 @@ export default function SellerScreen() {
 }
 
 const styles = StyleSheet.create({
-  avatar: { width: 88, height: 88, borderRadius: 44, alignItems: 'center', justifyContent: 'center' },
   stats: { marginHorizontal: 16, flexDirection: 'row', borderRadius: radius.card + 2 },
   stat: { flex: 1, padding: 14, alignItems: 'center', gap: 2 },
 });

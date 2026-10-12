@@ -4,7 +4,7 @@ export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://pickledeals.app').replace(/\/$/, '');
 
 /** Public Storage URL for catalog, brand-logo and listing images. */
-export function storageUrl(bucket: 'catalog' | 'brand-logos' | 'listing-images', path: string): string {
+export function storageUrl(bucket: 'catalog' | 'brand-logos' | 'listing-images' | 'avatars', path: string): string {
   return `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path.split('/').map(encodeURIComponent).join('/')}`;
 }
 

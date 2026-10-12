@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation';
 import { ShareButton } from '@/components/client/Actions';
 import { Gallery } from '@/components/client/Gallery';
 import { InAppButton, SaveButton } from '@/components/client/SaveInApp';
+import { Avatar } from '@/components/Avatar';
 import { Icon } from '@/components/Icon';
 import { fetchListing } from '@/data/market';
 import { productArt } from '@/lib/art';
@@ -94,9 +95,7 @@ export default async function ListingPage({ params }: Props) {
             </span>
           </div>
           <Link href={sellerHref(l.seller.id)} className="seller-card">
-            <span className="avatar" aria-hidden="true">
-              {l.seller.name.slice(0, 1).toUpperCase()}
-            </span>
+            <Avatar name={l.seller.name} path={l.seller.avatarPath} />
             <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <b style={{ fontSize: 16 }}>{l.seller.name}</b>
               <span className="muted num" style={{ fontSize: 13 }}>

@@ -9,6 +9,7 @@ import { requireSupabase } from '@/lib/supabase';
 
 import { useAuth } from './authStore';
 import { forgetGoogle, googleCredential, googleSignInConfigured } from './google';
+import { pullGoogleAvatar } from '@/features/profile/avatar';
 
 export class AuthCanceled extends Error {}
 
@@ -62,6 +63,8 @@ export async function signInWithGoogle(): Promise<void> {
   let profile = await fetchProfile(data.user.id);
   if (googleName && profile.nameSource === 'generated') profile = await updateDisplayName(data.user.id, googleName);
   useAuth.getState().setProfile(profile);
+  // Owner decision (Oct 11): the Google account photo becomes the profile photo when there's none yet.
+  void pullGoogleAvatar(credential.photo);
 }
 
 export async function sendEmailCode(email: string): Promise<void> {

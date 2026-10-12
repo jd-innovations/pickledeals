@@ -17,7 +17,7 @@ function configure() {
   configured = true;
 }
 
-export type GoogleCredential = { idToken: string; givenName: string | null; familyName: string | null };
+export type GoogleCredential = { idToken: string; givenName: string | null; familyName: string | null; photo: string | null };
 
 /** Shows Google's sheet. Returns null when the user cancels. */
 export async function googleCredential(): Promise<GoogleCredential | null> {
@@ -26,7 +26,7 @@ export async function googleCredential(): Promise<GoogleCredential | null> {
     const response = await GoogleSignin.signIn();
     if (isCancelledResponse(response)) return null;
     if (!isSuccessResponse(response) || !response.data.idToken) throw new Error('Google did not return an identity token.');
-    return { idToken: response.data.idToken, givenName: response.data.user.givenName, familyName: response.data.user.familyName };
+    return { idToken: response.data.idToken, givenName: response.data.user.givenName, familyName: response.data.user.familyName, photo: response.data.user.photo ?? null };
   } catch (e) {
     if (isErrorWithCode(e) && (e.code === statusCodes.SIGN_IN_CANCELLED || e.code === statusCodes.IN_PROGRESS)) return null;
     throw e;

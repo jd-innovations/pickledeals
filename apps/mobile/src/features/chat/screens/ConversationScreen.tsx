@@ -139,7 +139,7 @@ export default function ConversationScreen() {
             disabled={!t?.otherId}
             onPress={() => t?.otherId && router.push({ pathname: '/seller/[id]', params: { id: t.otherId } })}
             style={{ flex: 1, alignItems: 'center', gap: 2 }}>
-            <Avatar name={t?.otherName ?? ' '} />
+            <Avatar name={t?.otherName ?? ' '} userId={t?.otherId} />
             <Text variant="caption" weight="600" numberOfLines={1}>
               {t ? `${t.otherName}${t.otherId ? ' ›' : ''}` : ' '}
             </Text>

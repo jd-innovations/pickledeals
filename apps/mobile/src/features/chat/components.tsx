@@ -3,10 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { Linking, Pressable, View } from 'react-native';
 
-import { AcceptedBanner, MessageBubble, OfferCard, ProductImage, SystemMessage, type OfferCardData } from '@/commerce';
+import { AcceptedBanner, MessageBubble, OfferCard, PersonAvatar, ProductImage, SystemMessage, type OfferCardData } from '@/commerce';
 import { useTheme } from '@/design/theme';
 import { SpotMap } from '@/features/map';
 import { listingImage } from '@/features/market/hooks';
+import { useAvatarUrl } from '@/features/profile/avatar';
 import { confirm } from '@/lib/dialog';
 import { Group, Icon, ListRow, Text } from '@/ui';
 
@@ -16,17 +17,9 @@ import { useBlocked, useChatMutations } from './hooks';
 export const threadImage = (t: Pick<Thread, 'listingId' | 'listingImage' | 'listingTitle' | 'productSlug' | 'categorySlug'>) =>
   listingImage({ id: t.listingId, imagePath: t.listingImage, title: t.listingTitle, productSlug: t.productSlug, categorySlug: t.categorySlug });
 
-const initial = (name: string) => name.trim().charAt(0).toUpperCase() || '?';
-
-export function Avatar({ name, size = 34 }: { name: string; size?: number }) {
-  const { colors } = useTheme();
-  return (
-    <View style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: colors.surfacePressed, alignItems: 'center', justifyContent: 'center' }}>
-      <Text variant={size > 30 ? 'subhead' : 'caption'} weight="700" style={size <= 30 ? { fontSize: 11 } : undefined}>
-        {initial(name)}
-      </Text>
-    </View>
-  );
+/** The other person in a thread: their profile photo, or their initial. */
+export function Avatar({ name, userId, size = 34 }: { name: string; userId?: string | null; size?: number }) {
+  return <PersonAvatar name={name} uri={useAvatarUrl(userId)} size={size} />;
 }
 
 /** Inbox row (design: Inbox). Unread threads are bold with a dot. */
@@ -45,7 +38,7 @@ export function ThreadRow({ t, onPress, onLongPress }: { t: Thread; onPress: () 
       <View style={{ width: 56, height: 56 }}>
         <ProductImage source={threadImage(t)} width={56} round={14} padding={5} />
         <View style={{ position: 'absolute', right: -4, bottom: -4, borderRadius: 15, borderWidth: 2, borderColor: colors.background }}>
-          <Avatar name={t.otherName} size={26} />
+          <Avatar name={t.otherName} userId={t.otherId} size={26} />
         </View>
       </View>
       <View style={{ flex: 1, gap: 2, minWidth: 0 }}>

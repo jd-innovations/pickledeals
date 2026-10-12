@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { Avatar } from '@/components/Avatar';
 import { ListingCard } from '@/components/Cards';
 import { fetchSeller } from '@/data/market';
 
@@ -31,9 +32,7 @@ export default async function SellerPage({ params }: Props) {
         <span aria-current="page">{s.name}</span>
       </nav>
       <section style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <span className="avatar" style={{ width: 72, height: 72, borderRadius: 36, fontSize: 26 }} aria-hidden="true">
-          {s.name.slice(0, 1).toUpperCase()}
-        </span>
+        <Avatar name={s.name} path={s.avatarPath} size={72} />
         <div className="page-title">
           <h1>{s.name}</h1>
           <p className="sub num">{[`Member since ${new Date(s.memberSince).getFullYear()}`, s.areaLabel, `${s.listings.length} ${s.listings.length === 1 ? 'listing' : 'listings'}`].filter(Boolean).join(' · ')}</p>

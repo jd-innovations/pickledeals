@@ -898,26 +898,26 @@ isOneToOne: false
                   ]
                 },"profiles": {
                   Row: {
-                    "area_label": string | null,"avatar_path": string | null,"created_at": string,"display_name": string,"display_name_source": Database["public"]['Enums']["display_name_source"],"id": string,"member_since": string,"updated_at": string
+                    "area_label": string | null,"avatar_path": string | null,"avatar_source": string | null,"created_at": string,"display_name": string,"display_name_source": Database["public"]['Enums']["display_name_source"],"id": string,"member_since": string,"updated_at": string
                   }
                   Insert: {
-                    "area_label"?: string | null,"avatar_path"?: string | null,"created_at"?: string,"display_name": string,"display_name_source"?: Database["public"]['Enums']["display_name_source"],"id": string,"member_since"?: string,"updated_at"?: string
+                    "area_label"?: string | null,"avatar_path"?: string | null,"avatar_source"?: string | null,"created_at"?: string,"display_name": string,"display_name_source"?: Database["public"]['Enums']["display_name_source"],"id": string,"member_since"?: string,"updated_at"?: string
                   }
                   Update: {
-                    "area_label"?: string | null,"avatar_path"?: string | null,"created_at"?: string,"display_name"?: string,"display_name_source"?: Database["public"]['Enums']["display_name_source"],"id"?: string,"member_since"?: string,"updated_at"?: string
+                    "area_label"?: string | null,"avatar_path"?: string | null,"avatar_source"?: string | null,"created_at"?: string,"display_name"?: string,"display_name_source"?: Database["public"]['Enums']["display_name_source"],"id"?: string,"member_since"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     
                   ]
                 },"profiles_private": {
                   Row: {
-                    "appearance": string | null,"created_at": string,"daily_deal_cap": number | null,"email_missed": boolean,"email_token": string,"home_label": string | null,"home_point": unknown,"quiet_enabled": boolean,"quiet_end": string,"quiet_start": string,"search_radius_m": number,"terms_accepted_at": string | null,"terms_version": string | null,"tz": string,"updated_at": string,"user_id": string
+                    "appearance": string | null,"avatar_auto_off": boolean,"created_at": string,"daily_deal_cap": number | null,"email_missed": boolean,"email_token": string,"home_label": string | null,"home_point": unknown,"quiet_enabled": boolean,"quiet_end": string,"quiet_start": string,"search_radius_m": number,"terms_accepted_at": string | null,"terms_version": string | null,"tz": string,"updated_at": string,"user_id": string
                   }
                   Insert: {
-                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"email_missed"?: boolean,"email_token"?: string,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id": string
+                    "appearance"?: string | null,"avatar_auto_off"?: boolean,"created_at"?: string,"daily_deal_cap"?: number | null,"email_missed"?: boolean,"email_token"?: string,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id": string
                   }
                   Update: {
-                    "appearance"?: string | null,"created_at"?: string,"daily_deal_cap"?: number | null,"email_missed"?: boolean,"email_token"?: string,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id"?: string
+                    "appearance"?: string | null,"avatar_auto_off"?: boolean,"created_at"?: string,"daily_deal_cap"?: number | null,"email_missed"?: boolean,"email_token"?: string,"home_label"?: string | null,"home_point"?: unknown,"quiet_enabled"?: boolean,"quiet_end"?: string,"quiet_start"?: string,"search_radius_m"?: number,"terms_accepted_at"?: string | null,"terms_version"?: string | null,"tz"?: string,"updated_at"?: string,"user_id"?: string
                   }
                   Relationships: [
                     
@@ -1695,6 +1695,9 @@ isOneToOne: false
 "release_held_notifications":
 { Args: { "at"?: string }; Returns: number
                            },
+"remove_avatar":
+{ Args: Record<PropertyKey, never>; Returns: string
+                           },
 "reopen_raw_offer":
 { Args: { "raw_id": string }; Returns: undefined
                            },
@@ -1721,6 +1724,9 @@ isOneToOne: false
                            },
 "send_weekly_digests":
 { Args: { "at"?: string }; Returns: number
+                           },
+"set_avatar":
+{ Args: { "path": string,"source"?: string }; Returns: string
                            },
 "set_conversation_state":
 { Args: { "archived"?: boolean,"conversation": string,"muted"?: boolean }; Returns: undefined
@@ -1776,6 +1782,9 @@ isOneToOne: false
                            },
 "staff_queue_counts":
 { Args: Record<PropertyKey, never>; Returns: Json
+                           },
+"staff_remove_avatar":
+{ Args: { "reason": string,"target": string }; Returns: string
                            },
 "staff_reports":
 { Args: { "include_closed"?: boolean }; Returns: {

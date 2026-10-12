@@ -310,6 +310,13 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   (migration 20261030, staff read; `staff_set_partner_status` logs to staff_actions; tests `23_partner_inquiries`)
   and emails `PARTNER_INBOX` (function secret; set to the user's Gmail) via Resend with reply-to the applicant.
   Admin → Retail → Partner applications. Footer and brand pages link to it; privacy table has a row for it.
+- **Profile photos (Oct 11; owner: optional, initials otherwise, Google photo pulled automatically):** bucket
+  `avatars/{uid}/{uuid}.jpg` (public read, own-folder writes, staff delete); `profiles.avatar_path` now only via
+  `set_avatar(path, source)` / `remove_avatar()` (remove sets `profiles_private.avatar_auto_off` so Google never
+  re-applies); `staff_remove_avatar` logs. Migration 20261031, tests `24_profile_avatars`. App: Profile photo button
+  (take / choose / remove; square 512 px JPEG, EXIF stripped), `PersonAvatar` + `useAvatarUrl` on listing, seller,
+  inbox and chat header; Google sign-in calls `pullGoogleAvatar`. Admin → Users: Remove photo. Website seller cards
+  show it. delete-account removes the folder. Privacy table updated (site + web).
 - **Map (Phase 7, D4):**
   - `market_in_bounds(min_lng, min_lat, max_lng, max_lat, …filters)` returns `{total, truncated, items}`. It's capped at 500 rows, nearest the viewport centre first. Each item's `lat`/`lng` is its public cell centre.
   - Listing detail and the sell step decode `listing_locations.geohash6` client-side (`geohashCenter` / `snapToCell` in `packages/shared/src/geo.ts`).

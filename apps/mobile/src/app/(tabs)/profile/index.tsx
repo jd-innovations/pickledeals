@@ -3,7 +3,7 @@ import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { authErrorMessage, signOut } from '@/features/auth/api';
@@ -11,7 +11,11 @@ import { useAlerts, useSavedIds } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { useMyOffers, useUnreadThreads } from '@/features/chat/hooks';
 import { useHomeArea, useMyListings } from '@/features/market/hooks';
-import { Button, Group, ListRow, Text } from '@/ui';
+import { avatarUrl, changeAvatar, removeAvatar } from '@/features/profile/avatar';
+import { haptic } from '@/lib/haptics';
+import { chooseAction } from '@/lib/dialog';
+import { PersonAvatar } from '@/commerce';
+import { Button, Group, Icon, ListRow, Text } from '@/ui';
 
 const APPEARANCE_LABEL = { system: 'System', light: 'Light', dark: 'Dark' } as const;
 const APP_VERSION = Constants.expoConfig?.version ?? '';
@@ -56,9 +60,7 @@ export default function ProfileScreen() {
       contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120, gap: 24 }}>
       {user ? (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-          <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: colors.surfacePressed, alignItems: 'center', justifyContent: 'center' }}>
-            <Text variant="title1">{name.charAt(0)}</Text>
-          </View>
+          <ProfilePhotoButton name={name} />
           <View style={{ flex: 1, gap: 2 }}>
             <Text variant="title2" numberOfLines={1}>
               {name}
@@ -116,5 +118,59 @@ export default function ProfileScreen() {
 
       {user && <Button label="Sign out" variant="secondary" onPress={onSignOut} loading={signingOut} />}
     </ScrollView>
+  );
+}
+
+/**
+ * Your photo (owner decision Oct 11: optional; initials until you add one). Tap to take one, choose
+ * one from the library, or remove it. The camera badge marks it as changeable.
+ */
+function ProfilePhotoButton({ name }: { name: string }) {
+  const { colors } = useTheme();
+  const path = useAuth((s) => s.profile?.avatarPath ?? null);
+  const [busy, setBusy] = useState(false);
+  const run = (task: () => Promise<unknown>) => async () => {
+    setBusy(true);
+    try {
+      await task();
+    } catch {
+      haptic.error();
+      Alert.alert('Couldn’t update your photo', 'Check your connection and try again.');
+    } finally {
+      setBusy(false);
+    }
+  };
+  const open = () =>
+    chooseAction(path ? 'Profile photo' : 'Add a profile photo', [
+      { text: 'Take photo', onPress: run(() => changeAvatar('camera')) },
+      { text: 'Choose from library', onPress: run(() => changeAvatar('library')) },
+      ...(path ? [{ text: 'Remove photo', destructive: true, onPress: run(removeAvatar) }] : []),
+    ]);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={path ? 'Profile photo. Change or remove' : 'Add a profile photo'}
+      accessibilityState={{ busy }}
+      disabled={busy}
+      onPress={open}
+      style={({ pressed }) => ({ opacity: pressed || busy ? 0.6 : 1 })}>
+      <PersonAvatar name={name} uri={avatarUrl(path)} size={64} />
+      <View
+        style={{
+          position: 'absolute',
+          right: -2,
+          bottom: -2,
+          width: 24,
+          height: 24,
+          borderRadius: 12,
+          backgroundColor: colors.interactive,
+          borderWidth: 2,
+          borderColor: colors.background,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <Icon name="camera" size={12} color={colors.onInteractive} />
+      </View>
+    </Pressable>
   );
 }

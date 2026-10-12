@@ -179,7 +179,7 @@ export type ListingDetail = {
   /** Public cell centre (D2) for the approximate-area map. */
   areaCenter: { lat: number; lng: number } | null;
   images: string[];
-  seller: { id: string; name: string; memberSince: string; areaLabel: string | null };
+  seller: { id: string; name: string; memberSince: string; areaLabel: string | null; avatarPath: string | null };
   bestNewCents: number | null;
 };
 
@@ -218,7 +218,7 @@ export async function fetchListing(id: string): Promise<ListingDetail | null> {
   if (!['active', 'pending', 'sold'].includes(row.status)) return null;
 
   const [seller, best] = await Promise.all([
-    db().from('profiles').select('id, display_name, member_since, area_label').eq('id', row.seller_id).maybeSingle(),
+    db().from('profiles').select('id, display_name, member_since, area_label, avatar_path').eq('id', row.seller_id).maybeSingle(),
     row.variant_id ? db().from('variant_offer_ranking').select('delivered_cents').eq('variant_id', row.variant_id).eq('rank', 1).maybeSingle() : Promise.resolve({ data: null, error: null }),
   ]);
   if (seller.error) throw seller.error;
@@ -243,17 +243,17 @@ export async function fetchListing(id: string): Promise<ListingDetail | null> {
     areaLabel: row.location?.area_label ?? null,
     areaCenter: row.location ? geohashCenter(row.location.geohash6) : null,
     images: [...row.images].sort((a, b) => a.sort - b.sort).map((i) => i.storage_path),
-    seller: { id: seller.data.id, name: seller.data.display_name, memberSince: seller.data.member_since, areaLabel: seller.data.area_label },
+    seller: { id: seller.data.id, name: seller.data.display_name, memberSince: seller.data.member_since, areaLabel: seller.data.area_label, avatarPath: seller.data.avatar_path },
     bestNewCents: (best.data as { delivered_cents: number | null } | null)?.delivered_cents ?? null,
   };
 }
 
 export async function fetchSeller(id: string) {
   const [profile, active] = await Promise.all([
-    db().from('profiles').select('id, display_name, member_since, area_label').eq('id', id).maybeSingle(),
+    db().from('profiles').select('id, display_name, member_since, area_label, avatar_path').eq('id', id).maybeSingle(),
     fetchMarket({ sellerId: id, statuses: ['active', 'pending'], radiusM: null, sort: 'newest', limit: 60 }),
   ]);
   if (profile.error) throw profile.error;
   if (!profile.data) return null;
-  return { id, name: profile.data.display_name, memberSince: profile.data.member_since, areaLabel: profile.data.area_label, listings: active.items };
+  return { id, name: profile.data.display_name, memberSince: profile.data.member_since, areaLabel: profile.data.area_label, avatarPath: profile.data.avatar_path, listings: active.items };
 }

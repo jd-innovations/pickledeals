@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, useWindowDimensions, View, type NativeScrollEvent, type NativeSyntheticEvent } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ConditionBadge, FavoriteButton, PhotoViewer, photoIndex, ProductImage, UsedVsNew, type ImageSource } from '@/commerce';
+import { ConditionBadge, FavoriteButton, PersonAvatar, PhotoViewer, photoIndex, ProductImage, UsedVsNew, type ImageSource } from '@/commerce';
 import { productArt } from '@/commerce/catalogArt';
 import { useTheme } from '@/design/theme';
 import { startConversation } from '@/features/chat/api';
@@ -12,6 +12,7 @@ import { AreaMap } from '@/features/map';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { openProduct } from '@/features/catalog/components';
+import { useAvatarUrl } from '@/features/profile/avatar';
 import { shareItem } from '@/lib/share';
 import { Button, DetailTable, ErrorState, Icon, IconButton, Skeleton, Text } from '@/ui';
 
@@ -42,6 +43,7 @@ export default function ListingScreen() {
   const { openSeller, openManage, openConversation } = useMarketNav();
   const [page, setPage] = useState(0);
   const [photo, setPhoto] = useState<number | null>(null);
+  const sellerAvatar = useAvatarUrl(l?.sellerId);
 
   if (isError) {
     return (
@@ -186,11 +188,7 @@ export default function ListingScreen() {
             </View>
 
             <Pressable accessibilityRole="button" onPress={() => openSeller(l.sellerId)} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <View style={[styles.avatar, { backgroundColor: colors.surfacePressed }]}>
-                <Text variant="title3" weight="700">
-                  {l.seller.name.charAt(0)}
-                </Text>
-              </View>
+              <PersonAvatar name={l.seller.name} uri={sellerAvatar} size={48} />
               <View style={{ flex: 1, gap: 2 }}>
                 <Text variant="headline">{l.seller.name}</Text>
                 <Text variant="footnote" tone="secondary" numeric>
@@ -284,6 +282,5 @@ const styles = StyleSheet.create({
   tag: { position: 'absolute', bottom: 16, paddingHorizontal: 8, paddingVertical: 5, borderRadius: 6 },
   topBar: { position: 'absolute', left: 16, right: 16, flexDirection: 'row', justifyContent: 'space-between' },
   bottom: { paddingTop: 12, paddingHorizontal: 16, flexDirection: 'row', gap: 10, borderTopWidth: StyleSheet.hairlineWidth },
-  avatar: { width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center' },
   delivery: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 14, paddingHorizontal: 16 },
 });

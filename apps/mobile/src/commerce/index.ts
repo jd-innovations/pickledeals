@@ -1,3 +1,4 @@
+export { PersonAvatar } from './PersonAvatar';
 export { ProductImage, type ImageSource } from './ProductImage';
 export { DealBadge, DealQualityMeter, DiscountPill, PriceBlock, UsedVsNew } from './Pricing';
 export { DealCard, FavoriteButton, ListingCard, type DealCardData, type ListingCardData } from './Cards';

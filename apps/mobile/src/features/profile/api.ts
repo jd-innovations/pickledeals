@@ -9,6 +9,9 @@ export type MyProfile = {
   nameSource: 'generated' | 'provided';
   memberSince: string;
   areaLabel: string | null;
+  /** Profile photo in the avatars bucket (null: initials). */
+  avatarPath: string | null;
+  avatarSource: 'upload' | 'google' | null;
   /** Terms of Use version the user agreed to (null: not yet). */
   termsVersion?: string | null;
 };
@@ -19,9 +22,11 @@ type ProfileRow = {
   display_name_source: MyProfile['nameSource'];
   member_since: string;
   area_label: string | null;
+  avatar_path: string | null;
+  avatar_source: MyProfile['avatarSource'];
 };
 
-const COLUMNS = 'id, display_name, display_name_source, member_since, area_label';
+const COLUMNS = 'id, display_name, display_name_source, member_since, area_label, avatar_path, avatar_source';
 
 const toProfile = (row: ProfileRow): MyProfile => ({
   id: row.id,
@@ -29,6 +34,8 @@ const toProfile = (row: ProfileRow): MyProfile => ({
   nameSource: row.display_name_source,
   memberSince: row.member_since,
   areaLabel: row.area_label,
+  avatarPath: row.avatar_path,
+  avatarSource: row.avatar_source,
 });
 
 export async function fetchProfile(userId: string): Promise<MyProfile> {

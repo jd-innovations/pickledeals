@@ -9,7 +9,7 @@
 // Order matters: Apple tokens are revoked first, so a failure leaves the account intact.
 // Deleting the auth user cascades to profiles, profiles_private, user_roles, the user's listings and
 // the conversations on them; message senders elsewhere become null. Storage doesn't cascade, so the
-// user's listing photos and the photos in their listings' threads are removed afterwards
+// user's listing photos, profile photo and the photos in their listings' threads are removed afterwards
 // (best effort: the account is already gone, and failures are logged).
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -78,6 +78,7 @@ Deno.serve(async (req) => {
 
   try {
     await removeFolder(admin, 'listing-images', user.id);
+    await removeFolder(admin, 'avatars', user.id);
     for (const t of threads ?? []) await removeFolder(admin, 'chat-images', t.id);
   } catch (e) {
     console.error('delete-account: storage cleanup failed', user.id, e);

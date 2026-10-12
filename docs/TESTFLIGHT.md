@@ -24,8 +24,9 @@ Audit of Oct 11, 2026. Goal: PickleDeals on TestFlight this week.
       request is in the Oct 3 conversation).
    - Once it works: add the Sign in with Apple key to Supabase function secrets (`APPLE_TEAM_ID`, `APPLE_KEY_ID`,
      `APPLE_PRIVATE_KEY`, `APPLE_CLIENT_ID`) so account deletion can revoke Apple sign-ins (5.1.1(v)).
-2. ⬜ 👤 **Set up Sign in with Google** (owner decision Oct 11: in the first TestFlight build). The app code is built
-   and hidden until the IDs exist. Steps:
+2. 🟨 **Set up Sign in with Google** (owner decision Oct 11: in the first TestFlight build). Steps 1–5 done Oct 12
+   (client IDs in `eas.json` for development, preview and production; Supabase provider on). Left: step 6 after the
+   build. The app code is built and hidden until the IDs exist. Steps:
    1. console.cloud.google.com → new project "PickleDeals" → **Google Auth Platform / OAuth consent screen**:
       External, app name PickleDeals, support email, logo (PD), home page https://pickledeals.app, privacy
       https://pickledeals.app/privacy, terms https://pickledeals.app/terms, authorized domain `pickledeals.app`,

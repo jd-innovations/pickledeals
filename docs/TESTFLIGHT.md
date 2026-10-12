@@ -12,19 +12,45 @@ Audit of Oct 11, 2026. Goal: PickleDeals on TestFlight this week.
 
 ## Blockers
 
-1. ⬜ 👤 **Sign in with Apple still fails on device** ("Sign Up Not Complete", open since Oct 3). If a tester or the
-   reviewer taps it, it fails. Guideline 4.8 only requires Apple sign-in when the app offers a third-party login
-   (Google, Facebook…); email codes are PickleDeals' own accounts, so Apple sign-in is optional.
-   **Recommendation:** hide the Apple button in TestFlight builds until Apple fixes the App ID (🛠 small change,
-   one setting), and keep the DTS request going.
-2. ⬜ 👤 **Production build must be run interactively once.** The app now asks for Associated Domains (links open
+1. ⬜ 👤 **Fix Sign in with Apple** (owner decision Oct 11: must work before TestFlight). It still fails on device with
+   "Sign Up Not Complete" in Apple's own sheet (open since Oct 3; no Apple sign-in has ever reached the live
+   backend). Supabase is already set up for it (Apple on, client ID `app.pickledeals`; an iPhone app needs no secret),
+   so the fix is on Apple's side. In order:
+   1. Run the interactive production build (blocker 3). It makes fresh signing profiles with every capability;
+      stale profiles are a common cause of this message. Install it and try Continue with Apple.
+   2. Still failing: Apple Developer → Identifiers → `app.pickledeals` → untick **Sign In with Apple** → Save →
+      tick it again (Enable as a primary App ID) → Save → build again.
+   3. Still failing: Apple Developer Technical Support (the known new-App-ID problem only Apple can reset; a draft
+      request is in the Oct 3 conversation).
+   - Once it works: add the Sign in with Apple key to Supabase function secrets (`APPLE_TEAM_ID`, `APPLE_KEY_ID`,
+     `APPLE_PRIVATE_KEY`, `APPLE_CLIENT_ID`) so account deletion can revoke Apple sign-ins (5.1.1(v)).
+2. ⬜ 👤 **Set up Sign in with Google** (owner decision Oct 11: in the first TestFlight build). The app code is built
+   and hidden until the IDs exist. Steps:
+   1. console.cloud.google.com → new project "PickleDeals" → **Google Auth Platform / OAuth consent screen**:
+      External, app name PickleDeals, support email, logo (PD), home page https://pickledeals.app, privacy
+      https://pickledeals.app/privacy, terms https://pickledeals.app/terms, authorized domain `pickledeals.app`,
+      scopes email + profile + openid. Publish it (In production), otherwise only listed test users can sign in.
+   2. **Clients → Create client → iOS**: bundle ID `app.pickledeals`, team ID `ZSH27U747N`. Copy the iOS client ID.
+   3. **Clients → Create client → Web application**: name "Supabase"; authorized redirect URI
+      `https://tadxbjlhknukpyxbqrpt.supabase.co/auth/v1/callback`. Copy the Web client ID and secret.
+   4. Supabase dashboard → Authentication → Sign In / Providers → **Google**: enable; Client IDs = the Web client
+      ID, then a comma, then the iOS client ID; Client Secret = the Web secret; turn on **Skip nonce checks**
+      (the iPhone Google sheet doesn't pass a nonce). Save.
+   5. Send Claude the two client IDs (they're public, fine in chat; the secret is not and stays in Supabase only).
+      🛠 Claude adds `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` and `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` to the production
+      and preview profiles in `eas.json` and to local `config.toml`. They must be in place **before** the build,
+      because the iOS client ID also becomes the app's return URL scheme.
+   6. After the build: sign in with Google on the phone; check Profile shows the Google email.
+   - Guideline 4.8: with Google offered, Sign in with Apple becomes **required**, so item 1 has to be fixed too.
+3. ⬜ 👤 **Production build must be run interactively once** (after items 1–2 are ready). The app now asks for Associated Domains (links open
    the app), and the App Store distribution profile needs that capability, which EAS can only turn on with your
    Apple sign-in: `cd apps/mobile` → `npx eas-cli build --profile production --platform ios` → sign in when asked.
-   Same reason the postponed preview build failed (build `d6293119`).
-3. ⬜ 👤 **App record in App Store Connect** (bundle ID `app.pickledeals`, SKU e.g. `pickledeals-ios`, name
+   Same reason the postponed preview build failed (build `d6293119`). Make a new preview build the same way so
+   the build on your phone matches.
+4. ⬜ 👤 **App record in App Store Connect** (bundle ID `app.pickledeals`, SKU e.g. `pickledeals-ios`, name
    "PickleDeals"). EAS Submit can create it during the first `npx eas-cli submit --platform ios --latest`, or create
    it at appstoreconnect.apple.com → Apps → +. Note the Apple ID number it gets (for `eas.json` → `submit.production.ios.ascAppId`, 🛠).
-4. ⬜ 👤 **Reviewer sign-in (external stage only).** Sign-in is an emailed code, which the reviewer can't receive.
+5. ⬜ 👤 **Reviewer sign-in (external stage only).** Sign-in is an emailed code, which the reviewer can't receive.
    Options:
    - (a) **Review account with a password** (recommended): a single `review@pickledeals.app` account; the
      sign-in screen shows a password field only after that exact email is typed. 🛠 small change + a migration-free
@@ -91,11 +117,10 @@ Install from the TestFlight app, then:
 - Screenshots, keywords, description, age rating questionnaire (App Store submission, not TestFlight)
 - Amazon: tracking tag, Creators API, and opening Amazon links in Safari or the Amazon app instead of the in-app
   browser (required before any Amazon tag goes on)
-- Sign in with Google (built, off; needs client IDs)
 
 ## Open decisions
 
-1. Hide the Apple button for TestFlight? (recommended: yes, until Apple fixes the App ID)
+1. ~~Hide the Apple button for TestFlight?~~ Decided Oct 11: fix Apple sign-in and add Google before TestFlight.
 2. Reviewer sign-in: password review account (a) or internal-only this week (b)?
 3. Add Sentry before external testers?
 4. Meet-up spot default (open since Phase 13): start the pin at the listing's ~1 km area instead of the phone's

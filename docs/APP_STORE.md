@@ -1,5 +1,7 @@
 # App Store submission checklist (Phase 13)
 
+For the TestFlight launch, see `TESTFLIGHT.md` (Oct 11 audit); it supersedes the "Before the TestFlight build" section below.
+
 Status as of Oct 2026. ✅ done in code · ⬜ to do · 👤 needs the user.
 
 ## Review guidelines that apply
@@ -9,11 +11,11 @@ Status as of Oct 2026. ✅ done in code · ⬜ to do · 👤 needs the user.
 | 1.2 User-generated content | A way to filter objectionable content | ✅ `prohibited_terms` and the custom-listing review queue |
 | | Reporting with timely responses | ✅ `file_report`, admin Reports page. 👤 Someone has to work the queue within 24 h |
 | | Blocking abusive users | ✅ `block_user`. Blocks hide the other person's threads and listings |
-| | Published contact information | ⬜ Support email in the app (Profile) and on the support URL |
-| | Users agree to terms forbidding objectionable content (EULA) | ⬜ Accept the Terms before the first listing or message (draft in `docs/legal/TERMS_DRAFT.md`) |
+| | Published contact information | ✅ Profile → Support, and https://pickledeals.app/support |
+| | Users agree to terms forbidding objectionable content (EULA) | ✅ Community rules accepted before the first listing, message or offer |
 | 4.8 Login services | Sign in with Apple offered next to the other login | ✅ Apple and email code. 👤 Apple's "Sign Up Not Complete" issue is still open (see the handoff) |
 | 5.1.1(v) Account deletion | Deletion inside the app, with Apple token revocation | ✅ Profile → Account. Listing and thread photos are removed too. 👤 Apple .p8 key needed in production |
-| 5.1.1 Data collection | Privacy policy link in App Store Connect and in the app | ⬜ Needs a public URL (draft in `docs/legal/PRIVACY_POLICY_DRAFT.md`) |
+| 5.1.1 Data collection | Privacy policy link in App Store Connect and in the app | ✅ https://pickledeals.app/privacy, linked in Profile |
 | 5.1.1 Permissions | Purpose strings explain each permission | ✅ Location, camera and photos in `app.json` |
 | 5.1.2 Data use | No tracking without ATT | ✅ No tracking, so no ATT prompt |
 | 3.1.1 Payments | No digital goods sold | ✅ Only physical goods and affiliate links |
@@ -69,7 +71,7 @@ Notes:
   for push dispatch and ingestion, and Apple sign-in keys
 - ⬜ `APP_ENV=production` config pointing at it; EAS production profile; EAS Update channel
 - ✅ Dev-only entries (component gallery) are behind `__DEV__` on Profile. Recheck before submitting
-- ⬜ App icon and splash final art
+- ✅ App icon and splash final art (PD logo v2)
 - ⬜ Crash reporting (Sentry) before external testers
 
 ## Open questions for the user

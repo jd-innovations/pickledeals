@@ -1,15 +1,17 @@
 import { formatPrice, formatThreadTime } from '@pickledeals/shared';
 import { useQuery } from '@tanstack/react-query';
 import { Image } from 'expo-image';
+import { router } from 'expo-router';
 import { Linking, Pressable, View } from 'react-native';
 
 import { AcceptedBanner, MessageBubble, OfferCard, PersonAvatar, ProductImage, SystemMessage, type OfferCardData } from '@/commerce';
 import { useTheme } from '@/design/theme';
+import { useAuth } from '@/features/auth/authStore';
 import { SpotMap } from '@/features/map';
 import { listingImage } from '@/features/market/hooks';
 import { useAvatarUrl } from '@/features/profile/avatar';
 import { confirm } from '@/lib/dialog';
-import { Group, Icon, ListRow, Text } from '@/ui';
+import { Button, Group, Icon, ListRow, Text } from '@/ui';
 
 import { chatImageUrl, type ChatMessage, type Offer, type Thread } from './api';
 import { useBlocked, useChatMutations } from './hooks';
@@ -149,10 +151,16 @@ function SpotMessage({ m, outgoing }: { m: ChatMessage; outgoing: boolean }) {
 /** One message (any kind). `receipt` is shown under the newest outgoing message only. */
 export function MessageItem({ m, mine, receipt, onRetry }: { m: ChatMessage; mine: boolean; receipt?: string; onRetry?: () => void }) {
   const { colors } = useTheme();
+  const uid = useAuth((s) => s.user?.id);
   if (m.kind === 'status_event' || m.kind === 'offer_event') {
+    // The sold line in the linked buyer's thread offers the review (seller_reviews migration).
+    const rateListing = m.meta.status === 'sold' && m.meta.buyer_id === uid && typeof m.meta.listing_id === 'string' ? m.meta.listing_id : null;
     return (
-      <View style={{ paddingVertical: 6 }}>
+      <View style={{ paddingVertical: 6, gap: 8, alignItems: 'center' }}>
         <SystemMessage text={m.body ?? ''} />
+        {rateListing && (
+          <Button label="Rate seller" variant="secondary" size="sm" icon="star" iconPosition="leading" onPress={() => router.push({ pathname: '/rate-seller/[listing]', params: { listing: rateListing } })} />
+        )}
       </View>
     );
   }

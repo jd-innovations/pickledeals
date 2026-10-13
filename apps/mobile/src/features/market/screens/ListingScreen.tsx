@@ -13,6 +13,8 @@ import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { useAuth } from '@/features/auth/authStore';
 import { openProduct } from '@/features/catalog/components';
 import { useAvatarUrl } from '@/features/profile/avatar';
+import { ratingLine } from '@/features/reviews/components';
+import { useSellerReviews } from '@/features/reviews/hooks';
 import { shareItem } from '@/lib/share';
 import { Button, DetailTable, ErrorState, Icon, IconButton, Skeleton, Text } from '@/ui';
 
@@ -35,6 +37,7 @@ export default function ListingScreen() {
   const { width } = useWindowDimensions();
   const { data: l, isError, refetch } = useListing(id);
   const seller = useSeller(l?.sellerId ?? '');
+  const sellerReviews = useSellerReviews(l?.sellerId ?? '').data;
   const feedItem = useMarket({ ids: [id], statuses: ['active', 'pending', 'sold'], radiusM: null, limit: 1 }, !!id).data?.items[0];
   const saved = useSavedIds();
   const toggleSave = useToggleSave();
@@ -192,8 +195,9 @@ export default function ListingScreen() {
               <View style={{ flex: 1, gap: 2 }}>
                 <Text variant="headline">{l.seller.name}</Text>
                 <Text variant="footnote" tone="secondary" numeric>
-                  Member since {new Date(l.seller.memberSince).getFullYear()}
-                  {seller.data ? ` · ${seller.data.sold.length} sold` : ''}
+                  {[ratingLine(sellerReviews), `Member since ${new Date(l.seller.memberSince).getFullYear()}`, seller.data ? `${seller.data.sold.length} sold` : null]
+                    .filter(Boolean)
+                    .join(' · ')}
                 </Text>
               </View>
               <Icon name="chevronRight" size={16} color={colors.textTertiary} />

@@ -1489,6 +1489,9 @@ isOneToOne: false
 "decline_offer":
 { Args: { "offer": string }; Returns: undefined
                            },
+"delete_review":
+{ Args: { "listing": string }; Returns: undefined
+                           },
 "detect_deal":
 { Args: { "vid": string }; Returns: undefined
                            },
@@ -1545,6 +1548,9 @@ isOneToOne: false
               "content_hash": string,"content_ref": string,"product_id": string,"slug": string
             }[]
                            },
+"listing_buyer_candidates":
+{ Args: { "listing": string }; Returns: { "accepted": boolean,"avatar_path": string | null,"buyer_id": string,"detail": string,"name": string }[]
+                           },
 "listing_is_public":
 { Args: { "lid": string }; Returns: boolean
                            },
@@ -1577,6 +1583,9 @@ isOneToOne: false
                            },
 "market_match":
 { Args: { "brand_slugs"?: (string)[],"category_slug"?: string,"conditions"?: (string)[],"ids"?: (string)[],"max_cents"?: number,"min_cents"?: number,"pickup_only"?: boolean,"product"?: string,"q"?: string,"seller"?: string,"statuses"?: (string)[] }; Returns: string[]
+                           },
+"my_review":
+{ Args: { "listing": string }; Returns: Json
                            },
 "my_badge_count":
 { Args: Record<PropertyKey, never>; Returns: number
@@ -1722,6 +1731,9 @@ isOneToOne: false
 "schedule_ingestion":
 { Args: { "only_source"?: string }; Returns: undefined
                            },
+"seller_reviews_for":
+{ Args: { "max_rows"?: number,"seller": string,"skip"?: number }; Returns: Json
+                           },
 "search_catalog":
 { Args: { "product_limit"?: number,"q": string }; Returns: Json
                            },
@@ -1822,6 +1834,9 @@ isOneToOne: false
                            },
 "store_product_name":
 { Args: { "brand_name": string,"title": string,"vendor": string }; Returns: string
+                           },
+"submit_review":
+{ Args: { "body"?: string,"listing": string,"rating": number }; Returns: string
                            },
 "suggest_catalog_matches":
 { Args: { "brand"?: string,"max_rows"?: number,"title": string }; Returns: Json

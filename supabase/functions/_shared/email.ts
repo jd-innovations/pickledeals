@@ -1,8 +1,9 @@
-// Missed-message emails: rendering (HTML + plain text) and Resend webhook verification.
+// Missed-message, review and account-notice emails: rendering (HTML + plain text) and Resend webhook
+// verification.
 // Pure functions shared by dispatch-emails and email-events; tested in packages/shared.
 // The look matches the sign-in code email (supabase/templates/email-code.html).
 
-export type EmailKind = 'offer' | 'new_message' | 'system';
+export type EmailKind = 'offer' | 'new_message' | 'review' | 'system';
 
 export type EmailInput = {
   kind: EmailKind;
@@ -50,6 +51,11 @@ export function renderEmail(input: EmailInput): RenderedEmail {
     heading = title;
     subject = listingTitle ? `${title} · ${listingTitle}` : title;
     cta = 'Open the offer';
+  } else if (kind === 'review') {
+    // Either "How was buying … from …?" (to the buyer) or "… left you a 5-star review" (to the seller).
+    heading = title;
+    subject = title;
+    cta = input.route?.startsWith('/rate-seller/') ? 'Rate your purchase' : 'See your reviews';
   } else {
     heading = title;
     subject = title;
@@ -60,7 +66,9 @@ export function renderEmail(input: EmailInput): RenderedEmail {
   const reason =
     kind === 'system'
       ? 'This is a notice about your PickleDeals account.'
-      : 'You’re getting this because a conversation on PickleDeals was unread for an hour.';
+      : kind === 'review'
+        ? 'You’re getting this because of a sale on PickleDeals, and the notification was unread for an hour.'
+        : 'You’re getting this because a conversation on PickleDeals was unread for an hour.';
 
   const html = `<!doctype html>
 <html lang="en">

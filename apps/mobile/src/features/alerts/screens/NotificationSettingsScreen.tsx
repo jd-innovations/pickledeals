@@ -49,6 +49,7 @@ export default function NotificationSettingsScreen() {
         { key: 'new_message', title: 'Messages', detail: 'From buyers and sellers' },
         { key: 'nearby_listing', title: 'Nearby listings', detail: s ? `Matches within ${radiusLabel(s.radiusM)}` : 'Matches near you' },
         { key: 'listing_update', title: 'Listing updates', detail: 'Pending or sold on items you saved' },
+        { key: 'review', title: 'Reviews', detail: 'Rating what you bought, and new reviews of you' },
       ],
     },
   ];

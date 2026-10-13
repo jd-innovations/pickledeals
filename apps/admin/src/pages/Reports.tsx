@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 
 type Row = {
   id: string;
-  target_type: 'listing' | 'user' | 'conversation';
+  target_type: 'listing' | 'user' | 'conversation' | 'review';
   target_id: string;
   reason: string;
   details: string | null;
@@ -18,6 +18,7 @@ type Row = {
   target_owner_name: string | null;
   listing_status: string | null;
   transcript: { at: string; from: string; kind: string; body: string | null }[] | null;
+  review_hidden: boolean | null;
 };
 
 const REASON: Record<string, string> = {
@@ -52,7 +53,14 @@ export function ReportsPage({ role }: { role: 'admin' | 'editor' }) {
     setMessage(
       error
         ? { error: true, text: error.message }
-        : { error: false, text: removeListing ? `Removed “${r.target_label}” and closed its reports.` : decision === 'dismissed' ? 'Dismissed.' : 'Marked as actioned.' },
+        : {
+            error: false,
+            text: removeListing
+              ? `${r.target_type === 'review' ? 'Hid' : 'Removed'} “${r.target_label}” and closed its reports.`
+              : decision === 'dismissed'
+                ? 'Dismissed.'
+                : 'Marked as actioned.',
+          },
     );
     load();
   };
@@ -69,7 +77,7 @@ export function ReportsPage({ role }: { role: 'admin' | 'editor' }) {
   return (
     <>
       <h1>Reports</h1>
-      <p className="muted">Listings, people and conversations reported from the app. Act within 24 hours.</p>
+      <p className="muted">Listings, people, conversations and seller reviews reported from the app. Act within 24 hours.</p>
       <div className="row" style={{ margin: '12px 0' }}>
         <label className="row" style={{ fontSize: 13 }}>
           <input type="checkbox" checked={closed} onChange={(e) => setClosed(e.target.checked)} /> Include closed
@@ -100,8 +108,9 @@ function ReportCard({ r, role, onResolve }: { r: Row; role: 'admin' | 'editor'; 
       </div>
       <div className="muted" style={{ fontSize: 12 }}>
         Reported by {r.reporter_name ?? 'a deleted account'} · {formatAgo(r.created_at)}
-        {r.target_owner_name ? ` · ${r.target_type === 'conversation' ? 'other party' : 'owner'}: ${r.target_owner_name}` : ''}
+        {r.target_owner_name ? ` · ${r.target_type === 'conversation' ? 'other party' : r.target_type === 'review' ? 'written by' : 'owner'}: ${r.target_owner_name}` : ''}
         {r.listing_status ? ` · listing ${r.listing_status}` : ''}
+        {r.review_hidden ? ' · review hidden' : ''}
         {r.target_owner && (
           <>
             {' · '}
@@ -115,7 +124,7 @@ function ReportCard({ r, role, onResolve }: { r: Row; role: 'admin' | 'editor'; 
           {r.transcript.map((m, i) => (
             <div key={i}>
               <span className="muted num">{new Date(m.at).toLocaleString()} · </span>
-              <strong>{m.from}</strong>: {m.body ?? `[${m.kind.replace('_', ' ')}]`}
+              <strong>{m.from}</strong>: <span style={{ whiteSpace: 'pre-line' }}>{m.body ?? `[${m.kind.replace('_', ' ')}]`}</span>
             </div>
           ))}
         </div>
@@ -129,6 +138,11 @@ function ReportCard({ r, role, onResolve }: { r: Row; role: 'admin' | 'editor'; 
           <button className="btn" onClick={() => onResolve(r, 'actioned', note)}>
             Mark actioned
           </button>
+          {r.target_type === 'review' && !r.review_hidden && (
+            <button className="btn primary" onClick={() => onResolve(r, 'actioned', note, true)}>
+              Hide review
+            </button>
+          )}
           {r.target_type === 'listing' && r.listing_status !== 'removed' && (
             <button className="btn primary" onClick={() => onResolve(r, 'actioned', note, true)}>
               Remove listing

@@ -1,12 +1,14 @@
 import { radius } from '@pickledeals/shared';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { PersonAvatar } from '@/commerce';
 import { useAuth } from '@/features/auth/authStore';
 import { useAvatarUrl } from '@/features/profile/avatar';
+import { ReviewRow } from '@/features/reviews/components';
+import { useSellerReviews } from '@/features/reviews/hooks';
 import { Button, EmptyState, SegmentedControl, Skeleton, Text } from '@/ui';
 
 import { ListingGrid, ListingGridSkeleton, MarketLoadError } from '../components';
@@ -14,13 +16,15 @@ import { useSeller } from '../hooks';
 
 const monthYear = (iso: string) => new Date(iso).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-/** Seller profile (design: "Seller profile"). Public facts only: name, area label, member since, listings. */
+/** Seller profile (design: "Seller profile"). Public facts only: name, area label, member since, listings, reviews. */
 export default function SellerScreen() {
   const { id = '' } = useLocalSearchParams<{ id: string }>();
   const { colors } = useTheme();
   const { data: s, isError, refetch } = useSeller(id);
   const avatar = useAvatarUrl(id);
-  const [tab, setTab] = useState<'active' | 'sold'>('active');
+  const reviews = useSellerReviews(id).data;
+  const [tab, setTab] = useState<'active' | 'sold' | 'reviews'>('active');
+  const rated = !!reviews && reviews.count > 0 && reviews.average != null;
   const requireAuth = useAuth((x) => x.requireAuth);
   const uid = useAuth((x) => x.user?.id);
 
@@ -49,17 +53,23 @@ export default function SellerScreen() {
 
           <View style={[styles.stats, { backgroundColor: colors.surface }]}>
             {[
-              ['Active', s.active.length],
-              ['Sold', s.sold.length],
-            ].map(([label, n], i) => (
-              <View key={label} style={[styles.stat, i > 0 && { borderLeftWidth: 1, borderLeftColor: colors.background }]}>
+              { key: 'active', value: String(s.active.length), label: 'Active' },
+              { key: 'sold', value: String(s.sold.length), label: 'Sold' },
+              ...(rated ? [{ key: 'reviews', value: `★ ${reviews.average!.toFixed(1)}`, label: reviews.count === 1 ? '1 review' : `${reviews.count} reviews` }] : []),
+            ].map((x, i) => (
+              <Pressable
+                key={x.key}
+                accessibilityRole="button"
+                accessibilityLabel={x.key === 'reviews' ? `Rated ${reviews!.average!.toFixed(1)} out of 5, ${x.label}` : `${x.value} ${x.label}`}
+                onPress={() => setTab(x.key as typeof tab)}
+                style={[styles.stat, i > 0 && { borderLeftWidth: 1, borderLeftColor: colors.background }]}>
                 <Text variant="title2" numeric>
-                  {n}
+                  {x.value}
                 </Text>
                 <Text variant="caption" weight="400" tone="secondary">
-                  {label}
+                  {x.label}
                 </Text>
-              </View>
+              </Pressable>
             ))}
           </View>
 
@@ -68,16 +78,28 @@ export default function SellerScreen() {
               options={[
                 { value: 'active', label: `Active ${s.active.length}` },
                 { value: 'sold', label: `Sold ${s.sold.length}` },
+                ...(rated ? [{ value: 'reviews' as const, label: `Reviews ${reviews.count}` }] : []),
               ]}
               value={tab}
               onChange={setTab}
             />
           </View>
 
-          {(tab === 'active' ? s.active : s.sold).length ? (
+          {tab === 'reviews' && rated ? (
+            <View style={{ paddingHorizontal: 16 }}>
+              {reviews.items.map((r, i) => (
+                <ReviewRow key={r.id} r={r} divider={i > 0} />
+              ))}
+              {reviews.count > reviews.items.length && (
+                <Text variant="caption" weight="400" tone="tertiary" numeric>
+                  Showing the newest {reviews.items.length} of {reviews.count}.
+                </Text>
+              )}
+            </View>
+          ) : (tab === 'reviews' ? [] : tab === 'active' ? s.active : s.sold).length ? (
             <ListingGrid items={tab === 'active' ? s.active : s.sold} />
           ) : (
-            <EmptyState icon="tag" title={tab === 'active' ? 'Nothing for sale right now' : 'No sales yet'} message="Save a listing to hear when it changes." />
+            <EmptyState icon="tag" title={tab === 'sold' ? 'No sales yet' : 'Nothing for sale right now'} message="Save a listing to hear when it changes." />
           )}
 
           {id !== uid && (

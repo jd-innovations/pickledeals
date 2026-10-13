@@ -20,7 +20,7 @@ const REASONS: { value: ReportReason; label: string; detail: string }[] = [
   { value: 'other', label: 'Something else', detail: 'Tell us below' },
 ];
 
-const TITLES: Record<ReportTarget, string> = { listing: 'Report listing', user: 'Report seller', conversation: 'Report conversation' };
+const TITLES: Record<ReportTarget, string> = { listing: 'Report listing', user: 'Report seller', conversation: 'Report conversation', review: 'Report review' };
 
 /** Report sheet (App Store Guideline 1.2). Reports go to the admin moderation queue. */
 export default function ReportSheet() {

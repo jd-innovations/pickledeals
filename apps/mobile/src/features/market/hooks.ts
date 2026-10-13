@@ -72,7 +72,8 @@ export function useListingMutations() {
   const refresh = () => Promise.all([qc.invalidateQueries({ queryKey: ['market'] }), qc.invalidateQueries({ queryKey: ['me'] })]);
   return {
     setStatus: useMutation({
-      mutationFn: ({ id, status, soldPriceCents }: { id: string; status: 'active' | 'pending' | 'sold' | 'removed'; soldPriceCents?: number }) => setListingStatus(id, status, soldPriceCents),
+      mutationFn: ({ id, status, soldPriceCents, buyerId }: { id: string; status: 'active' | 'pending' | 'sold' | 'removed'; soldPriceCents?: number; buyerId?: string }) =>
+        setListingStatus(id, status, soldPriceCents, buyerId),
       onSuccess: refresh,
     }),
     update: useMutation({ mutationFn: ({ id, changes }: { id: string; changes: Parameters<typeof updateListing>[1] }) => updateListing(id, changes), onSuccess: refresh }),

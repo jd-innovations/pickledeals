@@ -7,6 +7,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
  * other platforms fall back to the stroke icons drawn for the approved design.
  */
 const ICONS = {
+  star: { sf: 'star', sfFilled: 'star.fill', d: 'M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z' },
   heart: { sf: 'heart', sfFilled: 'heart.fill', d: 'M12 20.5s-7.5-4.4-7.5-10.2A4.3 4.3 0 0 1 12 7.6a4.3 4.3 0 0 1 7.5 2.7c0 5.8-7.5 10.2-7.5 10.2z' },
   bell: { sf: 'bell', sfFilled: 'bell.fill', d: 'M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z M10 20a2 2 0 0 0 4 0' },
   search: { sf: 'magnifyingglass', d: 'M20 20l-3.5-3.5 M18 11a7 7 0 1 1-14 0 7 7 0 0 1 14 0z' },

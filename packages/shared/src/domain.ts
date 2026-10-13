@@ -57,6 +57,7 @@ export const AUTH_INTENTS = [
   'create_listing',
   'manage_listings',
   'report',
+  'rate_seller',
   'view_saved',
   'view_messages',
 ] as const;

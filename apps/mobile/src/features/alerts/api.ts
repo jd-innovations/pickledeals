@@ -259,6 +259,7 @@ export const NOTIFICATION_CATEGORIES = [
   'new_message',
   'nearby_listing',
   'listing_update',
+  'review',
 ] as const;
 export type NotificationCategory = (typeof NOTIFICATION_CATEGORIES)[number];
 

@@ -209,7 +209,7 @@ export async function fetchBlocked(): Promise<{ id: string; name: string }[]> {
   return data.map((r) => ({ id: r.blocked_id, name: byId.get(r.blocked_id) ?? 'Deleted user' }));
 }
 
-export type ReportTarget = 'listing' | 'user' | 'conversation';
+export type ReportTarget = 'listing' | 'user' | 'conversation' | 'review';
 export type ReportReason = 'prohibited' | 'scam' | 'offensive' | 'spam' | 'counterfeit' | 'other';
 
 export async function fileReport(targetType: ReportTarget, targetId: string, reason: ReportReason, details?: string) {

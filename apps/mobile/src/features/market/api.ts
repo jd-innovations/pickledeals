@@ -364,8 +364,8 @@ export async function fetchMyListings(userId: string): Promise<MyListing[]> {
   }));
 }
 
-export async function setListingStatus(id: string, status: 'active' | 'pending' | 'sold' | 'removed', soldPriceCents?: number) {
-  const { error } = await requireSupabase().rpc('set_listing_status', { listing: id, status, sold_price: soldPriceCents });
+export async function setListingStatus(id: string, status: 'active' | 'pending' | 'sold' | 'removed', soldPriceCents?: number, buyerId?: string) {
+  const { error } = await requireSupabase().rpc('set_listing_status', { listing: id, status, sold_price: soldPriceCents, buyer: buyerId });
   if (error) throw error;
 }
 

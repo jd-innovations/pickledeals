@@ -95,6 +95,7 @@ const TYPE_ICON: Record<string, IconName> = {
   offer: 'tag',
   nearby_listing: 'pin',
   listing_update: 'clock',
+  review: 'star',
 };
 
 function Activity({ items }: { items: AppNotification[] | undefined }) {

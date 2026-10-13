@@ -133,6 +133,13 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
 - **OTA to TestFlight (production channel):** same, with `APP_ENV=production`, the hosted URL/key and both
   `EXPO_PUBLIC_GOOGLE_*_CLIENT_ID` values from eas.json, `--channel production --environment production`. Check the
   .hbc has the hosted URL and no `:54321`. First one Oct 12 (sell price field), update group 5e925044….
+- **Seller reviews (Oct 13, owner-approved scope):** buyer → seller, 1–5 stars + optional comment, 30 days after
+  the sale, average shown from the first review. Mark as sold has the design's "Who's buying?" list (server checks
+  the buyer messaged about the listing); the buyer gets a `review` notification (push + email after an hour unread)
+  and a Rate seller button on the sold line in chat; the seller is notified of the first version. Ratings show on
+  the seller profile (stat tile + Reviews tab) and the listing's seller row. Reviews can be reported; staff hide them
+  in admin › Reports. Migration `20261102000000_seller_reviews.sql`, pgTAP `26_seller_reviews`. Going live needs
+  `db push` (with `20261101000000_brand_matching.sql`), `functions deploy dispatch-emails` (review emails), then the OTA.
 - **Email:** paid Resend plan; open question: which sending domain.
 - **CI:** check the GitHub run after each push (public API:
   `https://api.github.com/repos/jd-innovations/pickledeals/actions/runs?head_sha=<sha>`); `gh` isn't installed.

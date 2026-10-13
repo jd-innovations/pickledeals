@@ -27,6 +27,25 @@ describe('renderEmail', () => {
     expect(e.html).toContain('Open the offer');
   });
 
+  it('asks the buyer to rate the purchase, and shows sellers their reviews', () => {
+    const ask = renderEmail({
+      ...base,
+      kind: 'review',
+      title: 'How was buying JOOLA Perseus Pro IV from Jordan?',
+      body: 'Rate your purchase. It helps other players buy with confidence.',
+      route: '/rate-seller/7d1c2b3a-0000-4000-8000-000000000002',
+      unsubscribeUrl: `${SITE}/unsubscribe?t=x`,
+    });
+    expect(ask.subject).toBe('How was buying JOOLA Perseus Pro IV from Jordan?');
+    expect(ask.html).toContain('Rate your purchase');
+    expect(ask.html).toContain('href="https://pickledeals.app/open?to=%2Frate-seller%2F7d1c2b3a-0000-4000-8000-000000000002"');
+    expect(ask.text).toContain('because of a sale on PickleDeals');
+    expect(ask.text).toContain('Turn off these emails');
+
+    const got = renderEmail({ ...base, kind: 'review', title: 'Dana left you a 5-star review', body: 'Smooth meet-up.', route: '/seller/7d1c2b3a-0000-4000-8000-000000000003', unsubscribeUrl: null });
+    expect(got.html).toContain('See your reviews');
+  });
+
   it('escapes user text', () => {
     const e = renderEmail({ ...base, kind: 'new_message', title: '<b>Eve</b>', body: '<script>alert(1)</script> & "hi"', unsubscribeUrl: null });
     expect(e.html).not.toContain('<script>');

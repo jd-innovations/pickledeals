@@ -8,9 +8,10 @@ import { FavoriteButton, PriceBreakdown, ProductGallery, PromoCodeRow, StickyDea
 import { useTheme } from '@/design/theme';
 import { useSavedIds, useToggleSave } from '@/features/alerts/hooks';
 import { SaveAlertButtons } from '@/features/alerts/SaveAlertButtons';
+import { useAuth } from '@/features/auth/authStore';
 import { galleryImages, useProduct, useProductSlug } from '@/features/catalog/hooks';
 import { shareItem } from '@/lib/share';
-import { Chip, ErrorState, Group, Icon, IconButton, ListRow, Skeleton, Text } from '@/ui';
+import { Button, Chip, ErrorState, Group, Icon, IconButton, ListRow, Skeleton, Text } from '@/ui';
 
 import { AFFILIATE_DISCLOSURE, apiPriceDisclaimer, isApiPrice, ownershipDisclosure, priceAsOf, promoDetail, shippingLabel, shippingValue, shipsFromLabel } from '../format';
 import { openDeal, useLivePromos, useOffer } from '../hooks';
@@ -20,6 +21,7 @@ export default function DealScreen() {
   // `deal` is passed from deal cards, so the heart here is the same save as the card's heart.
   const { id = '', deal } = useLocalSearchParams<{ id: string; deal?: string }>();
   const { colors } = useTheme();
+  const requireAuth = useAuth((x) => x.requireAuth);
   const saved = useSavedIds();
   const toggleSave = useToggleSave();
   const offer = useOffer(id);
@@ -182,6 +184,20 @@ export default function DealScreen() {
                 {ownershipDisclosure([o]) ? ` ${ownershipDisclosure([o])}` : ''}
                 {apiPriceDisclaimer([o]) ? ` ${apiPriceDisclaimer([o])}` : ''}
               </Text>
+              <Button
+                label="Report a problem"
+                variant="link"
+                size="sm"
+                style={{ alignSelf: 'flex-start', marginTop: 8 }}
+                onPress={() =>
+                  requireAuth('report', () =>
+                    router.push({
+                      pathname: '/report',
+                      params: { type: 'offer', id: o.offerId, name: `${product.name} at ${o.retailer.name}`, ...(o.promo ? { promo: o.promo.id, code: o.promo.code } : {}) },
+                    }),
+                  )
+                }
+              />
             </View>
           </>
         )}

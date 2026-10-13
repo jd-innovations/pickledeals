@@ -11,7 +11,9 @@ import { Button, Icon, Text, TextField } from '@/ui';
 import { fileReport, type ReportReason, type ReportTarget } from '../api';
 import { useChatMutations } from '../hooks';
 
-const REASONS: { value: ReportReason; label: string; detail: string }[] = [
+type Reason = { value: ReportReason; label: string; detail: string };
+
+const CONDUCT: Reason[] = [
   { value: 'scam', label: 'Scam or fraud', detail: 'Asks for payment up front, fake item, phishing' },
   { value: 'counterfeit', label: 'Counterfeit or replica', detail: 'Fake branded gear' },
   { value: 'prohibited', label: 'Not allowed on PickleDeals', detail: 'Unrelated, illegal or dangerous items' },
@@ -19,12 +21,37 @@ const REASONS: { value: ReportReason; label: string; detail: string }[] = [
   { value: 'spam', label: 'Spam', detail: 'Repeated or misleading posts and messages' },
   { value: 'other', label: 'Something else', detail: 'Tell us below' },
 ];
+const NOT_AS_DESCRIBED: Reason = { value: 'not_as_described', label: 'Not as described', detail: 'Wrong item, condition or photos' };
 
-const TITLES: Record<ReportTarget, string> = { listing: 'Report listing', user: 'Report seller', conversation: 'Report conversation', review: 'Report review' };
+/** Deals and products: price and stock problems. "Code doesn't work" needs the code the offer showed. */
+const offerReasons = (code?: string): Reason[] => [
+  { value: 'wrong_price', label: 'Wrong price', detail: 'The store shows a different price' },
+  ...(code ? [{ value: 'code_failed' as const, label: 'Code doesn’t work', detail: `The store didn’t accept ${code}` }] : []),
+  { value: 'out_of_stock', label: 'Out of stock', detail: 'The store says it’s sold out' },
+  { value: 'broken_link', label: 'Link doesn’t work', detail: 'Missing page or a different product' },
+  { value: 'other', label: 'Something else', detail: 'Tell us below' },
+];
+
+const TITLES: Record<ReportTarget, string> = {
+  listing: 'Report listing',
+  user: 'Report seller',
+  conversation: 'Report conversation',
+  review: 'Report review',
+  offer: 'Report a problem',
+  promo: 'Report a problem',
+};
 
 /** Report sheet (App Store Guideline 1.2). Reports go to the admin moderation queue. */
 export default function ReportSheet() {
-  const { type = 'listing', id = '', name, user } = useLocalSearchParams<{ type: ReportTarget; id: string; name?: string; user?: string }>();
+  const { type = 'listing', id = '', name, user, promo, code } = useLocalSearchParams<{
+    type: ReportTarget;
+    id: string;
+    name?: string;
+    user?: string;
+    /** Offers only: the promo code shown with the offer, for "Code doesn't work". */
+    promo?: string;
+    code?: string;
+  }>();
   const { colors } = useTheme();
   const signedIn = useAuth((s) => !!s.user);
   const { block } = useChatMutations();
@@ -34,13 +61,17 @@ export default function ReportSheet() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const blockId = type === 'user' ? id : user;
+  const deal = type === 'offer' || type === 'promo';
+  const reasons = deal ? offerReasons(promo ? code : undefined) : type === 'listing' ? [NOT_AS_DESCRIBED, ...CONDUCT] : CONDUCT;
 
   const submit = async () => {
     if (!reason) return;
     setBusy(true);
     setError(null);
     try {
-      await fileReport(type, id, reason, details.trim() || undefined);
+      // A code that doesn't work is reported against the code, so repeats from different people add up.
+      if (reason === 'code_failed' && promo) await fileReport('promo', promo, reason, details.trim() || undefined);
+      else await fileReport(type, id, reason, details.trim() || undefined);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setDone(true);
     } catch (e) {
@@ -60,7 +91,9 @@ export default function ReportSheet() {
           Thanks for telling us
         </Text>
         <Text variant="subhead" weight="400" tone="secondary" align="center">
-          Our team reviews every report. We may remove the content or the account. We won’t tell {name ?? 'them'} who reported it.
+          {deal
+            ? 'We’ll check it with the store and fix or hide it. Prices can change at the store between our checks.'
+            : `Our team reviews every report. We may remove the content or the account. We won’t tell ${name ?? 'them'} who reported it.`}
         </Text>
         {blockId && signedIn && (
           <Button
@@ -94,7 +127,7 @@ export default function ReportSheet() {
         )}
       </View>
       <View accessibilityRole="radiogroup" style={{ borderRadius: 16, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' }}>
-        {REASONS.map((r, i) => (
+        {reasons.map((r, i) => (
           <Pressable
             key={r.value}
             accessibilityRole="radio"
@@ -122,16 +155,18 @@ export default function ReportSheet() {
           </Pressable>
         ))}
       </View>
-      <TextField label="Anything else? (optional)" value={details} onChangeText={setDetails} maxLength={500} multiline placeholder="What happened?" />
+      <TextField label="Anything else? (optional)" value={details} onChangeText={setDetails} maxLength={500} multiline placeholder={deal ? 'What did the store show?' : 'What happened?'} />
       {error && (
         <Text variant="footnote" tone="primary" weight="600">
           {error}
         </Text>
       )}
       <Button label="Send report" disabled={!reason} loading={busy} onPress={submit} />
-      <Text variant="caption" weight="400" tone="tertiary" align="center">
-        In danger? Contact local emergency services first.
-      </Text>
+      {!deal && (
+        <Text variant="caption" weight="400" tone="tertiary" align="center">
+          In danger? Contact local emergency services first.
+        </Text>
+      )}
     </ScrollView>
   );
 }

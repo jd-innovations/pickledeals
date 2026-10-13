@@ -39,6 +39,7 @@ import {
 } from '@/features/offers/format';
 import { openDeal, useLivePromos, usePriceHistory, useProductOffers } from '@/features/offers/hooks';
 import { shareItem } from '@/lib/share';
+import { useAuth } from '@/features/auth/authStore';
 import { Button, Chip, ChipRow, DetailTable, Group, IconButton, ListRow, SectionHeader, Skeleton, Text } from '@/ui';
 
 import { LoadError, openBrand, openCategory, openProduct, useGridCardWidth } from '../components';
@@ -50,6 +51,7 @@ const humanize = (key: string) => key.replace(/_/g, ' ').replace(/^\w/, (c) => c
 export default function ProductScreen() {
   const { slug = '' } = useLocalSearchParams<{ slug: string }>();
   const { colors } = useTheme();
+  const requireAuth = useAuth((x) => x.requireAuth);
   const { data: p, isError, refetch } = useProduct(slug);
   const offersQuery = useProductOffers(p?.id);
   const [variantId, setVariantId] = useState<string | null>(null);
@@ -179,6 +181,20 @@ export default function ProductScreen() {
                   <Text variant="caption" weight="400" tone="tertiary">
                     {[AFFILIATE_DISCLOSURE, ownershipDisclosure([best, ...others]), apiPriceDisclaimer([best, ...others])].filter(Boolean).join(' ')}
                   </Text>
+                  <Button
+                    label="Report a problem with this price"
+                    variant="link"
+                    size="sm"
+                    style={{ alignSelf: 'flex-start' }}
+                    onPress={() =>
+                      requireAuth('report', () =>
+                        router.push({
+                          pathname: '/report',
+                          params: { type: 'offer', id: best.offerId, name: `${p!.name} at ${best.retailer.name}`, ...(best.promo ? { promo: best.promo.id, code: best.promo.code } : {}) },
+                        }),
+                      )
+                    }
+                  />
                 </View>
               ) : checkPriceOnly ? (
                 <View style={{ padding: 16, borderRadius: radius.hero, backgroundColor: colors.surface, gap: 12 }}>

@@ -3,15 +3,16 @@
 Things only you can run from the PC. Tell Claude when each is done; Claude checks and does the follow-ups.
 Run everything in PowerShell from `C:\dev\pickledeals`.
 
-## 1. Push the database changes (brand filter + seller reviews)
+## 1. Push the database changes (brand filter, seller reviews, problem reports)
 
-Applies `20261101000000_brand_matching.sql` and `20261102000000_seller_reviews.sql` to the hosted database.
+Applies `20261101000000_brand_matching.sql`, `20261102000000_seller_reviews.sql` and
+`20261103000000_problem_reports.sql` to the hosted database.
 
 ```powershell
 cd C:\dev\pickledeals; Get-Content supabase\.env.hosted | ForEach-Object { if ($_ -match '^(\w+)=(.*)$') { Set-Item "env:$($matches[1])" $matches[2] } }; npx.cmd supabase db push --linked
 ```
 
-Answer **Y** if it asks. It should list exactly those two migrations.
+Answer **Y** if it asks. It should list exactly those three migrations.
 
 ## 2. Update the email sender (review emails)
 
@@ -23,7 +24,7 @@ npx.cmd supabase functions deploy dispatch-emails
 
 Claude then:
 - checks the hosted database (brand matching, brand counts, reviews functions);
-- sends one app update to TestFlight build 3 with the brand filter and seller reviews.
+- sends one app update to TestFlight build 3 with the brand filter, seller reviews and problem reports.
 
 ## 4. Test on the phone (after the update)
 
@@ -33,6 +34,8 @@ Claude then:
    under "Who's buying?".
 4. On the second account: the push / Activity item and the **Rate seller** button in the chat. Leave a review.
 5. Your seller profile shows the rating and the Reviews tab.
+6. On any deal or product page: **Report a problem** shows Wrong price / Code doesn't work / Out of stock /
+   Link doesn't work. A listing's **Report listing** has **Not as described** at the top.
 
 ## Also
 

@@ -209,8 +209,19 @@ export async function fetchBlocked(): Promise<{ id: string; name: string }[]> {
   return data.map((r) => ({ id: r.blocked_id, name: byId.get(r.blocked_id) ?? 'Deleted user' }));
 }
 
-export type ReportTarget = 'listing' | 'user' | 'conversation' | 'review';
-export type ReportReason = 'prohibited' | 'scam' | 'offensive' | 'spam' | 'counterfeit' | 'other';
+export type ReportTarget = 'listing' | 'user' | 'conversation' | 'review' | 'offer' | 'promo';
+export type ReportReason =
+  | 'prohibited'
+  | 'scam'
+  | 'offensive'
+  | 'spam'
+  | 'counterfeit'
+  | 'not_as_described'
+  | 'wrong_price'
+  | 'code_failed'
+  | 'out_of_stock'
+  | 'broken_link'
+  | 'other';
 
 export async function fileReport(targetType: ReportTarget, targetId: string, reason: ReportReason, details?: string) {
   const { error } = await requireSupabase().rpc('file_report', { target_type: targetType, target_id: targetId, reason, details });

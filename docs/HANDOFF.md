@@ -140,6 +140,11 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   the seller profile (stat tile + Reviews tab) and the listing's seller row. Reviews can be reported; staff hide them
   in admin › Reports. Migration `20261102000000_seller_reviews.sql`, pgTAP `26_seller_reviews`. Going live needs
   `db push` (with `20261101000000_brand_matching.sql`), `functions deploy dispatch-emails` (review emails), then the OTA.
+- **Problem reports (Oct 13, owner-approved):** listing reports gain "Not as described"; deal and product pages
+  have "Report a problem" (wrong price, out of stock, broken link → `offer` report; code doesn't work → `promo`
+  report). 3 different reporters of a failing code within a day un-verify it (drops out of prices until verified
+  again). Admin › Reports: Turn offer off / Remove code. Migration `20261103000000_problem_reports.sql`, pgTAP
+  `27_problem_reports`. Pending go-live steps live in `docs/DESKTOP_TODO.md`.
 - **Email:** paid Resend plan; open question: which sending domain.
 - **CI:** check the GitHub run after each push (public API:
   `https://api.github.com/repos/jd-innovations/pickledeals/actions/runs?head_sha=<sha>`); `gh` isn't installed.

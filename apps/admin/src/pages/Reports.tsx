@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 
 type Row = {
   id: string;
-  target_type: 'listing' | 'user' | 'conversation' | 'review';
+  target_type: 'listing' | 'user' | 'conversation' | 'review' | 'offer' | 'promo';
   target_id: string;
   reason: string;
   details: string | null;
@@ -27,7 +27,20 @@ const REASON: Record<string, string> = {
   prohibited: 'Not allowed',
   offensive: 'Harassment or hate',
   spam: 'Spam',
+  not_as_described: 'Not as described',
+  wrong_price: 'Wrong price',
+  code_failed: 'Code doesn’t work',
+  out_of_stock: 'Out of stock',
+  broken_link: 'Link doesn’t work',
   other: 'Other',
+};
+
+/** What the "remove" action does for each kind of target. */
+const REMOVE: Partial<Record<Row['target_type'], { label: string; done: string }>> = {
+  listing: { label: 'Remove listing', done: 'Removed' },
+  review: { label: 'Hide review', done: 'Hid' },
+  offer: { label: 'Turn offer off', done: 'Turned off' },
+  promo: { label: 'Remove code', done: 'Removed' },
 };
 
 /**
@@ -56,7 +69,7 @@ export function ReportsPage({ role }: { role: 'admin' | 'editor' }) {
         : {
             error: false,
             text: removeListing
-              ? `${r.target_type === 'review' ? 'Hid' : 'Removed'} “${r.target_label}” and closed its reports.`
+              ? `${REMOVE[r.target_type]?.done ?? 'Removed'} “${r.target_label}” and closed its reports.`
               : decision === 'dismissed'
                 ? 'Dismissed.'
                 : 'Marked as actioned.',
@@ -77,7 +90,10 @@ export function ReportsPage({ role }: { role: 'admin' | 'editor' }) {
   return (
     <>
       <h1>Reports</h1>
-      <p className="muted">Listings, people, conversations and seller reviews reported from the app. Act within 24 hours.</p>
+      <p className="muted">
+        Listings, people, conversations and seller reviews reported from the app, plus price, stock, link and code problems on deals. Act within 24 hours.
+        Three people saying a code doesn’t work within a day un-verify it automatically; a store feed turns an offer you turned off back on when it next sees it.
+      </p>
       <div className="row" style={{ margin: '12px 0' }}>
         <label className="row" style={{ fontSize: 13 }}>
           <input type="checkbox" checked={closed} onChange={(e) => setClosed(e.target.checked)} /> Include closed
@@ -109,7 +125,7 @@ function ReportCard({ r, role, onResolve }: { r: Row; role: 'admin' | 'editor'; 
       <div className="muted" style={{ fontSize: 12 }}>
         Reported by {r.reporter_name ?? 'a deleted account'} · {formatAgo(r.created_at)}
         {r.target_owner_name ? ` · ${r.target_type === 'conversation' ? 'other party' : r.target_type === 'review' ? 'written by' : 'owner'}: ${r.target_owner_name}` : ''}
-        {r.listing_status ? ` · listing ${r.listing_status}` : ''}
+        {r.listing_status ? ` · ${r.target_type === 'promo' ? 'code' : r.target_type} ${r.listing_status}` : ''}
         {r.review_hidden ? ' · review hidden' : ''}
         {r.target_owner && (
           <>
@@ -138,14 +154,9 @@ function ReportCard({ r, role, onResolve }: { r: Row; role: 'admin' | 'editor'; 
           <button className="btn" onClick={() => onResolve(r, 'actioned', note)}>
             Mark actioned
           </button>
-          {r.target_type === 'review' && !r.review_hidden && (
+          {REMOVE[r.target_type] && !r.review_hidden && !['removed', 'inactive'].includes(r.listing_status ?? '') && (
             <button className="btn primary" onClick={() => onResolve(r, 'actioned', note, true)}>
-              Hide review
-            </button>
-          )}
-          {r.target_type === 'listing' && r.listing_status !== 'removed' && (
-            <button className="btn primary" onClick={() => onResolve(r, 'actioned', note, true)}>
-              Remove listing
+              {REMOVE[r.target_type]!.label}
             </button>
           )}
         </div>

@@ -29,7 +29,8 @@ export default function GetTheAppPage() {
         <div className="page-title">
           <h1 style={{ fontSize: 'clamp(32px, 5vw, 48px)' }}>PickleDeals for iPhone</h1>
           <p className="sub" style={{ fontSize: 18, lineHeight: 1.5 }}>
-            Everything on the website, plus price alerts, saves, and pre-owned chat and offers.
+            Everything on the website, plus price alerts, saves, and pre-owned chat and offers. Sign up free with Apple, Google
+            or email. No password needed.
           </p>
         </div>
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>

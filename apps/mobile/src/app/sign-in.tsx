@@ -101,7 +101,7 @@ export default function SignInSheet() {
 
   return (
     <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, padding: 24, paddingTop: 32, gap: 14 }}>
-      <Text variant="title1">{step === 'code' ? 'Check your email' : 'Sign in'}</Text>
+      <Text variant="title1">{step === 'code' ? 'Check your email' : 'Sign in or create an account'}</Text>
       <Text variant="body" tone="secondary">
         {subtitle}
       </Text>
@@ -131,6 +131,9 @@ export default function SignInSheet() {
             disabled={busy}
             fullWidth
           />
+          <Text variant="footnote" tone="secondary" align="center" style={{ marginTop: 4 }}>
+            New to PickleDeals? Any of these creates your account. No password needed.
+          </Text>
         </View>
       ) : step === 'email' ? (
         <View style={{ gap: 12, marginTop: 8 }}>

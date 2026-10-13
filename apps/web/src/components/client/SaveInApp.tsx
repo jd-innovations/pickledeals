@@ -79,6 +79,7 @@ function SaveDialog({ ask, siteUrl, onClose }: { ask: Ask; siteUrl: string; onCl
           </p>
           <p style={{ fontSize: 15, fontWeight: 600 }}>{ask.title}</p>
           <ul className="perks">
+            <li>Sign up free with Apple, Google or email, no password</li>
             <li>Save products, deals and listings</li>
             <li>Price alerts when your target is hit</li>
             <li>Message sellers and make offers</li>
@@ -88,7 +89,7 @@ function SaveDialog({ ask, siteUrl, onClose }: { ask: Ask; siteUrl: string; onCl
               Open in the app
             </a>
             <a className="btn btn-primary btn-sm desktop-only" href="/app">
-              Get the app
+              Get the app, free
             </a>
             <button type="button" className="btn btn-secondary btn-sm" onClick={onClose}>
               Not now

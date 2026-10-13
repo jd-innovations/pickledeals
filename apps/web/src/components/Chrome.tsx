@@ -17,7 +17,7 @@ export function SiteHeader() {
     <>
       <div className="appbar-strip">
         <div className="wrap">
-          <span>Price alerts, saves and pre-owned chat live in the app.</span>
+          <span>Price alerts, saves and pre-owned chat live in the app. Sign up free, no password needed.</span>
           <Link href="/app">Get PickleDeals for iPhone ›</Link>
         </div>
       </div>

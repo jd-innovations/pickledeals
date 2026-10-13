@@ -18,7 +18,7 @@ Audit of Oct 11, 2026. Goal: PickleDeals on TestFlight this week.
    so the fix is on Apple's side. In order:
    1. Run the interactive production build (blocker 3). It makes fresh signing profiles with every capability;
       stale profiles are a common cause of this message. Install it and try Continue with Apple.
-      **Tried Oct 12: still fails** (no Apple request reached Supabase).
+      **Tried Oct 12: still fails** (no Apple request reached Supabase). Then toggled the capability (step 2) and built 3 with a new profile.
    2. Still failing: Apple Developer → Identifiers → `app.pickledeals` → untick **Sign In with Apple** → Save →
       tick it again (Enable as a primary App ID) → Save → build again.
    3. Still failing: Apple Developer Technical Support (the known new-App-ID problem only Apple can reset; a draft
@@ -49,7 +49,7 @@ Audit of Oct 11, 2026. Goal: PickleDeals on TestFlight this week.
    Apple sign-in: `cd apps/mobile` → `npx eas-cli build --profile production --platform ios` → sign in when asked.
    Same reason the postponed preview build failed (build `d6293119`). Make a new preview build the same way so
    the build on your phone matches.
-4. ⬜ 👤 **App record in App Store Connect** (bundle ID `app.pickledeals`, SKU e.g. `pickledeals-ios`, name
+4. ✅ **App record in App Store Connect** (created by EAS Submit Oct 12; Apple ID 6822097934, now in `eas.json`) (bundle ID `app.pickledeals`, SKU e.g. `pickledeals-ios`, name
    "PickleDeals"). EAS Submit can create it during the first `npx eas-cli submit --platform ios --latest`, or create
    it at appstoreconnect.apple.com → Apps → +. Note the Apple ID number it gets (for `eas.json` → `submit.production.ios.ascAppId`, 🛠).
 5. ⬜ 👤 **Reviewer sign-in (external stage only).** Sign-in is an emailed code, which the reviewer can't receive.

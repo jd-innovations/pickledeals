@@ -12,7 +12,9 @@ Audit of Oct 11, 2026. Goal: PickleDeals on TestFlight this week.
 
 ## Blockers
 
-1. ⬜ 👤 **Fix Sign in with Apple** (owner decision Oct 11: must work before TestFlight). It still fails on device with
+1. ✅ **Fix Sign in with Apple** (owner decision Oct 11: must work before TestFlight). **Fixed Oct 12, build 3**: toggling
+   the capability on the App ID (step 2) plus a new provisioning profile; first Apple sign-in reached Supabase.
+   Original notes: It still fails on device with
    "Sign Up Not Complete" in Apple's own sheet (open since Oct 3; no Apple sign-in has ever reached the live
    backend). Supabase is already set up for it (Apple on, client ID `app.pickledeals`; an iPhone app needs no secret),
    so the fix is on Apple's side. In order:

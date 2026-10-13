@@ -20,13 +20,20 @@ Answer **Y** if it asks. It should list exactly those three migrations.
 npx.cmd supabase functions deploy dispatch-emails
 ```
 
-## 3. Tell Claude "pushed"
+## 3. Website
+
+The website changes (ratings on seller and listing pages, "Report … in the app" links) are committed on `main`
+but not pushed to GitHub yet (local `main` is ahead of `origin`). They go live with the next website deploy.
+They're safe before or after step 1: without the new database functions the pages simply show no rating.
+Tell Claude whether to push `main`.
+
+## 4. Tell Claude "pushed"
 
 Claude then:
 - checks the hosted database (brand matching, brand counts, reviews functions);
 - sends one app update to TestFlight build 3 with the brand filter, seller reviews and problem reports.
 
-## 4. Test on the phone (after the update)
+## 5. Test on the phone (after the update)
 
 1. Fully close PickleDeals, open it, wait a few seconds, close and reopen.
 2. Marketplace → Filters: brands with listings first, **More brands** shows all.

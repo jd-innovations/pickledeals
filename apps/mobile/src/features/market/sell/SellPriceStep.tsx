@@ -1,8 +1,8 @@
 import { formatPrice, radius } from '@pickledeals/shared';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { useEffect } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Pressable, Text as RNText, StyleSheet, TextInput, View, type TextInputProps, type TextStyle } from 'react-native';
 
 import { useTheme } from '@/design/theme';
 import { Text, Toggle } from '@/ui';
@@ -14,6 +14,30 @@ import { SellFrame } from './SellFrame';
 const STEP = 500;
 const round5 = (c: number) => Math.max(STEP, Math.round(c / STEP) * STEP);
 const dollars = (c: number | null) => (c == null ? '' : String(Math.round(c / 100)));
+/** The 56 pt price is already the largest text in the app; let it grow a little with Dynamic Type, not 2×. */
+const PRICE_SCALE = 1.2;
+
+/**
+ * A one-line TextInput as wide as its text (or placeholder) at the current Dynamic Type size.
+ * iOS doesn't size TextInput to its content, so an invisible copy of the text is measured instead.
+ */
+function FitInput({ style, minWidth = 0, ...props }: TextInputProps & { style: TextStyle; minWidth?: number }) {
+  const [width, setWidth] = useState(0);
+  return (
+    <View>
+      <View aria-hidden pointerEvents="none" style={styles.measure}>
+        <RNText
+          numberOfLines={1}
+          maxFontSizeMultiplier={props.maxFontSizeMultiplier}
+          onLayout={(e) => setWidth(Math.ceil(e.nativeEvent.layout.width))}
+          style={style}>
+          {props.value || props.placeholder || '0'}
+        </RNText>
+      </View>
+      <TextInput {...props} style={[style, { width: Math.max(minWidth, width + 4) }]} />
+    </View>
+  );
+}
 
 /** Step 4 — price, with the best verified new price and what used sells for as the guide. */
 export default function SellPriceStep() {
@@ -85,11 +109,12 @@ export default function SellPriceStep() {
           </Text>
         </Pressable>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text variant="priceDisplay" style={{ fontSize: 56, lineHeight: 64 }}>
+          <Text variant="priceDisplay" maxFontSizeMultiplier={PRICE_SCALE} style={{ fontSize: 56, lineHeight: 64 }}>
             $
           </Text>
-          <TextInput
+          <FitInput
             accessibilityLabel="Price in dollars"
+            maxFontSizeMultiplier={PRICE_SCALE}
             value={dollars(price)}
             onChangeText={(t) => {
               const d = t.replace(/[^\d]/g, '').slice(0, 5);
@@ -98,7 +123,7 @@ export default function SellPriceStep() {
             keyboardType="number-pad"
             placeholder="0"
             placeholderTextColor={colors.textTertiary}
-            style={{ width: Math.max(1, dollars(price).length) * 33 + 6, fontSize: 56, fontWeight: '700', letterSpacing: -2.4, color: colors.textPrimary, padding: 0, fontVariant: ['tabular-nums'] }}
+            style={{ fontSize: 56, fontWeight: '700', letterSpacing: -2.4, color: colors.textPrimary, padding: 0, fontVariant: ['tabular-nums'] }}
           />
         </View>
         <Pressable accessibilityRole="button" accessibilityLabel="Increase by $5" onPress={() => bump(STEP)} style={[styles.step, { backgroundColor: colors.chip }]}>
@@ -198,8 +223,9 @@ export default function SellPriceStep() {
             <Text variant="subhead" tone="secondary">
               $
             </Text>
-            <TextInput
+            <FitInput
               accessibilityLabel="Hide offers below, in dollars"
+              minWidth={44}
               value={dollars(draft.hideBelowCents)}
               onChangeText={(t) => {
                 const d = t.replace(/[^\d]/g, '').slice(0, 5);
@@ -208,7 +234,7 @@ export default function SellPriceStep() {
               keyboardType="number-pad"
               placeholder="None"
               placeholderTextColor={colors.textTertiary}
-              style={{ width: 70, fontSize: 15, color: colors.textPrimary, padding: 0, textAlign: 'right', fontVariant: ['tabular-nums'] }}
+              style={{ fontSize: 15, color: colors.textPrimary, padding: 0, textAlign: 'right', fontVariant: ['tabular-nums'] }}
             />
           </View>
         )}
@@ -226,4 +252,6 @@ const styles = StyleSheet.create({
   knob: { width: 14, height: 14, borderRadius: 7, borderWidth: 3, marginTop: 2 },
   preset: { flex: 1, minHeight: 56, borderRadius: 14, alignItems: 'center', justifyContent: 'center', gap: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12 },
+  // Wide, invisible box so the measured text is never limited by the input it sizes.
+  measure: { position: 'absolute', top: 0, left: 0, width: 1000, flexDirection: 'row', opacity: 0 },
 });

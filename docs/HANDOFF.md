@@ -130,6 +130,9 @@ Paste this into a new session, or say: "Read docs/HANDOFF.md and continue."
   EXPO_PUBLIC_SUPABASE_ANON_KEY=<publishable key from eas.json> npx eas-cli update --channel preview --environment preview
   --platform ios --message "…" --non-interactive`; then check `dist/_expo/static/js/ios/*.hbc` contains the hosted URL.
   First OTA (Oct 6): deal CTA/promo row fix, update group 9e1577a4….
+- **OTA to TestFlight (production channel):** same, with `APP_ENV=production`, the hosted URL/key and both
+  `EXPO_PUBLIC_GOOGLE_*_CLIENT_ID` values from eas.json, `--channel production --environment production`. Check the
+  .hbc has the hosted URL and no `:54321`. First one Oct 12 (sell price field), update group 5e925044….
 - **Email:** paid Resend plan; open question: which sending domain.
 - **CI:** check the GitHub run after each push (public API:
   `https://api.github.com/repos/jd-innovations/pickledeals/actions/runs?head_sha=<sha>`); `gh` isn't installed.

@@ -198,6 +198,13 @@ export async function fetchListingCells(ids: string[]): Promise<Map<string, { la
   return new Map(data.map((r) => [r.listing_id, geohashCenter(r.geohash6)]));
 }
 
+/** Active listings per brand (slug → count), for ordering the brand filter. */
+export async function fetchMarketBrandCounts(): Promise<Map<string, number>> {
+  const { data, error } = await requireSupabase().rpc('market_brand_counts');
+  if (error) throw error;
+  return new Map(data.map((r) => [r.slug, r.listings]));
+}
+
 export function listingImageUrl(path: string): string {
   return requireSupabase().storage.from('listing-images').getPublicUrl(path).data.publicUrl;
 }

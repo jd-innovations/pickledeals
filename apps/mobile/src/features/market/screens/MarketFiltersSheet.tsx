@@ -1,6 +1,6 @@
 import { dollarsToCents, LISTING_CONDITIONS, radius } from '@pickledeals/shared';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
@@ -9,7 +9,7 @@ import { Button, Chip, SegmentedControl, Text, Toggle, SheetScroll } from '@/ui'
 
 import type { MarketSort } from '../api';
 import { RADIUS_OPTIONS } from '../components';
-import { DEFAULT_MARKET_FILTERS, filtersToQuery, useMarket, useMarketFilters, useViewer, type MarketFilters } from '../hooks';
+import { DEFAULT_MARKET_FILTERS, filtersToQuery, useMarket, useMarketBrandCounts, useMarketFilters, useViewer, type MarketFilters } from '../hooks';
 
 const CATEGORIES = [
   { slug: 'paddles', label: 'Paddles' },
@@ -29,6 +29,9 @@ const SORTS: { value: MarketSort; label: string }[] = [
   { value: 'price_desc', label: 'Price ↓' },
 ];
 
+/** Brands shown before "More brands". */
+const BRANDS_SHOWN = 12;
+
 const toDollars = (c?: number) => (c == null ? '' : String(Math.round(c / 100)));
 
 /** Marketplace filters (formSheet, design: "Filters"). Shows the live count before applying. */
@@ -40,6 +43,18 @@ export default function MarketFiltersSheet() {
   const [min, setMin] = useState(toDollars(current.minCents));
   const [max, setMax] = useState(toDollars(current.maxCents));
   const brands = useBrands();
+  const brandCounts = useMarketBrandCounts().data;
+  const [allBrands, setAllBrands] = useState(false);
+
+  // Brands with something for sale first (most listings first), then the rest in catalog order.
+  const orderedBrands = useMemo(
+    () => [...(brands.data ?? [])].sort((a, b) => (brandCounts?.get(b.slug) ?? 0) - (brandCounts?.get(a.slug) ?? 0)),
+    [brands.data, brandCounts],
+  );
+  const visibleBrands = allBrands
+    ? orderedBrands
+    : [...orderedBrands.slice(0, BRANDS_SHOWN), ...orderedBrands.slice(BRANDS_SHOWN).filter((b) => draft.brands.includes(b.slug))];
+  const hiddenBrands = orderedBrands.length - visibleBrands.length;
 
   const parsed: MarketFilters = {
     ...draft,
@@ -106,14 +121,19 @@ export default function MarketFiltersSheet() {
         </View>
       </View>
 
-      {(brands.data?.length ?? 0) > 0 && (
+      {orderedBrands.length > 0 && (
         <View style={{ gap: 10 }}>
           <Text variant="headline">Brand</Text>
           <View style={styles.wrap}>
-            {brands.data!.slice(0, 16).map((b) => (
+            {visibleBrands.map((b) => (
               <Chip key={b.slug} label={b.name} outlined selected={draft.brands.includes(b.slug)} onPress={() => setDraft({ ...draft, brands: toggle(draft.brands, b.slug) })} />
             ))}
           </View>
+          {orderedBrands.length > BRANDS_SHOWN && (
+            <View style={{ alignItems: 'flex-start' }}>
+              <Button label={allBrands ? 'Fewer brands' : `More brands (${hiddenBrands})`} variant="link" size="sm" onPress={() => setAllBrands(!allBrands)} />
+            </View>
+          )}
         </View>
       )}
 

@@ -1566,6 +1566,9 @@ isOneToOne: false
 "mark_promos_verified":
 { Args: { "promo_ids": (string)[] }; Returns: number
                            },
+"market_brand_counts":
+{ Args: Record<PropertyKey, never>; Returns: { "listings": number,"slug": string }[]
+                           },
 "market_feed":
 { Args: { "brand_slugs"?: (string)[],"category_slug"?: string,"conditions"?: (string)[],"ids"?: (string)[],"include_shipping"?: boolean,"lat"?: number,"lng"?: number,"max_cents"?: number,"max_rows"?: number,"min_cents"?: number,"pickup_only"?: boolean,"product"?: string,"q"?: string,"radius_m"?: number,"seller"?: string,"skip"?: number,"sort"?: string,"statuses"?: (string)[],"use_home"?: boolean }; Returns: Json
                            },

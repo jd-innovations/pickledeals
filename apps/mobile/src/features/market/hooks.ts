@@ -9,7 +9,7 @@ import { productArt } from '@/commerce/catalogArt';
 import type { ImageSource } from '@/commerce';
 import { useAuth } from '@/features/auth/authStore';
 
-import { fetchHomeArea, fetchListing, fetchMarket, fetchMarketInBounds, fetchMyListings, fetchPriceGuide, fetchSavedListings, fetchSeller, listingImageUrl, setListingStatus, updateListing, type BoundsQuery, type ListingCardItem, type MarketQuery, type MarketSort } from './api';
+import { fetchHomeArea, fetchListing, fetchMarket, fetchMarketBrandCounts, fetchMarketInBounds, fetchMyListings, fetchPriceGuide, fetchSavedListings, fetchSeller, listingImageUrl, setListingStatus, updateListing, type BoundsQuery, type ListingCardItem, type MarketQuery, type MarketSort } from './api';
 
 export const marketKeys = {
   feed: (q: MarketQuery) => ['market', 'feed', q] as const,
@@ -33,6 +33,8 @@ export function useMarket(q: Omit<MarketQuery, 'origin' | 'useHome'>, enabled = 
   const query: MarketQuery = { ...q, origin: point, useHome: !point && signedIn };
   return useQuery({ queryKey: marketKeys.feed(query), queryFn: () => fetchMarket(query), enabled, placeholderData: keepPreviousData, staleTime: 60_000 });
 }
+
+export const useMarketBrandCounts = () => useQuery({ queryKey: ['market', 'brand-counts'], queryFn: fetchMarketBrandCounts, staleTime: 5 * 60_000 });
 
 /** Listings inside a searched map area (null until the map knows its viewport). */
 export function useMarketInBounds(q: Omit<BoundsQuery, 'origin' | 'useHome'> | null) {

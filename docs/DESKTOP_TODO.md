@@ -3,37 +3,15 @@
 Things only you can run from the PC. Tell Claude when each is done; Claude checks and does the follow-ups.
 Run everything in PowerShell from `C:\dev\pickledeals`.
 
-## 1. Push the database changes (brand filter, seller reviews, problem reports)
+## Done (Oct 13)
 
-Applies `20261101000000_brand_matching.sql`, `20261102000000_seller_reviews.sql` and
-`20261103000000_problem_reports.sql` to the hosted database.
+- Database: `20261101000000_brand_matching`, `20261102000000_seller_reviews`, `20261103000000_problem_reports`
+  pushed and checked on hosted.
+- `dispatch-emails` deployed (version 4, review emails).
+- `main` pushed to GitHub (website changes).
+- App update for build 3 published (update group b2e32dc3…).
 
-```powershell
-cd C:\dev\pickledeals; Get-Content supabase\.env.hosted | ForEach-Object { if ($_ -match '^(\w+)=(.*)$') { Set-Item "env:$($matches[1])" $matches[2] } }; npx.cmd supabase db push --linked
-```
-
-Answer **Y** if it asks. It should list exactly those three migrations.
-
-## 2. Update the email sender (review emails)
-
-```powershell
-npx.cmd supabase functions deploy dispatch-emails
-```
-
-## 3. Website
-
-The website changes (ratings on seller and listing pages, "Report … in the app" links) are committed on `main`
-but not pushed to GitHub yet (local `main` is ahead of `origin`). They go live with the next website deploy.
-They're safe before or after step 1: without the new database functions the pages simply show no rating.
-Tell Claude whether to push `main`.
-
-## 4. Tell Claude "pushed"
-
-Claude then:
-- checks the hosted database (brand matching, brand counts, reviews functions);
-- sends one app update to TestFlight build 3 with the brand filter, seller reviews and problem reports.
-
-## 5. Test on the phone (after the update)
+## Next: test on the phone
 
 1. Fully close PickleDeals, open it, wait a few seconds, close and reopen.
 2. Marketplace → Filters: brands with listings first, **More brands** shows all.

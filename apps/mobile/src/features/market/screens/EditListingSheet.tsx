@@ -1,10 +1,10 @@
 import { dollarsToCents, radius } from '@pickledeals/shared';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Alert, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Alert, StyleSheet, TextInput, View } from 'react-native';
 
 import { useTheme } from '@/design/theme';
-import { Button, Skeleton, Text, Toggle } from '@/ui';
+import { Button, Skeleton, Text, Toggle, SheetScroll } from '@/ui';
 
 import type { MyListing } from '../api';
 import { listingTitle, useListingMutations, useMyListings } from '../hooks';
@@ -71,77 +71,76 @@ function EditForm({ l }: { l: MyListing }) {
   );
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ padding: 20, gap: 18 }} keyboardShouldPersistTaps="handled">
-        <View style={{ gap: 4 }}>
-          <Text variant="title2">Edit listing</Text>
-          <Text variant="footnote" tone="secondary" numberOfLines={1}>
-            {listingTitle(l)}
-          </Text>
-        </View>
+    <SheetScroll
+      contentContainerStyle={{ padding: 20, gap: 18 }}
+      footer={
+        <Button label="Save changes" fullWidth disabled={!valid} loading={update.isPending} onPress={save} />
+      }>
+      <View style={{ gap: 4 }}>
+        <Text variant="title2">Edit listing</Text>
+        <Text variant="footnote" tone="secondary" numberOfLines={1}>
+          {listingTitle(l)}
+        </Text>
+      </View>
 
-        <View style={[styles.field, { backgroundColor: colors.surface }]}>
-          <Text variant="caption" tone="secondary">
-            Price
-          </Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <Text variant="title2">$</Text>
+      <View style={[styles.field, { backgroundColor: colors.surface }]}>
+        <Text variant="caption" tone="secondary">
+          Price
+        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <Text variant="title2">$</Text>
+          <TextInput
+            accessibilityLabel="Price in dollars"
+            value={price}
+            onChangeText={(t) => setPrice(t.replace(/[^\d]/g, ''))}
+            keyboardType="number-pad"
+            style={{ flex: 1, fontSize: 22, fontWeight: '700', color: colors.textPrimary, padding: 0, fontVariant: ['tabular-nums'] }}
+          />
+        </View>
+      </View>
+
+      <View style={[styles.field, { backgroundColor: colors.surface }]}>
+        <Text variant="caption" tone="secondary">
+          Description
+        </Text>
+        <TextInput
+          accessibilityLabel="Description"
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          maxLength={1000}
+          style={{ minHeight: 96, fontSize: 16, lineHeight: 22, color: colors.textPrimary, padding: 0, textAlignVertical: 'top' }}
+        />
+        <Text variant="caption" weight="400" tone="tertiary" align="right" numeric>
+          {description.length} / 1000
+        </Text>
+      </View>
+
+      <View style={[styles.box, { borderColor: colors.border }]}>
+        {toggle('Accept offers', 'Buyers can send structured offers', acceptsOffers, setAcceptsOffers)}
+        {acceptsOffers && (
+          <View style={[styles.row, { borderBottomWidth: 1, borderBottomColor: colors.separator }]}>
+            <Text variant="subhead" weight="600" style={{ flex: 1 }}>
+              Hide offers below
+            </Text>
+            <Text variant="subhead" tone="secondary">
+              $
+            </Text>
             <TextInput
-              accessibilityLabel="Price in dollars"
-              value={price}
-              onChangeText={(t) => setPrice(t.replace(/[^\d]/g, ''))}
+              accessibilityLabel="Hide offers below, in dollars"
+              value={floor}
+              onChangeText={(t) => setFloor(t.replace(/[^\d]/g, ''))}
               keyboardType="number-pad"
-              style={{ flex: 1, fontSize: 22, fontWeight: '700', color: colors.textPrimary, padding: 0, fontVariant: ['tabular-nums'] }}
+              placeholder="None"
+              placeholderTextColor={colors.textTertiary}
+              style={{ width: 70, fontSize: 15, color: colors.textPrimary, padding: 0, textAlign: 'right', fontVariant: ['tabular-nums'] }}
             />
           </View>
-        </View>
-
-        <View style={[styles.field, { backgroundColor: colors.surface }]}>
-          <Text variant="caption" tone="secondary">
-            Description
-          </Text>
-          <TextInput
-            accessibilityLabel="Description"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            maxLength={1000}
-            style={{ minHeight: 96, fontSize: 16, lineHeight: 22, color: colors.textPrimary, padding: 0, textAlignVertical: 'top' }}
-          />
-          <Text variant="caption" weight="400" tone="tertiary" align="right" numeric>
-            {description.length} / 1000
-          </Text>
-        </View>
-
-        <View style={[styles.box, { borderColor: colors.border }]}>
-          {toggle('Accept offers', 'Buyers can send structured offers', acceptsOffers, setAcceptsOffers)}
-          {acceptsOffers && (
-            <View style={[styles.row, { borderBottomWidth: 1, borderBottomColor: colors.separator }]}>
-              <Text variant="subhead" weight="600" style={{ flex: 1 }}>
-                Hide offers below
-              </Text>
-              <Text variant="subhead" tone="secondary">
-                $
-              </Text>
-              <TextInput
-                accessibilityLabel="Hide offers below, in dollars"
-                value={floor}
-                onChangeText={(t) => setFloor(t.replace(/[^\d]/g, ''))}
-                keyboardType="number-pad"
-                placeholder="None"
-                placeholderTextColor={colors.textTertiary}
-                style={{ width: 70, fontSize: 15, color: colors.textPrimary, padding: 0, textAlign: 'right', fontVariant: ['tabular-nums'] }}
-              />
-            </View>
-          )}
-          {toggle('Local pickup', 'Meet up in your area', pickup, setPickup)}
-          {toggle('Will ship', 'You and the buyer arrange postage', ships, setShips, true)}
-        </View>
-      </ScrollView>
-      <View style={[styles.footer, { borderTopColor: colors.separator }]}>
-        <Button label="Save changes" fullWidth disabled={!valid} loading={update.isPending} onPress={save} />
+        )}
+        {toggle('Local pickup', 'Meet up in your area', pickup, setPickup)}
+        {toggle('Will ship', 'You and the buyer arrange postage', ships, setShips, true)}
       </View>
-    </View>
+    </SheetScroll>
   );
 }
 
@@ -149,5 +148,4 @@ const styles = StyleSheet.create({
   field: { padding: 12, paddingHorizontal: 14, borderRadius: radius.card, gap: 6 },
   box: { borderRadius: radius.card, borderWidth: 1 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 14, paddingVertical: 12 },
-  footer: { padding: 16, paddingBottom: 28, borderTopWidth: StyleSheet.hairlineWidth },
 });

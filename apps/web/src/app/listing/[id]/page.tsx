@@ -8,7 +8,8 @@ import { Gallery } from '@/components/client/Gallery';
 import { InAppButton, SaveButton } from '@/components/client/SaveInApp';
 import { Avatar } from '@/components/Avatar';
 import { Icon } from '@/components/Icon';
-import { fetchListing } from '@/data/market';
+import { ratingLine } from '@/components/Reviews';
+import { fetchListing, fetchSellerReviews } from '@/data/market';
 import { productArt } from '@/lib/art';
 import { conditionLabel } from '@/lib/copy';
 import { listingHref, productHref, sellerHref } from '@/lib/links';
@@ -39,6 +40,7 @@ export default async function ListingPage({ params }: Props) {
   const { id } = await params;
   const l = valid(id) ? await fetchListing(id) : null;
   if (!l) notFound();
+  const sellerReviews = await fetchSellerReviews(l.seller.id, 1);
   const title = [l.brand, l.title, l.variantLabel].filter(Boolean).join(' ');
   const save = l.bestNewCents != null && l.bestNewCents > l.priceCents ? l.bestNewCents - l.priceCents : null;
   const path = listingHref(l.id);
@@ -99,7 +101,7 @@ export default async function ListingPage({ params }: Props) {
             <span style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
               <b style={{ fontSize: 16 }}>{l.seller.name}</b>
               <span className="muted num" style={{ fontSize: 13 }}>
-                {[`Member since ${new Date(l.seller.memberSince).getFullYear()}`, l.seller.areaLabel].filter(Boolean).join(' · ')}
+                {[ratingLine(sellerReviews), `Member since ${new Date(l.seller.memberSince).getFullYear()}`, l.seller.areaLabel].filter(Boolean).join(' · ')}
               </span>
             </span>
             <Icon name="chevronRight" size={16} stroke={2.2} />
@@ -131,6 +133,9 @@ export default async function ListingPage({ params }: Props) {
               </span>
             </div>
           )}
+          <InAppButton title={title} path={path} action="report" className="text-btn">
+            Report this listing in the app
+          </InAppButton>
         </div>
       </div>
     </main>

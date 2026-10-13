@@ -4,7 +4,10 @@ import { notFound } from 'next/navigation';
 
 import { Avatar } from '@/components/Avatar';
 import { ListingCard } from '@/components/Cards';
-import { fetchSeller } from '@/data/market';
+import { InAppButton } from '@/components/client/SaveInApp';
+import { ratingLine, ReviewList } from '@/components/Reviews';
+import { fetchSeller, fetchSellerReviews } from '@/data/market';
+import { sellerHref } from '@/lib/links';
 
 export const revalidate = 300;
 
@@ -19,10 +22,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: `${s.name}’s pre-owned gear`, robots: { index: false } };
 }
 
-/** Seller's public profile: display name, member since, area, and their live listings. */
+/** Seller's public profile: display name, rating, member since, area, live listings and reviews. */
 export default async function SellerPage({ params }: Props) {
   const { id } = await params;
-  const s = valid(id) ? await fetchSeller(id) : null;
+  const [s, reviews] = valid(id) ? await Promise.all([fetchSeller(id), fetchSellerReviews(id)]) : [null, null];
   if (!s) notFound();
   return (
     <main className="page tight wrap">
@@ -35,7 +38,7 @@ export default async function SellerPage({ params }: Props) {
         <Avatar name={s.name} path={s.avatarPath} size={72} />
         <div className="page-title">
           <h1>{s.name}</h1>
-          <p className="sub num">{[`Member since ${new Date(s.memberSince).getFullYear()}`, s.areaLabel, `${s.listings.length} ${s.listings.length === 1 ? 'listing' : 'listings'}`].filter(Boolean).join(' · ')}</p>
+          <p className="sub num">{[ratingLine(reviews), `Member since ${new Date(s.memberSince).getFullYear()}`, s.areaLabel, `${s.listings.length} ${s.listings.length === 1 ? 'listing' : 'listings'}`].filter(Boolean).join(' · ')}</p>
         </div>
       </section>
       {s.listings.length ? (
@@ -50,6 +53,22 @@ export default async function SellerPage({ params }: Props) {
           <p>{s.name} has nothing for sale at the moment.</p>
         </div>
       )}
+      {reviews && reviews.count > 0 && (
+        <section style={{ display: 'flex', flexDirection: 'column', gap: 4, maxWidth: 720 }}>
+          <h2 style={{ fontSize: 22 }} className="num">
+            Reviews · {ratingLine(reviews)}
+          </h2>
+          <ReviewList reviews={reviews} />
+          {reviews.count > reviews.items.length && (
+            <p className="faint num" style={{ fontSize: 13 }}>
+              Showing the newest {reviews.items.length} of {reviews.count}.
+            </p>
+          )}
+        </section>
+      )}
+      <InAppButton title={s.name} path={sellerHref(s.id)} action="report" className="text-btn">
+        Report this seller in the app
+      </InAppButton>
     </main>
   );
 }

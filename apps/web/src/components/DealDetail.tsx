@@ -14,7 +14,7 @@ import { DealCard } from './Cards';
 import { Icon } from './Icon';
 import { GetDealButton, ShareButton } from './client/Actions';
 import { Gallery } from './client/Gallery';
-import { SaveButton } from './client/SaveInApp';
+import { InAppButton, SaveButton } from './client/SaveInApp';
 
 export type DealData = {
   offer: RankedOffer;
@@ -178,6 +178,9 @@ export async function DealDetail({ data, headingLevel = 'h1' }: { data: DealData
             Opens {o.retailer.name} in a new tab{o.promo && !o.codeAutoApplied ? '. The code is copied for you' : ''}. PickleDeals doesn’t handle checkout. {AFFILIATE_DISCLOSURE}
             {data.disclosure ? ` ${data.disclosure}` : ''}
           </p>
+          <InAppButton title={`${p.brand.name} ${name} at ${o.retailer.name}`} path={dealHref(o.offerId)} action="report" className="text-btn">
+            Wrong price or code? Report it in the app
+          </InAppButton>
         </div>
       </div>
       {similar.length > 0 && (

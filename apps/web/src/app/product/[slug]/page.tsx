@@ -8,14 +8,14 @@ import { Description } from '@/components/Description';
 import { PriceChart } from '@/components/PriceChart';
 import { GetDealButton, ShareButton } from '@/components/client/Actions';
 import { Gallery } from '@/components/client/Gallery';
-import { SaveButton } from '@/components/client/SaveInApp';
+import { InAppButton, SaveButton } from '@/components/client/SaveInApp';
 import { fetchProduct } from '@/data/catalog';
 import { fetchDeals } from '@/data/deals';
 import { fetchMarket } from '@/data/market';
 import { fetchLivePromos, fetchPriceHistory, fetchProductOffers } from '@/data/offers';
 import { productArt } from '@/lib/art';
 import { AFFILIATE_DISCLOSURE, dealButtonLabel, deltaLabel, monogram, offerDetail, ownershipDisclosure, QUALITY_LABEL, qualityDetail, UNTRACKED_NOTE } from '@/lib/copy';
-import { brandHref, categoryHref, productHref } from '@/lib/links';
+import { brandHref, categoryHref, dealHref, productHref } from '@/lib/links';
 import { goUrl, SITE_URL, storageUrl } from '@/lib/urls';
 
 export const revalidate = 300;
@@ -184,6 +184,11 @@ export default async function ProductPage({ params, searchParams }: Props) {
               <span className="muted" style={{ fontSize: 12 }}>
                 {AFFILIATE_DISCLOSURE}
               </span>
+              {best && (
+                <InAppButton title={`${name} at ${best.retailer.name}`} path={dealHref(best.offerId)} action="report" className="text-btn">
+                  Wrong price or code? Report it in the app
+                </InAppButton>
+              )}
             </div>
           </div>
         </div>

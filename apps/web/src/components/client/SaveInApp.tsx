@@ -11,7 +11,7 @@ import { Icon } from '../Icon';
  * and explain that saves, alerts and chat live in the app). Desktop shows a QR code that opens the
  * same page on an iPhone; phones get a sheet with "Open in the app".
  */
-type Ask = { title: string; path: string; action: 'save' | 'alert' | 'follow' | 'message' | 'offer' };
+type Ask = { title: string; path: string; action: 'save' | 'alert' | 'follow' | 'message' | 'offer' | 'report' };
 
 const COPY: Record<Ask['action'], { title: string; lede: string }> = {
   save: { title: 'Save this in the app', lede: 'Saves, price alerts and pre-owned chat live in the PickleDeals app, so they follow you and can notify you.' },
@@ -19,6 +19,10 @@ const COPY: Record<Ask['action'], { title: string; lede: string }> = {
   follow: { title: 'Follow in the app', lede: 'Follow brands in the PickleDeals app to hear about their new deals.' },
   message: { title: 'Message the seller in the app', lede: 'Chat, offers and meet-up spots happen in the PickleDeals app, so your contact details stay private.' },
   offer: { title: 'Make an offer in the app', lede: 'Offers, counteroffers and chat happen in the PickleDeals app.' },
+  report: {
+    title: 'Report a problem in the app',
+    lede: 'Reports go to our team from the PickleDeals app, so we can follow up. No app? Email support@pickledeals.app with a link to this page.',
+  },
 };
 
 const Ctx = createContext<(ask: Ask) => void>(() => {});

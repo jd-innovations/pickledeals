@@ -248,6 +248,24 @@ export async function fetchListing(id: string): Promise<ListingDetail | null> {
   };
 }
 
+export type SellerReviews = {
+  average: number | null;
+  count: number;
+  items: { id: string; rating: number; body: string | null; createdAt: string; reviewerName: string; reviewerAvatar: string | null; item: string | null }[];
+};
+
+/** A seller's rating and newest reviews (public). Null if it can't be read, so the page still renders. */
+export async function fetchSellerReviews(id: string, limit = 20): Promise<SellerReviews | null> {
+  const { data, error } = await db().rpc('seller_reviews_for', { seller: id, max_rows: limit });
+  if (error || !data) return null;
+  const d = data as { average: number | null; count: number; items: { id: string; rating: number; body: string | null; created_at: string; reviewer_name: string; reviewer_avatar: string | null; item: string | null }[] };
+  return {
+    average: d.average == null ? null : Number(d.average),
+    count: d.count,
+    items: d.items.map((r) => ({ id: r.id, rating: r.rating, body: r.body, createdAt: r.created_at, reviewerName: r.reviewer_name, reviewerAvatar: r.reviewer_avatar, item: r.item })),
+  };
+}
+
 export async function fetchSeller(id: string) {
   const [profile, active] = await Promise.all([
     db().from('profiles').select('id, display_name, member_since, area_label, avatar_path').eq('id', id).maybeSingle(),

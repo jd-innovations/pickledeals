@@ -41,7 +41,9 @@ export default function ProfileScreen() {
     setSigningOut(true);
     try {
       await signOut();
+      haptic.success();
     } catch (e) {
+      haptic.error();
       Alert.alert('Couldn’t sign out', authErrorMessage(e));
     } finally {
       setSigningOut(false);

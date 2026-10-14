@@ -79,10 +79,19 @@ export default function MarketHomeScreen() {
             hitSlop={8}
             style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexShrink: 1 }}>
             <Icon name="pin" size={16} color={colors.textPrimary} />
-            <Text variant="subhead" weight="600" numberOfLines={1} style={{ flexShrink: 1 }} numeric>
-              {areaLabel ? `${areaLabel} · ${radiusLabel(f.radiusM)}` : 'Set location'}
-            </Text>
-            <Icon name="chevronDown" size={14} color={colors.textPrimary} />
+            <View style={{ flexShrink: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text variant="subhead" weight="600" numberOfLines={2} style={{ flexShrink: 1 }}>
+                  {areaLabel ?? 'Set location'}
+                </Text>
+                <Icon name="chevronDown" size={14} color={colors.textPrimary} />
+              </View>
+              {areaLabel && (
+                <Text variant="footnote" weight="400" tone="secondary" numberOfLines={1} numeric>
+                  {f.radiusM == null ? 'Any distance' : `Within ${radiusLabel(f.radiusM)}`}
+                </Text>
+              )}
+            </View>
           </Pressable>
           <View style={{ width: 150 }}>
             <SegmentedControl

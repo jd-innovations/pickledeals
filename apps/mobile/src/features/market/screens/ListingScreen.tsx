@@ -20,7 +20,7 @@ import { Button, DetailTable, ErrorState, Icon, IconButton, Skeleton, Text } fro
 
 import { listingImageUrl, type ListingDetail } from '../api';
 import { conditionLabel, formatDistance, useMarketNav } from '../components';
-import { useListing, useMarket, useSeller } from '../hooks';
+import { useAreaDistance, useListing, useMarket, useSeller } from '../hooks';
 
 const humanize = (key: string) => key.replace(/_/g, ' ').replace(/^\w/, (c) => c.toUpperCase());
 
@@ -47,6 +47,7 @@ export default function ListingScreen() {
   const [page, setPage] = useState(0);
   const [photo, setPhoto] = useState<number | null>(null);
   const sellerAvatar = useAvatarUrl(l?.sellerId);
+  const distanceM = useAreaDistance(l?.areaCenter, feedItem?.distanceM);
 
   if (isError) {
     return (
@@ -61,7 +62,7 @@ export default function ListingScreen() {
   const pics = l ? images(l) : [];
   const own = !!l && l.sellerId === uid;
   const isSaved = saved.listings.has(id);
-  const distance = formatDistance(feedItem?.distanceM ?? null);
+  const distance = formatDistance(distanceM);
   // Single-variant products ("Standard") don't name the variant.
   const variantLabel = feedItem?.hasVariants ? l?.variant?.label : null;
   const fullTitle = l ? [l.product?.brand ?? l.customBrand, l.title, variantLabel].filter(Boolean).join(' ') : '';
@@ -183,7 +184,16 @@ export default function ListingScreen() {
               {l.ships && <DeliveryRow icon="ship" title="Will ship" detail="Buyer and seller arrange postage directly" divider={l.pickup} />}
               {l.areaCenter ? (
                 <View style={{ borderTopWidth: 1, borderTopColor: colors.separator }}>
-                  <AreaMap center={l.areaCenter} height={140} label="Approximate area" areaName={l.areaLabel} />
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={`Map of the approximate area${l.areaLabel ? ` around ${l.areaLabel}` : ''}`}
+                    accessibilityHint="Opens a full-screen map you can move and zoom"
+                    onPress={() => router.push({ pathname: '/area-map/[id]', params: { id: l.id } })}>
+                    <AreaMap center={l.areaCenter} height={140} label="Approximate area" areaName={l.areaLabel} />
+                    <View pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: 'absolute', top: 10, right: 10 }}>
+                      <IconButton icon="map" label="Open map" tone="glass" size={32} onPress={() => {}} />
+                    </View>
+                  </Pressable>
                 </View>
               ) : (
                 <DeliveryRow icon="shield" title="Approximate area" detail="Buyers see the area and a distance — never an address." divider />

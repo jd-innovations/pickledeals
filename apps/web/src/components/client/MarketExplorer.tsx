@@ -7,60 +7,9 @@ import type { ListingCardItem, MapListing } from '@/data/market';
 
 import { ListingCard } from '../Cards';
 
-declare global {
-  interface Window {
-    mapkit?: any;
-  }
-}
+import { isDark, loadMapKit } from './mapkit';
 
-// The full build: the map and annotations are part of the script (the core build loads them separately).
-const MAPKIT_SRC = 'https://cdn.apple-mapkit.com/mk/5.x.x/mapkit.js';
 const US = { lat: 39.5, lng: -98.35 };
-
-let loading: Promise<boolean> | null = null;
-
-/** Loads MapKit JS once, if the site has a MapKit key; resolves false when it doesn't. */
-function loadMapKit(): Promise<boolean> {
-  loading ??= fetch('/api/mapkit-token?check=1')
-    .then((r) => (r.ok ? (r.json() as Promise<{ enabled: boolean }>) : { enabled: false }))
-    .then(
-    (r) =>
-      r.enabled &&
-      new Promise<boolean>((resolve) => {
-        // data-callback runs once MapKit is ready. Reading mapkit.Map throws while its library is
-        // missing, hence the try.
-        (window as unknown as Record<string, () => void>).__pdMapKitReady = () => {
-          const mk = window.mapkit;
-          let ready = false;
-          try {
-            ready = typeof mk?.Map === 'function';
-          } catch {
-            ready = false;
-          }
-          if (!ready) return resolve(false);
-          mk.init({
-            authorizationCallback: (done: (t: string) => void) =>
-              fetch('/api/mapkit-token')
-                .then((t) => t.text())
-                .then(done),
-          });
-          resolve(true);
-        };
-        const s = document.createElement('script');
-        s.src = MAPKIT_SRC;
-        s.crossOrigin = 'anonymous';
-        s.async = true;
-        s.dataset.callback = '__pdMapKitReady';
-        s.onerror = () => resolve(false);
-        document.head.appendChild(s);
-      }),
-    () => false,
-  );
-  return loading;
-}
-
-const isDark = () =>
-  document.documentElement.dataset.theme === 'dark' || (!document.documentElement.dataset.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
 const toCard = (m: MapListing): ListingCardItem => ({
   id: m.id,
@@ -89,13 +38,14 @@ const toCard = (m: MapListing): ListingCardItem => ({
  * the map adds price pins at each listing's public ~1 km cell (D2) and "Search this area" swaps the
  * list for what's in view. Without a MapKit key the list takes the full width.
  */
-export function MarketExplorer({ initial, origin, category }: { initial: ListingCardItem[]; origin: { lat: number; lng: number } | null; category?: string }) {
+export function MarketExplorer({ initial, origin, category, focus }: { initial: ListingCardItem[]; origin: { lat: number; lng: number } | null; category?: string; focus?: string }) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
   const [mapState, setMapState] = useState<'loading' | 'on' | 'off'>('loading');
   const [items, setItems] = useState(initial);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(focus ?? null);
   const [moved, setMoved] = useState(false);
+  const focusPending = useRef(focus ?? null);
   const [busy, setBusy] = useState(false);
 
   const showPins = useCallback((pins: MapListing[]) => {
@@ -120,6 +70,12 @@ export function MarketExplorer({ initial, origin, category }: { initial: Listing
         return a;
       }),
     );
+    // Opened from a listing ("See nearby listings on the map"): select its pin once.
+    const f = m.annotations.find((_: unknown, i: number) => pins[i]?.id === focusPending.current);
+    if (f) {
+      focusPending.current = null;
+      f.selected = true;
+    }
   }, []);
 
   const searchArea = useCallback(
@@ -149,7 +105,7 @@ export function MarketExplorer({ initial, origin, category }: { initial: Listing
       if (!ok || !el.current) return setMapState('off');
       const mk = window.mapkit;
       const center = origin ?? US;
-      const span = origin ? 0.6 : 30;
+      const span = focus ? 0.15 : origin ? 0.6 : 30;
       const m = new mk.Map(el.current, {
         center: new mk.Coordinate(center.lat, center.lng),
         showsCompass: mk.FeatureVisibility.Hidden,
@@ -173,7 +129,7 @@ export function MarketExplorer({ initial, origin, category }: { initial: Listing
       map.current?.destroy();
       map.current = null;
     };
-  }, [origin, searchArea]);
+  }, [origin, focus, searchArea]);
 
   const list = items.length ? (
     <div className={`grid ${mapState === 'off' ? 'g4' : 'g3'}`}>

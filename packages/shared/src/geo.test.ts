@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { geohashCenter, geohashEncode, regionAround, regionBounds, regionZoom, snapToCell, viewportMoved } from './geo';
+import { cellDistanceM, geohashCenter, geohashEncode, regionAround, regionBounds, regionZoom, snapToCell, viewportMoved } from './geo';
 
 describe('geohash', () => {
   it('matches PostGIS ST_GeoHash (pgTAP: 27.336789,-82.531234 → dhv79b)', () => {
@@ -49,5 +49,16 @@ describe('viewport', () => {
     expect(regionZoom({ ...base, longitudeDelta: 360 }, 256)).toBe(0);
     expect(regionZoom(base, 390)).toBeGreaterThan(9);
     expect(regionZoom({ ...base, longitudeDelta: 1e-9 }, 390)).toBe(20);
+  });
+
+  it('measures distance between snapped cells', () => {
+    const bradenton = { lat: 27.4989, lng: -82.5748 };
+    const sarasota = { lat: 27.3364, lng: -82.5307 };
+    expect(cellDistanceM(bradenton, bradenton)).toBe(0);
+    const d = cellDistanceM(bradenton, sarasota);
+    expect(d).toBeGreaterThan(17_000);
+    expect(d).toBeLessThan(20_000);
+    // Moving within the same ~1 km cell doesn't change the answer.
+    expect(cellDistanceM({ lat: 27.4989, lng: -82.5749 }, sarasota)).toBe(d);
   });
 });

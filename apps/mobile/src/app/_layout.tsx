@@ -51,6 +51,7 @@ function RootNavigator() {
         <Stack.Screen name="meetup" options={{ ...sheet, sheetAllowedDetents: [0.9] }} />
         <Stack.Screen name="report" options={{ ...sheet, sheetAllowedDetents: [0.85, 1] }} />
         <Stack.Screen name="rate-seller/[listing]" options={{ ...sheet, sheetAllowedDetents: [0.94] }} />
+        <Stack.Screen name="area-map/[id]" options={{ presentation: 'fullScreenModal', headerShown: false }} />
         <Stack.Screen name="make-offer" options={{ ...sheet, sheetAllowedDetents: [0.94] }} />
         <Stack.Screen name="counter-offer" options={{ ...sheet, sheetAllowedDetents: [0.75, 0.94] }} />
         <Stack.Screen name="listing/[id]" />

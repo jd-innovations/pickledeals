@@ -84,6 +84,18 @@ export const snapToCell = (lat: number, lng: number): LatLng => geohashCenter(ge
 /** Radius (m) of the "approximate area" circle drawn around a cell centre: covers a ~1.2 × 0.6 km cell. */
 export const APPROX_AREA_RADIUS_M = 800;
 
+/**
+ * Great-circle distance in metres between the snapped ~1 km cells of two points (D2: the same
+ * approximation the feed uses, so a listing never reveals more than its area).
+ */
+export function cellDistanceM(a: LatLng, b: LatLng): number {
+  const p = snapToCell(a.lat, a.lng);
+  const q = snapToCell(b.lat, b.lng);
+  const rad = Math.PI / 180;
+  const h = Math.sin(((q.lat - p.lat) * rad) / 2) ** 2 + Math.cos(p.lat * rad) * Math.cos(q.lat * rad) * Math.sin(((q.lng - p.lng) * rad) / 2) ** 2;
+  return 2 * 6_371_000 * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
 const M_PER_DEG_LAT = 111_320;
 
 /** A region that fits a circle of `radiusM` around `center`. */

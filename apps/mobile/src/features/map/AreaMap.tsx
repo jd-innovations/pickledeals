@@ -8,21 +8,27 @@ import { AreaLabel } from './AreaLabel';
 import type { AreaMapProps } from './types';
 
 /**
- * Static "approximate area" map (listing detail, sell Details). Draws a ~1 km circle around the
- * public cell centre and never a pin — there is no exact point to show (D2).
+ * "Approximate area" map (listing detail, sell Details, the full-screen area map). Draws a ~1 km
+ * circle around the public cell centre and never a pin — there is no exact point to show (D2).
+ * Fixed by default; `interactive` lets people pan and zoom around it.
  */
-export function AreaMap({ center, height, label, labelStyle = 'badge', areaName }: AreaMapProps) {
+export function AreaMap({ center, height, label, labelStyle = 'badge', areaName, interactive, fill }: AreaMapProps) {
   const { scheme, colors } = useTheme();
+  const region = regionAround(center, APPROX_AREA_RADIUS_M * (interactive ? 6 : 2.6));
   return (
-    <View style={{ height }} pointerEvents="none" accessible accessibilityLabel={areaName ? `Map of the approximate area around ${areaName}` : 'Map of the approximate area'}>
+    <View
+      style={fill ? { flex: 1 } : { height }}
+      pointerEvents={interactive ? 'auto' : 'none'}
+      accessible={!interactive}
+      accessibilityLabel={areaName ? `Map of the approximate area around ${areaName}` : 'Map of the approximate area'}>
       <MapView
         style={{ flex: 1 }}
-        region={regionAround(center, APPROX_AREA_RADIUS_M * 2.6)}
+        {...(interactive ? { initialRegion: region } : { region })}
         mapType="mutedStandard"
         userInterfaceStyle={scheme}
-        showsPointsOfInterests={false}
-        scrollEnabled={false}
-        zoomEnabled={false}
+        showsPointsOfInterests={!!interactive}
+        scrollEnabled={!!interactive}
+        zoomEnabled={!!interactive}
         pitchEnabled={false}
         rotateEnabled={false}
         toolbarEnabled={false}>

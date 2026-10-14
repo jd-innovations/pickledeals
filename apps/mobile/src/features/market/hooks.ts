@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { ListingCondition } from '@pickledeals/shared';
+import { cellDistanceM, type ListingCondition } from '@pickledeals/shared';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Crypto from 'expo-crypto';
 import { create } from 'zustand';
@@ -10,6 +10,7 @@ import type { ImageSource } from '@/commerce';
 import { useAuth } from '@/features/auth/authStore';
 
 import { fetchHomeArea, fetchListing, fetchMarket, fetchMarketBrandCounts, fetchMarketInBounds, fetchMyListings, fetchPriceGuide, fetchSavedListings, fetchSeller, listingImageUrl, setListingStatus, updateListing, type BoundsQuery, type ListingCardItem, type MarketQuery, type MarketSort } from './api';
+import { quietDevicePoint } from './device';
 
 export const marketKeys = {
   feed: (q: MarketQuery) => ['market', 'feed', q] as const,
@@ -35,6 +36,18 @@ export function useMarket(q: Omit<MarketQuery, 'origin' | 'useHome'>, enabled = 
 }
 
 export const useMarketBrandCounts = () => useQuery({ queryKey: ['market', 'brand-counts'], queryFn: fetchMarketBrandCounts, staleTime: 5 * 60_000 });
+
+/**
+ * Distance to a listing's area: the feed's figure when it has one (device point or saved home area),
+ * else from the phone's last known position if location is already allowed (no prompt). Cell to cell (D2).
+ */
+export function useAreaDistance(center: { lat: number; lng: number } | null | undefined, feedDistanceM: number | null | undefined) {
+  const viewer = useViewer((s) => s.point);
+  const quiet = useQuery({ queryKey: ['device', 'quiet-point'], queryFn: quietDevicePoint, enabled: feedDistanceM == null && !viewer, staleTime: 10 * 60_000 });
+  if (feedDistanceM != null) return feedDistanceM;
+  const from = viewer ?? quiet.data;
+  return center && from ? cellDistanceM(from, center) : null;
+}
 
 /** Listings inside a searched map area (null until the map knows its viewport). */
 export function useMarketInBounds(q: Omit<BoundsQuery, 'origin' | 'useHome'> | null) {

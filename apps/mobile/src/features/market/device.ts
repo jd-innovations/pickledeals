@@ -32,6 +32,18 @@ export async function getDeviceArea(): Promise<DeviceArea | 'denied'> {
   return { lat, lng, label, postalCode };
 }
 
+/**
+ * The device's last known position, only when location is already allowed: never prompts. Used to
+ * show a distance on listings opened outside the feed; it stays on the phone.
+ */
+export async function quietDevicePoint(): Promise<{ lat: number; lng: number } | null> {
+  if (Platform.OS === 'web') return null;
+  const { status } = await Location.getForegroundPermissionsAsync();
+  if (status !== 'granted') return null;
+  const pos = await Location.getLastKnownPositionAsync({ maxAge: 30 * 60_000 });
+  return pos ? { lat: pos.coords.latitude, lng: pos.coords.longitude } : null;
+}
+
 /** "34236" or "Sarasota, FL" → a point (native geocoder; not available on web). */
 export async function geocodeArea(query: string): Promise<DeviceArea | null> {
   if (Platform.OS === 'web') return null;

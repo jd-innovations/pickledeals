@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { ShareButton } from '@/components/client/Actions';
+import { AreaMap } from '@/components/client/AreaMap';
 import { Gallery } from '@/components/client/Gallery';
 import { InAppButton, SaveButton } from '@/components/client/SaveInApp';
 import { Avatar } from '@/components/Avatar';
@@ -125,12 +126,18 @@ export default async function ListingPage({ params }: Props) {
               <Icon name="chevronRight" size={16} stroke={2.2} />
             </Link>
           )}
-          {l.areaLabel && (
+          {(l.areaLabel || l.areaCenter) && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               <h2 style={{ fontSize: 20 }}>Area</h2>
+              {l.areaCenter && <AreaMap center={l.areaCenter} areaName={l.areaLabel} />}
               <span className="muted" style={{ fontSize: 13 }}>
-                {l.areaLabel} · shown to about 1 km. The exact spot is shared privately in chat.
+                {l.areaLabel ? `${l.areaLabel} · ` : ''}shown to about 1 km. The exact spot is shared privately in chat.
               </span>
+              {l.areaCenter && l.status === 'active' && (
+                <Link href={`/marketplace?near=${l.areaCenter.lat.toFixed(4)},${l.areaCenter.lng.toFixed(4)}&focus=${l.id}`} className="text-btn">
+                  See nearby listings on the map
+                </Link>
+              )}
             </div>
           )}
           <InAppButton title={title} path={path} action="report" className="text-btn">

@@ -34,6 +34,10 @@ export type AreaMapProps = {
   labelStyle?: 'badge' | 'title';
   /** Place name for screen readers ("Lakewood Ranch, FL"). */
   areaName?: string | null;
+  /** Pan and zoom (the full-screen area map). Off: a fixed snapshot. */
+  interactive?: boolean;
+  /** Fill the parent instead of a fixed height. */
+  fill?: boolean;
 };
 
 export type SpotMapProps = { point: LatLng; height: number };

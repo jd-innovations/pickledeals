@@ -1,6 +1,6 @@
 import { formatPrice, regionAround, type MapRegion } from '@pickledeals/shared';
 import { useQuery } from '@tanstack/react-query';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useDeferredValue, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -21,6 +21,10 @@ const TAB_BAR = 49;
 
 /** Marketplace map (designs: MarketMap, MapPreview, DarkMap). Pins sit on public ~1 km cell centres (D2). */
 export default function MarketMapScreen() {
+  // "See nearby listings" from a listing's area map: open on that area with the listing selected.
+  const params = useLocalSearchParams<{ lat?: string; lng?: string; focus?: string }>();
+  const target = Number.isFinite(Number(params.lat)) && Number.isFinite(Number(params.lng)) && params.lat && params.lng ? { lat: Number(params.lat), lng: Number(params.lng) } : null;
+  const targetKey = target ? `${target.lat},${target.lng},${params.focus ?? ''}` : null;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -34,17 +38,24 @@ export default function MarketMapScreen() {
 
   // Where to open: the device's area; else the nearest listing's cell (which also covers a saved
   // home area — the client can't read that point); else, for guests, the newest listings' extent.
-  const opening = useMarket({ ...filtersToQuery(DEFAULT_MARKET_FILTERS), radiusM: null, sort: 'nearest', limit: 20 }, !viewer);
+  const opening = useMarket({ ...filtersToQuery(DEFAULT_MARKET_FILTERS), radiusM: null, sort: 'nearest', limit: 20 }, !viewer && !target);
   const openIds = opening.data ? (opening.data.hasOrigin ? opening.data.items.slice(0, 1) : opening.data.items).map((l) => l.id) : [];
   const cells = useQuery({ queryKey: ['market', 'cells', openIds], queryFn: () => fetchListingCells(openIds), enabled: openIds.length > 0, staleTime: Infinity });
-  const initial: MapRegion | null = viewer
-    ? regionAround(viewer, VIEW_RADIUS_M)
+  const initial: MapRegion | null = target
+    ? regionAround(target, VIEW_RADIUS_M)
+    : viewer
+      ? regionAround(viewer, VIEW_RADIUS_M)
     : opening.isPending || (openIds.length > 0 && cells.isPending)
       ? null
       : cells.data?.size
         ? fitRegion([...cells.data.values()])
         : CONTIGUOUS_US;
-  if (initial && !viewport.current) viewport.reset(initial);
+  // A new target (the tab may already be open) re-centres the search; the map remounts on it below.
+  const [appliedTarget, setAppliedTarget] = useState<string | null>(null);
+  if (initial && (!viewport.current || (targetKey && appliedTarget !== targetKey))) {
+    viewport.reset(initial);
+    if (targetKey) setAppliedTarget(targetKey);
+  }
 
   const q = filtersToQuery(f);
   const result = useMarketInBounds(
@@ -54,16 +65,24 @@ export default function MarketMapScreen() {
   const pins = useMemo<MapPin[]>(() => items.map((l) => ({ id: l.id, point: l.point, label: formatPrice(l.priceCents) })), [items]);
 
   // Preview carousel: the tapped listing first, then its neighbours (or everything in a tapped cell).
-  const [cards, setCards] = useState<{ ids: string[]; index: number } | null>(null);
+  const [picked, setPicked] = useState<{ ids: string[]; index: number } | null>(null);
+  const [focusClosed, setFocusClosed] = useState<string | null>(null);
   const byId = useMemo(() => new Map(items.map((l) => [l.id, l])), [items]);
+  const near = (at: { lat: number; lng: number }) => [...items].sort((a, b) => dist2(a.point, at) - dist2(b.point, at)).slice(0, 10).map((l) => l.id);
+  // The focused listing's card shows until the person closes it or picks another pin.
+  const focused = params.focus ? byId.get(params.focus) : undefined;
+  const cards = picked ?? (focused && focusClosed !== targetKey ? { ids: near(focused.point), index: 0 } : null);
+  const setCards = (next: { ids: string[]; index: number } | null) => {
+    if (!next) setFocusClosed(targetKey);
+    setPicked(next);
+  };
   const cardItems = (cards?.ids ?? []).map((id) => byId.get(id)).filter((l): l is MapListing => !!l);
   const selected = cardItems[cards?.index ?? 0];
 
   const openPin = (id: string) => {
     const at = byId.get(id)?.point;
     if (!at) return;
-    const near = [...items].sort((a, b) => dist2(a.point, at) - dist2(b.point, at)).slice(0, 10);
-    setCards({ ids: near.map((l) => l.id), index: 0 });
+    setCards({ ids: near(at), index: 0 });
   };
 
   const recentre = () => {
@@ -81,6 +100,7 @@ export default function MarketMapScreen() {
     <View style={{ flex: 1, backgroundColor: colors.mapLand }}>
       {initial && (
         <ListingMap
+          key={targetKey ?? 'default'}
           ref={map}
           initialRegion={initial}
           pins={pins}
@@ -167,7 +187,7 @@ export default function MarketMapScreen() {
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            onMomentumScrollEnd={(e) => setCards((c) => c && { ...c, index: Math.round(e.nativeEvent.contentOffset.x / width) })}>
+            onMomentumScrollEnd={(e) => cards && setPicked({ ...cards, index: Math.round(e.nativeEvent.contentOffset.x / width) })}>
             {cardItems.map((l) => (
               <View key={l.id} style={{ width, paddingHorizontal: 12 }}>
                 <PreviewCard l={l} onPress={() => nav.openListing(l.id)} />

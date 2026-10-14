@@ -11,6 +11,24 @@ Run everything in PowerShell from `C:\dev\pickledeals`.
 - `main` pushed to GitHub (website changes).
 - App update for build 3 published (update group b2e32dc3…).
 
+## Apple email relay (before launch)
+
+People who sign in with Apple and choose **Hide My Email** get an `@privaterelay.appleid.com` address. Apple
+only forwards mail to it from domains you register, so today they get no PickleDeals emails at all (message
+and offer emails, review requests, account notices). The server skips those addresses on purpose until this
+is set up.
+
+1. developer.apple.com → **Certificates, IDs & Profiles** → **Services** (left menu) → **Sign in with Apple
+   for Email Communication** → **Configure** (or **+**).
+2. **Domains and subdomains:** add `pickledeals.app` and `send.pickledeals.app` (Resend sends from the
+   `send.` subdomain, which carries the SPF record). Register.
+3. **Email addresses:** add `notifications@pickledeals.app` (message, offer and review emails) and
+   `no-reply@pickledeals.app` (sign-in codes). Register.
+4. Apple shows a check next to each entry once it verifies SPF. If any shows a warning or failure, send Claude a
+   screenshot (the DNS records live at Hostinger).
+5. Tell Claude "Apple relay registered". Claude then removes the `apple_relay` skip in `claim_pending_emails`
+   (a small migration, so one more `db push` from here) and tests an email to a Hide My Email account.
+
 ## Next: test on the phone
 
 1. Fully close PickleDeals, open it, wait a few seconds, close and reopen.

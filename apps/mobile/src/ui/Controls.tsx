@@ -190,7 +190,7 @@ export function ListRow({
       accessibilityRole={onPress ? 'button' : undefined}
       onPress={onPress}
       style={({ pressed }) => [styles.row, { backgroundColor: pressed && onPress ? colors.surfacePressed : 'transparent' }]}>
-      {icon && <Icon name={icon} size={18} color={colors.textPrimary} />}
+      {icon && <Icon name={icon} size={20} color={colors.textPrimary} />}
       <View style={[styles.rowInner, !last && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.separator }]}>
         <Text variant="body" style={{ flex: 1 }}>
           {title}
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
   segment: { height: 36, borderRadius: radius.control, padding: 2, flexDirection: 'row' },
   segmentItem: { flex: 1, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   search: { minHeight: 44, borderRadius: 22, paddingHorizontal: 14, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 16 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingLeft: 16 },
   rowInner: { flex: 1, minHeight: 50, flexDirection: 'row', alignItems: 'center', gap: 8, paddingRight: 16 },
 });
 

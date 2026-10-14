@@ -339,7 +339,7 @@
    "x": 0,
    "y": 17200,
    "w": 390,
-   "h": 1400,
+   "h": 1300,
    "title": "Profile",
    "radius": 40,
    "is_interactive": true
@@ -358,7 +358,7 @@
    "y": 17200,
    "w": 390,
    "h": 900,
-   "title": "Appearance",
+   "title": "Appearance (retired Oct 14: now inline in Profile)",
    "radius": 40,
    "is_interactive": true
   },

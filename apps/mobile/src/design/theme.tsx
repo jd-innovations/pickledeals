@@ -16,7 +16,8 @@ const STORAGE_KEY = 'pd.appearance';
 const ThemeContext = createContext<ThemeValue | null>(null);
 
 function applyNative(p: AppearancePreference) {
-  Appearance.setColorScheme(p === 'system' ? 'unspecified' : p);
+  // Not implemented by react-native-web; our tokens still switch there.
+  if (typeof Appearance.setColorScheme === 'function') Appearance.setColorScheme(p === 'system' ? 'unspecified' : p);
 }
 
 /**

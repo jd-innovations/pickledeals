@@ -43,6 +43,14 @@ const ICONS = {
   ship: { sf: 'shippingbox', d: 'M3 7h11v9H3z M14 10h4l3 3v3h-7' },
   message: { sf: 'bubble.left', d: 'M20.5 12a8.5 8.5 0 0 1-12.3 7.6L3.5 20.5l1-4.4A8.5 8.5 0 1 1 20.5 12z' },
   sliders: { sf: 'slider.horizontal.3', d: 'M4 7h10 M18 7h2 M4 17h4 M12 17h8' },
+  // Profile rows (approved Oct 14: icons on every row).
+  priceAlert: { sf: 'chart.line.downtrend.xyaxis', d: 'M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z M8 7.5h.01 M12 10v6 M9.5 13.5L12 16l2.5-2.5' },
+  person: { sf: 'person', d: 'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z M4.5 20.5a7.5 7.5 0 0 1 15 0' },
+  help: { sf: 'questionmark.circle', d: 'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17z M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.4v.6 M12 16.8h.01' },
+  doc: { sf: 'doc.text', d: 'M7 3h7l4 4v14H7z M14 3v4h4 M9.5 12h5 M9.5 16h5' },
+  lock: { sf: 'lock', d: 'M6 11h12v9.5H6z M8.5 11V8a3.5 3.5 0 0 1 7 0v3' },
+  info: { sf: 'info.circle', d: 'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17z M12 11v5.5 M12 7.8h.01' },
+  appearance: { sf: 'circle.lefthalf.filled', d: 'M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17z M12 3.5v17' },
 } as const;
 
 export type IconName = keyof typeof ICONS;

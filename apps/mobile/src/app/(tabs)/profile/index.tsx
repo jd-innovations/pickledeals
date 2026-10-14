@@ -12,12 +12,12 @@ import { useAuth } from '@/features/auth/authStore';
 import { useMyOffers, useUnreadThreads } from '@/features/chat/hooks';
 import { useHomeArea, useMyListings } from '@/features/market/hooks';
 import { avatarUrl, changeAvatar, removeAvatar } from '@/features/profile/avatar';
+import { ThemePicker } from '@/features/profile/ThemePicker';
 import { haptic } from '@/lib/haptics';
 import { chooseAction } from '@/lib/dialog';
 import { PersonAvatar } from '@/commerce';
 import { Button, Group, Icon, ListRow, Text } from '@/ui';
 
-const APPEARANCE_LABEL = { system: 'System', light: 'Light', dark: 'Dark' } as const;
 const APP_VERSION = Constants.expoConfig?.version ?? '';
 
 /**
@@ -26,7 +26,7 @@ const APP_VERSION = Constants.expoConfig?.version ?? '';
  * The Location row is the saved home area (approximate, D2) used for "near you" and pre-owned alerts.
  */
 export default function ProfileScreen() {
-  const { colors, preference } = useTheme();
+  const { colors } = useTheme();
   const user = useAuth((s) => s.user);
   const profile = useAuth((s) => s.profile);
   const [signingOut, setSigningOut] = useState(false);
@@ -89,30 +89,30 @@ export default function ProfileScreen() {
       {user && (
         <>
           <Group label="Shopping">
-            <ListRow title="Saved" value={String(saved.products.size + saved.deals.size + saved.listings.size)} onPress={() => router.push('/profile/saved')} />
-            <ListRow title="Price alerts" value={String(alerts.data?.length ?? 0)} onPress={() => router.push('/alerts')} />
-            <ListRow title="Followed brands" value={String(saved.brands.size)} onPress={() => router.push('/profile/brands')} last />
+            <ListRow title="Saved" icon="heart" value={String(saved.products.size + saved.deals.size + saved.listings.size)} onPress={() => router.push('/profile/saved')} />
+            <ListRow title="Price alerts" icon="priceAlert" value={String(alerts.data?.length ?? 0)} onPress={() => router.push('/alerts')} />
+            <ListRow title="Followed brands" icon="star" value={String(saved.brands.size)} onPress={() => router.push('/profile/brands')} last />
           </Group>
           <Group label="Buying & selling">
-            <ListRow title="My listings" value={myListings.data ? String(myListings.data.filter((l) => l.status !== 'sold').length) : undefined} onPress={() => router.push('/profile/listings')} />
-            <ListRow title="Location" value={home.data?.label ?? 'Not set'} onPress={() => router.push('/profile/location')} />
-            <ListRow title="Offers" value={offersWaiting ? `${offersWaiting} to answer` : undefined} onPress={() => router.push('/profile/offers')} />
-            <ListRow title="Messages" value={unreadThreads ? `${unreadThreads} unread` : undefined} onPress={() => router.push('/profile/messages')} last />
+            <ListRow title="My listings" icon="tag" value={myListings.data ? String(myListings.data.filter((l) => l.status !== 'sold').length) : undefined} onPress={() => router.push('/profile/listings')} />
+            <ListRow title="Location" icon="pin" value={home.data?.label ?? 'Not set'} onPress={() => router.push('/profile/location')} />
+            <ListRow title="Offers" icon="hand" value={offersWaiting ? `${offersWaiting} to answer` : undefined} onPress={() => router.push('/profile/offers')} />
+            <ListRow title="Messages" icon="message" value={unreadThreads ? `${unreadThreads} unread` : undefined} onPress={() => router.push('/profile/messages')} last />
           </Group>
         </>
       )}
 
       <Group label="Settings">
-        {user && <ListRow title="Notifications" onPress={() => router.push('/profile/notifications')} />}
-        <ListRow title="Appearance" value={APPEARANCE_LABEL[preference]} onPress={() => router.push('/profile/appearance')} last={!user} />
-        {user && <ListRow title="Account" onPress={() => router.push('/profile/account')} last />}
+        {user && <ListRow title="Notifications" icon="bell" onPress={() => router.push('/profile/notifications')} />}
+        {user && <ListRow title="Account" icon="person" onPress={() => router.push('/profile/account')} />}
+        <ThemePicker />
       </Group>
 
       <Group label="About">
-        <ListRow title="Support" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.support)} />
-        <ListRow title="Terms of Use" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.terms)} />
-        <ListRow title="Privacy Policy" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.privacy)} />
-        <ListRow title="Version" value={APP_VERSION} last />
+        <ListRow title="Support" icon="help" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.support)} />
+        <ListRow title="Terms of Use" icon="doc" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.terms)} />
+        <ListRow title="Privacy Policy" icon="lock" onPress={() => WebBrowser.openBrowserAsync(LEGAL_URLS.privacy)} />
+        <ListRow title="Version" icon="info" value={APP_VERSION} last />
       </Group>
 
       {__DEV__ && (

@@ -51,9 +51,7 @@ export default function ProfileScreen() {
   };
 
   const name = profile?.displayName ?? ' ';
-  const subtitle = profile
-    ? [profile.areaLabel, `member since ${new Date(profile.memberSince).getFullYear()}`].filter(Boolean).join(' · ')
-    : ' ';
+  const memberSince = profile ? `Member since ${new Date(profile.memberSince).getFullYear()}` : ' ';
 
   return (
     <ScrollView
@@ -67,8 +65,13 @@ export default function ProfileScreen() {
             <Text variant="title2" numberOfLines={1}>
               {name}
             </Text>
-            <Text variant="subhead" weight="400" tone="secondary" numberOfLines={1}>
-              {subtitle.charAt(0).toUpperCase() + subtitle.slice(1)}
+            {!!profile?.areaLabel && (
+              <Text variant="subhead" weight="400" tone="secondary" numberOfLines={2}>
+                {profile.areaLabel}
+              </Text>
+            )}
+            <Text variant="subhead" weight="400" tone="secondary" numberOfLines={2} numeric>
+              {memberSince}
             </Text>
           </View>
           <Button label="Edit" variant="secondary" size="sm" onPress={() => router.push('/display-name')} />
